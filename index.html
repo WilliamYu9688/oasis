@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V6.3 稳如磐石版</title>
+    <title>Oasis Bridge - V6.4 X光诊断版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -50,7 +50,7 @@
             <div id="scenario-tag" class="bg-[#d4af37]/20 text-[#d4af37] text-[10px] px-2 py-0.5 rounded inline-block mb-3 uppercase font-bold">LOADING...</div>
             <p class="text-gray-400 text-sm mb-1">请流利朗读：</p>
             <h3 id="target-sentence" class="text-xl font-bold text-white mb-2 leading-tight">加载中...</h3>
-            <p id="target-zh" class="text-sm text-gray-500 mb-4 italic"></p>
+            <div id="target-zh" class="text-sm text-gray-500 mb-4 italic"></div>
             
             <div id="feedback-box" class="min-h-[4rem] p-3 rounded bg-gray-900 border border-gray-700 text-sm text-gray-400 flex items-center justify-center text-center flex-col">
                 <span>准备就绪</span>
@@ -60,42 +60,26 @@
         <button id="mic-btn" onclick="toggleSpeechRecognition()" class="w-full p-5 gold-btn rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-2">
             <span id="mic-text">点击开始录音</span>
         </button>
-        <p class="text-[10px] text-gray-600 mt-4">已启用 Levenshtein 核心打分算法</p>
     </div>
 
     <script>
-        // ==========================================
-        // 0. 核心科技：真实文本相似度计算引擎
-        // ==========================================
         function calculateSimilarity(str1, str2) {
             const s1 = str1.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
             const s2 = str2.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
-            
             if (s1 === s2) return 100;
             if (s1.length === 0 || s2.length === 0) return 0;
-
             const matrix = Array(s2.length + 1).fill(null).map(() => Array(s1.length + 1).fill(null));
             for (let i = 0; i <= s1.length; i++) matrix[0][i] = i;
             for (let j = 0; j <= s2.length; j++) matrix[j][0] = j;
-
             for (let j = 1; j <= s2.length; j++) {
                 for (let i = 1; i <= s1.length; i++) {
                     const indicator = s1[i - 1] === s2[j - 1] ? 0 : 1;
-                    matrix[j][i] = Math.min(
-                        matrix[j][i - 1] + 1, 
-                        matrix[j - 1][i] + 1, 
-                        matrix[j - 1][i - 1] + indicator 
-                    );
+                    matrix[j][i] = Math.min(matrix[j][i - 1] + 1, matrix[j - 1][i] + 1, matrix[j - 1][i - 1] + indicator);
                 }
             }
-            const distance = matrix[s2.length][s1.length];
-            const maxLen = Math.max(s1.length, s2.length);
-            return Math.round((1 - distance / maxLen) * 100);
+            return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
-        // ==========================================
-        // 1 & 2. 云端连接与登录 (已焊死您的真实秘钥)
-        // ==========================================
         let oasisCloud;
         const msgBox = document.getElementById('auth-msg');
         function initSupabase() {
@@ -110,13 +94,10 @@
 
         async function executeAuth() {
             msgBox.innerText = "⏳ 正在响应...";
-            if (!oasisCloud) { 
-                initSupabase(); 
-                if(!oasisCloud) { msgBox.innerText = "❌ 网络核心库未加载，请刷新网页"; return; } 
-            }
+            if (!oasisCloud) { initSupabase(); if(!oasisCloud) return msgBox.innerText = "❌ 网络核心库未加载"; }
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            if(!email || !password) { msgBox.innerText = "⚠️ 请填写邮箱和密码"; return; }
+            if(!email || !password) return msgBox.innerText = "⚠️ 请填写邮箱和密码";
             const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
             if (error) msgBox.innerText = error.message; else enterApp(data.user);
         }
@@ -131,117 +112,101 @@
 
         function doSignOut() { location.reload(); }
 
-        // ==========================================
-        // 3. 提取 DC 动态数据 (带防呆机制)
-        // ==========================================
         let currentPhrase = null;
         async function fetchNewPhrase() {
             if (!oasisCloud) return;
-            const selectedLevel = document.getElementById('level-filter').value;
+            // 【重要修复】强制将下拉菜单的文字 "1" 转换成数学数字 1，防止数据库不认
+            const selectedLevel = parseInt(document.getElementById('level-filter').value); 
             const targetSentenceEl = document.getElementById('target-sentence');
             const targetZhEl = document.getElementById('target-zh');
-            const scenarioTagEl = document.getElementById('scenario-tag');
-            const feedbackBox = document.getElementById('feedback-box');
-            const micBtn = document.getElementById('mic-btn');
             
-            targetSentenceEl.innerText = "🔄 正在从云端抽取...";
+            targetSentenceEl.innerText = "🔄 正在请求数据库...";
             targetZhEl.innerText = "";
             
             try {
-                const { data, error } = await oasisCloud.from('phrases').select('*').eq('difficulty', selectedLevel);
-                if (error) throw error;
+                // 向 Supabase 发起查询
+                const response = await oasisCloud.from('phrases').select('*').eq('difficulty', selectedLevel);
                 
-                if (data && data.length > 0) {
-                    currentPhrase = data[Math.floor(Math.random() * data.length)];
+                if (response.error) throw response.error;
+                
+                if (response.data && response.data.length > 0) {
+                    // 成功拿到数据
+                    currentPhrase = response.data[Math.floor(Math.random() * response.data.length)];
                     targetSentenceEl.innerText = currentPhrase.text_en;
                     targetZhEl.innerText = "中文：" + currentPhrase.text_zh;
-                    scenarioTagEl.innerText = currentPhrase.scenario;
-                    feedbackBox.innerHTML = "<span class='text-gray-400'>准备就绪，请点击录音</span>";
-                    micBtn.disabled = false;
+                    document.getElementById('scenario-tag').innerText = currentPhrase.scenario;
+                    document.getElementById('feedback-box').innerHTML = "<span class='text-gray-400'>准备就绪，请点击录音</span>";
+                    document.getElementById('mic-btn').disabled = false;
                 } else {
+                    // 没拿到数据，开启 X 光诊断模式
                     currentPhrase = null;
-                    targetSentenceEl.innerText = "⚠️ 题库空空如也";
-                    targetZhEl.innerText = "当前难度下暂无语料，请点击上方菜单切换难度！";
-                    scenarioTagEl.innerText = "EMPTY";
-                    feedbackBox.innerHTML = "<span class='text-red-400'>请先切换难度</span>";
-                    micBtn.disabled = true;
+                    targetSentenceEl.innerText = "⚠️ 数据被拦截或为空";
+                    
+                    // 把底层的返回值直接打印到屏幕上！
+                    targetZhEl.innerHTML = `
+                        <div class="text-left bg-black border border-red-900 p-3 rounded-lg mt-2 text-[10px] font-mono text-amber-500">
+                            <strong>[诊断报告]</strong><br>
+                            请求难度级别: ${selectedLevel}<br>
+                            数据库返回值: ${JSON.stringify(response.data)}<br>
+                            <span class="text-red-400 mt-2 block">
+                            如果返回 []：说明 Supabase 里没数据，或者被 RLS 安全策略拦截了！
+                            </span>
+                        </div>
+                    `;
+                    document.getElementById('scenario-tag').innerText = "BLOCKED";
+                    document.getElementById('mic-btn').disabled = true;
                 }
             } catch (err) {
                 console.error("DC 读取错误:", err);
-                targetSentenceEl.innerText = "❌ 语料库连接失败";
+                targetSentenceEl.innerText = "❌ 查询报错";
+                targetZhEl.innerText = `错误详情: ${err.message || JSON.stringify(err)}`;
             }
         }
 
-        // ==========================================
-        // 4. 语音监听与真实打分反馈
-        // ==========================================
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null; let isRecording = false; let isProcessing = false; let isRewarding = false;
-        let watchdog = null;
+        let recognition = null; let isRecording = false; let isProcessing = false; let isRewarding = false; let watchdog = null;
 
         function forceResetUI() {
             clearTimeout(watchdog); isRecording = false; isProcessing = false; isRewarding = false;
-            const micBtn = document.getElementById('mic-btn');
-            micBtn.classList.remove('recording-pulse');
+            document.getElementById('mic-btn').classList.remove('recording-pulse');
             document.getElementById('mic-text').innerText = "点击开始录音";
-            if(currentPhrase) micBtn.disabled = false;
+            if(currentPhrase) document.getElementById('mic-btn').disabled = false;
         }
 
         window.toggleSpeechRecognition = function() {
             if (!SpeechRecognition || isRewarding || isProcessing || !currentPhrase) return;
-
             if (isRecording) {
-                isProcessing = true;
-                document.getElementById('mic-text').innerText = "🔄 正在分析...";
-                document.getElementById('mic-btn').disabled = true;
+                isProcessing = true; document.getElementById('mic-text').innerText = "🔄 正在分析..."; document.getElementById('mic-btn').disabled = true;
                 try { recognition.stop(); } catch(e) {}
                 watchdog = setTimeout(forceResetUI, 4000);
                 return;
             }
-
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            isRecording = true;
-            document.getElementById('mic-btn').classList.add('recording-pulse');
-            document.getElementById('mic-text').innerText = "正在录音... (点击结束)";
+            recognition = new SpeechRecognition(); recognition.lang = 'en-US'; isRecording = true;
+            document.getElementById('mic-btn').classList.add('recording-pulse'); document.getElementById('mic-text').innerText = "正在录音... (点击结束)";
             try { recognition.start(); } catch(e) { forceResetUI(); }
 
             recognition.onresult = (event) => {
                 clearTimeout(watchdog);
                 const spoken = event.results[0][0].transcript;
-                const target = currentPhrase.text_en;
-
-                const realScore = calculateSimilarity(spoken, target);
-                const feedbackBox = document.getElementById('feedback-box');
+                const realScore = calculateSimilarity(spoken, currentPhrase.text_en);
+                const fb = document.getElementById('feedback-box');
 
                 if (realScore >= 90) {
-                    feedbackBox.innerHTML = `
-                        <span class="text-3xl font-black text-green-400 mb-1">${realScore} 分</span>
-                        <span class="text-xs text-gray-400">Excellent! 识别内容: "${spoken}"</span>
-                    `;
+                    fb.innerHTML = `<span class="text-3xl font-black text-green-400 mb-1">${realScore} 分</span><span class="text-xs text-gray-400">识别内容: "${spoken}"</span>`;
                     triggerReward(); 
                 } else if (realScore >= 60) {
-                    feedbackBox.innerHTML = `
-                        <span class="text-3xl font-black text-amber-400 mb-1">${realScore} 分</span>
-                        <span class="text-xs text-gray-400">勉强及格！听到内容: "${spoken}"</span>
-                    `;
+                    fb.innerHTML = `<span class="text-3xl font-black text-amber-400 mb-1">${realScore} 分</span><span class="text-xs text-gray-400">勉强及格！听到内容: "${spoken}"</span>`;
                     forceResetUI();
                 } else {
-                    feedbackBox.innerHTML = `
-                        <span class="text-3xl font-black text-red-400 mb-1">${realScore} 分</span>
-                        <span class="text-xs text-gray-400">差异过大。听到内容: "${spoken}"</span>
-                    `;
+                    fb.innerHTML = `<span class="text-3xl font-black text-red-400 mb-1">${realScore} 分</span><span class="text-xs text-gray-400">听到内容: "${spoken}"</span>`;
                     forceResetUI();
                 }
             };
-            
-            recognition.onerror = forceResetUI;
-            recognition.onend = () => { if(!isRewarding) forceResetUI(); };
+            recognition.onerror = forceResetUI; recognition.onend = () => { if(!isRewarding) forceResetUI(); };
         };
 
         async function triggerReward() {
-            isRewarding = true;
-            document.getElementById('mic-text').innerText = "正在结算奖励...";
+            isRewarding = true; document.getElementById('mic-text').innerText = "正在结算奖励...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
                 const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
@@ -249,9 +214,7 @@
                 await oasisCloud.from('profiles').update({ wallet_balance: newBalance }).eq('id', user.id);
                 document.getElementById('balance').innerText = newBalance.toFixed(2);
                 await fetchNewPhrase(); 
-            } finally {
-                forceResetUI();
-            }
+            } finally { forceResetUI(); }
         }
     </script>
 </body>
