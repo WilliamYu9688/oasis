@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oasis Bridge - V5.0 智能语音引擎</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: -apple-system, sans-serif; }
+        .gold-btn { background: linear-gradient(135deg, #d4af37 0%, #aa8000 100%); color: #000; transition: all 0.3s; }
+        .gold-btn:active { transform: scale(0.95); opacity: 0.9; }
+        .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.1); }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* 录音时的呼吸灯特效 */
+        .recording-pulse { animation: pulse 1.5s infinite; background: #ef4444 !important; color: white !important; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen relative">
+
+    <div id="auth-panel" class="p-8 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
+        <h1 class="text-3xl font-bold text-[#d4af37] mb-2">Oasis Bridge</h1>
+        <p id="auth-subtitle" class="text-gray-500 mb-8 text-sm">欢迎回来，请登录您的云端金库</p>
+        
+        <div class="space-y-4">
+            <input id="email" type="email" placeholder="邮箱地址" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-[#d4af37]">
+            <input id="password" type="password" placeholder="密码" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-[#d4af37]">
+            <input id="confirm-password" type="password" placeholder="再次确认密码 (至少6位)" class="hidden w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-[#d4af37]">
+            
+            <button id="main-auth-btn" onclick="executeAuth()" class="w-full p-4 gold-btn rounded-xl font-bold text-lg shadow-lg">登 录</button>
+            <div class="pt-2">
+                <button onclick="toggleAuthMode()" id="switch-mode-btn" class="text-sm text-[#d4af37] underline hover:text-white transition-colors">没有账号？点击开通金库</button>
+            </div>
+        </div>
+        <p id="auth-msg" class="text-sm text-amber-500 mt-6 min-h-[1.25rem]"></p>
+    </div>
+
+    <div id="app-panel" class="hidden p-6 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
+        <div class="flex justify-between items-center mb-4">
+            <p class="text-gray-400 text-sm">ID: <span id="user-display" class="text-white font-medium"></span></p>
+            <button onclick="doSignOut()" class="text-gray-500 text-xs hover:text-[#d4af37]">退出登录</button>
+        </div>
+
+        <div class="mb-6 p-6 border border-[#d4af37]/20 rounded-2xl bg-black/50 relative overflow-hidden">
+            <p class="text-gray-500 text-xs uppercase tracking-widest mb-1">云端实时账本</p>
+            <h2 class="text-4xl font-black text-[#d4af37]"><span id="balance">0.00</span> <span class="text-lg">AED</span></h2>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-5 mb-6 shadow-inner text-left">
+            <span class="bg-gray-700 text-xs text-gray-300 px-2 py-1 rounded mb-3 inline-block">场景：迪拜商场购物</span>
+            <p class="text-gray-400 text-sm mb-1">请流利读出以下英文：</p>
+            <h3 id="target-sentence" class="text-2xl font-bold text-white mb-2">How much is this</h3>
+            <p class="text-sm text-[#d4af37] mb-4">中文：这个多少钱？</p>
+            
+            <div id="feedback-box" class="min-h-[3rem] p-3 rounded bg-gray-900 border border-gray-700 text-sm text-gray-400 flex items-center justify-center">
+                等待您的发音...
+            </div>
+        </div>
+
+        <button id="mic-btn" onclick="startSpeechRecognition()" class="w-full p-5 gold-btn rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-2">
+            <svg id="mic-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            <span id="mic-text">点击开始录音</span>
+        </button>
+        <p class="text-xs text-gray-500 mt-4">首次点击将请求麦克风权限，完全免费</p>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. 云端基建初始化 (Supabase)
+        // ==========================================
+        let oasisCloud;
+        const msgBox = document.getElementById('auth-msg');
+
+        try {
+            if (window.supabase) {
+                oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
+                msgBox.innerText = "✅ 系统就绪";
+            }
+        } catch (e) { msgBox.innerText = "❌ 网络错误：" + e.message; }
+
+        const authPanel = document.getElementById('auth-panel');
+        const appPanel = document.getElementById('app-panel');
+        const balanceEl = document.getElementById('balance');
+        const userDisplay = document.getElementById('user-display');
+        const confirmPwdInput = document.getElementById('confirm-password');
+        const mainAuthBtn = document.getElementById('main-auth-btn');
+        const switchModeBtn = document.getElementById('switch-mode-btn');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const pwdInput = document.getElementById('password');
+
+        let isLoginMode = true; 
+
+        // ==========================================
+        // 2. 账号与登录逻辑 (复用 V4.8)
+        // ==========================================
+        window.toggleAuthMode = function() {
+            isLoginMode = !isLoginMode; 
+            msgBox.innerText = ""; 
+            if (isLoginMode) {
+                confirmPwdInput.classList.add('hidden');
+                confirmPwdInput.classList.remove('fade-in');
+                mainAuthBtn.innerText = "登 录";
+                switchModeBtn.innerText = "没有账号？点击开通金库";
+                authSubtitle.innerText = "欢迎回来，请登录您的云端金库";
+                pwdInput.placeholder = "密码";
+            } else {
+                confirmPwdInput.classList.remove('hidden');
+                confirmPwdInput.classList.add('fade-in'); 
+                mainAuthBtn.innerText = "注 册 新 账 号";
+                switchModeBtn.innerText = "已有账号？直接登录";
+                authSubtitle.innerText = "只需两步，创建您的专属账本";
+                pwdInput.placeholder = "设置密码 (至少6位)";
+            }
+        };
+
+        window.executeAuth = async function() {
+            if (!oasisCloud) return;
+            if (isLoginMode) await doSignIn(); else await doSignUp();
+        };
+
+        async function doSignUp() {
+            const email = document.getElementById('email').value;
+            const pwd1 = pwdInput.value;
+            const pwd2 = confirmPwdInput.value;
+            if (!email || !pwd1 || !pwd2) return msgBox.innerText = "⚠️ 请完整填写"; 
+            if (pwd1 !== pwd2) return msgBox.innerText = "❌ 密码不一致"; 
+            
+            msgBox.innerText = "⏳ 正在开通...";
+            const { data, error } = await oasisCloud.auth.signUp({ email, password: pwd1 });
+            if (error) { msgBox.innerText = "❌ " + error.message; } 
+            else {
+                msgBox.innerText = "✅ 注册成功！请登录。";
+                pwdInput.value = ''; confirmPwdInput.value = '';
+                setTimeout(toggleAuthMode, 1500);
+            }
+        }
+
+        async function doSignIn() {
+            const email = document.getElementById('email').value;
+            const password = pwdInput.value;
+            if(!email || !password) return msgBox.innerText = "⚠️ 请输入完整信息"; 
+            
+            msgBox.innerText = "⏳ 验证中...";
+            const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
+            if (error) msgBox.innerText = "❌ " + error.message; else enterApp(data.user);
+        }
+
+        async function enterApp(user) {
+            authPanel.classList.add('hidden');
+            appPanel.classList.remove('hidden');
+            userDisplay.innerText = user.email.split('@')[0];
+            const { data, error } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
+            if (data) balanceEl.innerText = data.wallet_balance.toFixed(2);
+        }
+
+        window.doSignOut = async function() {
+            await oasisCloud.auth.signOut();
+            appPanel.classList.add('hidden');
+            authPanel.classList.remove('hidden');
+            msgBox.innerText = "✅ 已登出";
+            document.getElementById('email').value = '';
+            pwdInput.value = ''; confirmPwdInput.value = '';
+            if(!isLoginMode) toggleAuthMode();
+        };
+
+        // ==========================================
+        // 3. 核心引擎：Web Speech API 智能打分系统 (本周重点)
+        // ==========================================
+        const targetSentence = "How much is this"; // 目标句子
+        const micBtn = document.getElementById('mic-btn');
+        const micText = document.getElementById('mic-text');
+        const feedbackBox = document.getElementById('feedback-box');
+        
+        // 兼容不同的浏览器内核
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        window.startSpeechRecognition = function() {
+            if (!SpeechRecognition) {
+                feedbackBox.innerHTML = "<span class='text-red-400'>❌ 您的浏览器不支持语音识别，请使用 Chrome 或 Safari。</span>";
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; // 设置识别语言为英语
+            recognition.interimResults = false; // 只返回最终确定的结果
+            recognition.maxAlternatives = 1;
+
+            // UI 状态：正在录音
+            micBtn.classList.add('recording-pulse');
+            micText.innerText = "正在聆听...";
+            feedbackBox.innerHTML = "<span class='text-white'>请朗读上方的英文句子...</span>";
+
+            // 开始监听麦克风
+            recognition.start();
+
+            // 成功监听到声音并返回结果
+            recognition.onresult = function(event) {
+                const spokenText = event.results[0][0].transcript;
+                
+                // 进行宽容度匹配 (全转小写，去除标点)
+                const cleanSpoken = spokenText.toLowerCase().replace(/[.,!?]/g, "").trim();
+                const cleanTarget = targetSentence.toLowerCase().replace(/[.,!?]/g, "").trim();
+
+                if (cleanSpoken.includes(cleanTarget) || cleanTarget === cleanSpoken) {
+                    // 读对了！
+                    feedbackBox.innerHTML = `✅ <span class="text-green-400">Perfect! 识别结果: "${spokenText}"</span>`;
+                    triggerReward(); // 触发云端打钱逻辑
+                } else {
+                    // 读错了
+                    feedbackBox.innerHTML = `❌ <span class="text-red-400">再试一次！系统听到的是: "${spokenText}"</span>`;
+                }
+            };
+
+            // 录音结束恢复 UI
+            recognition.onspeechend = function() {
+                recognition.stop();
+                resetMicUI();
+            };
+
+            // 错误处理 (比如用户拒绝了麦克风权限)
+            recognition.onerror = function(event) {
+                feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 麦克风出错: ${event.error}</span>`;
+                resetMicUI();
+            };
+        };
+
+        function resetMicUI() {
+            micBtn.classList.remove('recording-pulse');
+            micText.innerText = "点击开始录音";
+        }
+
+        // ==========================================
+        // 4. 商业闭环：读对后向云端申请结算
+        // ==========================================
+        async function triggerReward() {
+            if (!oasisCloud) return;
+            micText.innerText = "正在向云端结算...";
+            micBtn.disabled = true;
+
+            const { data: { user } } = await oasisCloud.auth.getUser();
+            if (!user) return;
+
+            // 获取最新余额并加钱
+            const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
+            const updatedBalance = (profile?.wallet_balance || 0) + 0.35;
+
+            const { error } = await oasisCloud.from('profiles').update({ wallet_balance: updatedBalance }).eq('id', user.id);
+            
+            if (!error) {
+                // 更新页面金库数字，并加个小动画
+                balanceEl.innerText = updatedBalance.toFixed(2);
+                balanceEl.classList.add('fade-in');
+                setTimeout(() => balanceEl.classList.remove('fade-in'), 300);
+            }
+
+            micBtn.disabled = false;
+            micText.innerText = "继续读下一句";
+        }
+    </script>
+</body>
+</html>
