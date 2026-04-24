@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V6.5 交互润滑版</title>
+    <title>Oasis Bridge - V6.8 瞬时分析版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -20,50 +20,45 @@
 <body class="flex items-center justify-center min-h-screen">
 
     <div id="auth-panel" class="p-8 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
-        <h1 class="text-3xl font-bold text-[#d4af37] mb-2 text-center">Oasis Bridge</h1>
-        <p class="text-gray-500 mb-8 text-sm">欢迎回来，请登录您的云端金库</p>
+        <h1 class="text-3xl font-bold text-[#d4af37] mb-2 text-center italic tracking-tighter">Oasis Bridge</h1>
+        <p class="text-gray-500 mb-8 text-sm uppercase tracking-widest">Global Language Indorsement</p>
         <div class="space-y-4">
-            <input id="email" type="email" placeholder="邮箱地址" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white">
-            <input id="password" type="password" placeholder="密码" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white">
-            <button onclick="executeAuth()" class="w-full p-4 gold-btn rounded-xl font-bold">登 录</button>
+            <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white outline-none">
+            <input id="password" type="password" placeholder="Password" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white outline-none">
+            <button onclick="executeAuth()" class="w-full p-4 gold-btn rounded-xl font-bold">ENTER SYSTEM</button>
         </div>
-        <p id="auth-msg" class="text-sm font-medium text-amber-500 mt-6 min-h-[1.25rem]"></p>
+        <p id="auth-msg" class="text-sm font-medium text-amber-500 mt-6"></p>
     </div>
 
     <div id="app-panel" class="hidden p-6 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
         <div class="flex justify-between items-center mb-6">
             <div class="text-left">
-                <p class="text-gray-500 text-xs uppercase tracking-widest">账户余额</p>
-                <h2 class="text-2xl font-black text-[#d4af37]"><span id="balance">0.00</span> AED</h2>
+                <p class="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Cloud Wallet</p>
+                <h2 class="text-2xl font-black text-[#d4af37]"><span id="balance">0.00</span> <span class="text-xs">AED</span></h2>
             </div>
-            <div class="flex flex-col gap-2">
-                <select id="level-filter" onchange="fetchNewPhrase()">
-                    <option value="1">初级练习</option>
-                    <option value="2">中级进阶</option>
-                    <option value="3">高级专家</option>
-                </select>
-                <button onclick="doSignOut()" class="text-gray-500 text-xs hover:text-[#d4af37] text-right">退出登录</button>
-            </div>
+            <select id="level-filter" onchange="fetchNewPhrase()">
+                <option value="1">初级练习 L1</option>
+                <option value="2">中级进阶 L2</option>
+                <option value="3">专家模式 L3</option>
+            </select>
         </div>
         
-        <div class="bg-gray-800 rounded-xl p-5 mb-6 text-left border-l-4 border-[#d4af37]">
-            <div id="scenario-tag" class="bg-[#d4af37]/20 text-[#d4af37] text-[10px] px-2 py-0.5 rounded inline-block mb-3 uppercase font-bold">LOADING...</div>
-            <p class="text-gray-400 text-sm mb-1">请流利朗读：</p>
-            <h3 id="target-sentence" class="text-xl font-bold text-white mb-2 leading-tight">加载中...</h3>
-            <div id="target-zh" class="text-sm text-gray-500 mb-4 italic"></div>
+        <div class="bg-gray-800 rounded-xl p-5 mb-6 text-left border-t border-white/5">
+            <div id="scenario-tag" class="bg-[#d4af37]/20 text-[#d4af37] text-[10px] px-2 py-0.5 rounded inline-block mb-3 uppercase font-bold tracking-widest">Negotiation</div>
+            <h3 id="target-sentence" class="text-xl font-bold text-white mb-2 leading-tight tracking-tight">Fetching...</h3>
+            <div id="target-zh" class="text-sm text-gray-500 mb-6 italic border-l-2 border-[#d4af37] pl-3"></div>
             
-            <div id="feedback-box" class="min-h-[4.5rem] p-3 rounded bg-gray-900 border border-gray-700 text-sm text-gray-400 flex items-center justify-center text-center flex-col transition-all">
-                <span>准备就绪，请点击录音</span>
+            <div id="feedback-box" class="min-h-[5rem] p-3 rounded bg-black/40 border border-white/5 text-sm flex items-center justify-center text-center flex-col transition-all">
+                <span class="text-gray-500 font-bold uppercase tracking-widest">System Ready</span>
             </div>
         </div>
 
         <button id="mic-btn" onclick="toggleSpeechRecognition()" class="w-full p-5 gold-btn rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-2 transition-all">
-            <span id="mic-text">点击开始录音</span>
+            <span id="mic-text">START RECORDING</span>
         </button>
     </div>
 
     <script>
-        // 核心算法
         function calculateSimilarity(str1, str2) {
             const s1 = str1.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
             const s2 = str2.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
@@ -81,28 +76,21 @@
             return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
-        // 云端初始化
         let oasisCloud;
-        const msgBox = document.getElementById('auth-msg');
         function initSupabase() {
             if (window.supabase) {
-                oasisCloud = window.supabase.createClient(
-                    'https://tpawabhfakqpjmepruzx.supabase.co', 
-                    'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB'
-                );
+                oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
             }
         }
         initSupabase();
 
-        // 登录逻辑
         async function executeAuth() {
-            msgBox.innerText = "⏳ 正在响应...";
-            if (!oasisCloud) { initSupabase(); if(!oasisCloud) return msgBox.innerText = "❌ 网络核心库未加载"; }
+            const msg = document.getElementById('auth-msg');
+            msg.innerText = "⏳ VERIFYING...";
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            if(!email || !password) return msgBox.innerText = "⚠️ 请填写邮箱和密码";
             const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-            if (error) msgBox.innerText = error.message; else enterApp(data.user);
+            if (error) msg.innerText = error.message; else enterApp(data.user);
         }
 
         async function enterApp(user) {
@@ -115,129 +103,103 @@
 
         function doSignOut() { location.reload(); }
 
-        // 获取新题
         let currentPhrase = null;
         async function fetchNewPhrase() {
             if (!oasisCloud) return;
-            const selectedLevel = parseInt(document.getElementById('level-filter').value); 
-            const targetSentenceEl = document.getElementById('target-sentence');
-            const targetZhEl = document.getElementById('target-zh');
-            
-            targetSentenceEl.innerText = "🔄 正在请求数据库...";
-            targetZhEl.innerText = "";
-            
+            const level = parseInt(document.getElementById('level-filter').value); 
+            const sentenceEl = document.getElementById('target-sentence');
+            const zhEl = document.getElementById('target-zh');
+            sentenceEl.innerText = "REFRESHING...";
             try {
-                const { data, error } = await oasisCloud.from('phrases').select('*').eq('difficulty', selectedLevel);
-                if (error) throw error;
-                
+                const { data, error } = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
                 if (data && data.length > 0) {
                     currentPhrase = data[Math.floor(Math.random() * data.length)];
-                    targetSentenceEl.innerText = currentPhrase.text_en;
-                    targetZhEl.innerText = "中文：" + currentPhrase.text_zh;
+                    sentenceEl.innerText = currentPhrase.text_en;
+                    zhEl.innerText = currentPhrase.text_zh;
                     document.getElementById('scenario-tag').innerText = currentPhrase.scenario;
-                    document.getElementById('feedback-box').innerHTML = "<span class='text-gray-400'>准备就绪，请点击录音</span>";
+                    document.getElementById('feedback-box').innerHTML = "<span class='text-gray-500 font-bold uppercase tracking-widest'>System Ready</span>";
                     document.getElementById('mic-btn').disabled = false;
-                } else {
-                    currentPhrase = null;
-                    targetSentenceEl.innerText = "⚠️ 题库空空如也";
-                    targetZhEl.innerText = "当前难度下暂无语料，请点击上方菜单切换难度！";
-                    document.getElementById('scenario-tag').innerText = "EMPTY";
-                    document.getElementById('feedback-box').innerHTML = "<span class='text-red-400'>请先切换难度</span>";
-                    document.getElementById('mic-btn').disabled = true;
                 }
-            } catch (err) {
-                targetSentenceEl.innerText = "❌ 查询报错";
-            }
+            } catch (err) { sentenceEl.innerText = "CONNECT ERROR"; }
         }
 
-        // 语音控制
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null; let isRecording = false; let isProcessing = false; let isRewarding = false; let watchdog = null;
+        let recognition = null; 
+        let isRecording = false; 
+        let isRewarding = false;
 
-        function forceResetUI() {
-            clearTimeout(watchdog); isRecording = false; isProcessing = false; isRewarding = false;
-            document.getElementById('mic-btn').classList.remove('recording-pulse');
-            document.getElementById('mic-text').innerText = "点击开始录音";
-            if(currentPhrase) document.getElementById('mic-btn').disabled = false;
+        function finishTurn(finalText) {
+            if (isRewarding) return;
+            const fb = document.getElementById('feedback-box');
+            // 营销话术：AI正在分析
+            fb.innerHTML = `<span class="text-blue-400 animate-pulse font-bold tracking-widest uppercase">🔄 AI 正在分析您的发音...</span>`;
+            
+            // 给予 500ms 的视觉延迟，增加“分析感”
+            setTimeout(() => {
+                const score = calculateSimilarity(finalText, currentPhrase.text_en);
+                if (score >= 90) {
+                    fb.innerHTML = `<span class="text-4xl font-black text-green-400 mb-1">${score}</span><span class="text-[10px] text-gray-500 font-bold uppercase tracking-tighter italic">识别内容: "${finalText}"</span>`;
+                    triggerReward(); 
+                } else {
+                    fb.innerHTML = `<span class="text-3xl font-black text-amber-500 mb-1">${score} 分</span><span class="text-[10px] text-gray-500 font-bold uppercase">听到内容: "${finalText}"</span>`;
+                    resetUIState();
+                }
+            }, 600);
+        }
+
+        function resetUIState() {
+            isRecording = false;
+            const btn = document.getElementById('mic-btn');
+            btn.classList.remove('recording-pulse');
+            btn.disabled = false;
+            document.getElementById('mic-text').innerText = "START RECORDING";
         }
 
         window.toggleSpeechRecognition = function() {
-            if (!SpeechRecognition || isRewarding || isProcessing || !currentPhrase) return;
-            
+            if (!SpeechRecognition || isRewarding || !currentPhrase) return;
             const fb = document.getElementById('feedback-box');
 
             if (isRecording) {
-                // 【修复核心 1】：点击停止时，立刻给出“正在分析”的视觉反馈
-                isProcessing = true; 
-                document.getElementById('mic-text').innerText = "🔄 分析中..."; 
-                document.getElementById('mic-btn').disabled = true;
-                fb.innerHTML = `<span class="text-blue-400 animate-pulse font-bold">🔄 AI 正在分析您的发音...</span>`;
-                
                 try { recognition.stop(); } catch(e) {}
-                watchdog = setTimeout(forceResetUI, 4000);
                 return;
             }
 
-            // 【修复核心 2】：点击开始时，清空上一次的分数，给出“正在聆听”的提示
-            recognition = new SpeechRecognition(); recognition.lang = 'en-US'; isRecording = true;
+            isRecording = true;
+            recognition = new SpeechRecognition(); 
+            recognition.lang = 'en-US'; 
+            recognition.continuous = false; // 商业级单句精识别
+            recognition.interimResults = false; 
+
             document.getElementById('mic-btn').classList.add('recording-pulse'); 
-            document.getElementById('mic-text').innerText = "正在录音... (点击结束)";
-            fb.innerHTML = `<span class="text-amber-400 animate-pulse font-bold">🎙️ 系统正在聆听，请朗读...</span>`;
+            document.getElementById('mic-text').innerText = "STOP (STOP)";
+            fb.innerHTML = `<span class="text-amber-400 animate-pulse font-bold tracking-widest uppercase">🎙️ 系统正在聆听，请朗读...</span>`;
             
-            try { recognition.start(); } catch(e) { forceResetUI(); }
+            recognition.start();
 
             recognition.onresult = (event) => {
-                clearTimeout(watchdog);
                 const spoken = event.results[0][0].transcript;
-                const realScore = calculateSimilarity(spoken, currentPhrase.text_en);
+                finishTurn(spoken);
+            };
 
-                if (realScore >= 90) {
-                    fb.innerHTML = `<span class="text-3xl font-black text-green-400 mb-1">${realScore} 分</span><span class="text-xs text-gray-400">Perfect! 识别: "${spoken}"</span>`;
-                    triggerReward(); 
-                } else if (realScore >= 60) {
-                    fb.innerHTML = `<span class="text-3xl font-black text-amber-400 mb-1">${realScore} 分</span><span class="text-xs text-gray-400">勉强及格！听到: "${spoken}"</span>`;
-                    forceResetUI();
-                } else {
-                    fb.innerHTML = `<span class="text-3xl font-black text-red-400 mb-1">${realScore} 分</span><span class="text-xs text-gray-400">差异过大。听到: "${spoken}"</span>`;
-                    forceResetUI();
-                }
-            };
-            
-            // 【修复核心 3】：捕获各种杂音错误，防止死机
-            recognition.onerror = (e) => {
-                if (e.error === 'not-allowed') {
-                    fb.innerHTML = "<span class='text-amber-400'>⚠️ 请允许麦克风权限</span>";
-                } else if (e.error === 'no-speech') {
-                    fb.innerHTML = "<span class='text-gray-400'>未检测到声音，请大声重试</span>";
-                } else if (e.error !== 'aborted') {
-                    fb.innerHTML = `<span class='text-red-400'>⚠️ 引擎错误: ${e.error}</span>`;
-                }
-                forceResetUI();
-            };
-            
-            recognition.onend = () => { if(!isRewarding) forceResetUI(); };
+            recognition.onerror = () => resetUIState();
+            recognition.onend = () => { if(!isRewarding) resetUIState(); };
         };
 
-        // 结算
         async function triggerReward() {
             isRewarding = true; 
-            document.getElementById('mic-text').innerText = "正在结算奖励...";
+            document.getElementById('mic-text').innerText = "SETTLING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
                 const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
                 const newBalance = (profile?.wallet_balance || 0) + Number(currentPhrase.reward_aed);
                 await oasisCloud.from('profiles').update({ wallet_balance: newBalance }).eq('id', user.id);
                 document.getElementById('balance').innerText = newBalance.toFixed(2);
-                
-                // 【修复核心 4】：强制延迟 1.5 秒，让用户享受高分的成就感，然后再切下一题
                 setTimeout(async () => {
                     await fetchNewPhrase(); 
-                    forceResetUI();
+                    isRewarding = false;
+                    resetUIState();
                 }, 1500);
-
-            } catch (err) {
-                forceResetUI();
-            }
+            } catch (err) { isRewarding = false; resetUIState(); }
         }
     </script>
 </body>
