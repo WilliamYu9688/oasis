@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V5.5 究极看门狗版</title>
+    <title>Oasis Bridge - V5.6 拒绝装死版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -14,7 +14,6 @@
         .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.1); }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        /* 录音特效 */
         .recording-pulse { animation: pulse 1.5s infinite; background: #ef4444 !important; color: white !important; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
@@ -35,7 +34,7 @@
                 <button onclick="toggleAuthMode()" id="switch-mode-btn" class="text-sm text-[#d4af37] underline hover:text-white transition-colors">没有账号？点击开通金库</button>
             </div>
         </div>
-        <p id="auth-msg" class="text-sm text-amber-500 mt-6 min-h-[1.25rem]"></p>
+        <p id="auth-msg" class="text-sm font-medium text-amber-500 mt-6 min-h-[1.25rem]"></p>
     </div>
 
     <div id="app-panel" class="hidden p-6 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
@@ -68,16 +67,25 @@
 
     <script>
         // ==========================================
-        // 1 & 2. 账号与云端逻辑
+        // 1 & 2. 账号与云端逻辑 (彻底修复静默无反应 Bug)
         // ==========================================
         let oasisCloud;
         const msgBox = document.getElementById('auth-msg');
-        try {
-            if (window.supabase) {
-                oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
-                msgBox.innerText = "✅ 系统就绪";
-            }
-        } catch (e) { msgBox.innerText = "❌ 网络错误：" + e.message; }
+        
+        // 提取初始化函数，方便随时重试
+        function initSupabase() {
+            try {
+                if (window.supabase) {
+                    oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
+                    msgBox.innerText = "✅ 系统就绪";
+                    return true;
+                }
+            } catch (e) { msgBox.innerText = "❌ 网络错误：" + e.message; }
+            return false;
+        }
+        
+        // 页面打开时尝试初始化
+        initSupabase();
 
         const authPanel = document.getElementById('auth-panel'); const appPanel = document.getElementById('app-panel');
         const balanceEl = document.getElementById('balance'); const userDisplay = document.getElementById('user-display');
@@ -100,24 +108,40 @@
         };
 
         window.executeAuth = async function() {
-            if (!oasisCloud) return;
+            // 修复1：只要点击，立刻给反馈，绝不装死
+            msgBox.innerText = "⏳ 正在响应...";
+            
+            // 修复2：如果云端库断线，尝试抢救一次
+            if (!oasisCloud) {
+                const isRecovered = initSupabase();
+                if (!isRecovered) {
+                    msgBox.innerHTML = "<span class='text-red-500'>❌ 网络较慢，云端核心库未加载，请尝试刷新网页！</span>";
+                    return;
+                }
+            }
+
             if (isLoginMode) await doSignIn(); else await doSignUp();
         };
 
         async function doSignUp() {
             const email = document.getElementById('email').value; const pwd1 = pwdInput.value; const pwd2 = confirmPwdInput.value;
-            if (!email || !pwd1 || !pwd2) return msgBox.innerText = "⚠️ 请完整填写"; if (pwd1 !== pwd2) return msgBox.innerText = "❌ 密码不一致"; 
+            // 修复3：文案提示更醒目
+            if (!email || !pwd1 || !pwd2) { msgBox.innerText = "⚠️ 请完整填写邮箱和密码！"; return; }
+            if (pwd1 !== pwd2) { msgBox.innerText = "❌ 两次输入的密码不一致！"; return; }
+            
             msgBox.innerText = "⏳ 正在开通...";
             const { error } = await oasisCloud.auth.signUp({ email, password: pwd1 });
-            if (error) msgBox.innerText = "❌ " + error.message; else { msgBox.innerText = "✅ 注册成功！请登录。"; pwdInput.value = ''; confirmPwdInput.value = ''; setTimeout(toggleAuthMode, 1500); }
+            if (error) msgBox.innerText = "❌ 注册失败: " + error.message; 
+            else { msgBox.innerText = "✅ 注册成功！请直接点击登录。"; pwdInput.value = ''; confirmPwdInput.value = ''; setTimeout(toggleAuthMode, 1500); }
         }
 
         async function doSignIn() {
             const email = document.getElementById('email').value; const password = pwdInput.value;
-            if(!email || !password) return msgBox.innerText = "⚠️ 请输入完整信息"; 
-            msgBox.innerText = "⏳ 验证中...";
+            if(!email || !password) { msgBox.innerText = "⚠️ 请输入您的邮箱和密码！"; return; }
+            
+            msgBox.innerText = "⏳ 身份验证中...";
             const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-            if (error) msgBox.innerText = "❌ " + error.message; else enterApp(data.user);
+            if (error) msgBox.innerText = "❌ 登录失败: " + error.message; else enterApp(data.user);
         }
 
         async function enterApp(user) {
@@ -129,124 +153,83 @@
 
         window.doSignOut = async function() {
             await oasisCloud.auth.signOut();
-            appPanel.classList.add('hidden'); authPanel.classList.remove('hidden'); msgBox.innerText = "✅ 已登出";
+            appPanel.classList.add('hidden'); authPanel.classList.remove('hidden'); msgBox.innerText = "✅ 已安全登出";
             document.getElementById('email').value = ''; pwdInput.value = ''; confirmPwdInput.value = ''; if(!isLoginMode) toggleAuthMode();
         };
 
         // ==========================================
-        // 3. 核心引擎：V5.5 看门狗强制重置版
+        // 3. 核心引擎：V5.5 架构 (保持究极看门狗)
         // ==========================================
         const targetSentence = "How much is this"; 
-        const micBtn = document.getElementById('mic-btn');
-        const micText = document.getElementById('mic-text');
-        const feedbackBox = document.getElementById('feedback-box');
-        
+        const micBtn = document.getElementById('mic-btn'); const micText = document.getElementById('mic-text'); const feedbackBox = document.getElementById('feedback-box');
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null; 
         
-        // 状态锁
-        let isRecording = false;  
-        let isProcessing = false; 
-        let isRewarding = false;  
-        let hasResult = false;    
-
-        // 新增：全局看门狗 (防止任何状态卡死)
+        let isRecording = false;  let isProcessing = false; let isRewarding = false;  let hasResult = false;    
         let watchdogTimer = null;
+
         function setWatchdog(ms, warningMsg) {
             clearTimeout(watchdogTimer);
             watchdogTimer = setTimeout(() => {
                 if (warningMsg) feedbackBox.innerHTML = `<span class='text-amber-400'>${warningMsg}</span>`;
-                forceResetUI(); // 只要超时，不废话直接重置整个UI和锁
+                forceResetUI(); 
             }, ms);
         }
 
         function forceResetUI() {
             clearTimeout(watchdogTimer);
-            isRecording = false;
-            isProcessing = false;
-            isRewarding = false;
-            micBtn.classList.remove('recording-pulse');
-            micText.innerText = "点击开始录音";
-            micBtn.disabled = false;
+            isRecording = false; isProcessing = false; isRewarding = false;
+            micBtn.classList.remove('recording-pulse'); micText.innerText = "点击开始录音"; micBtn.disabled = false;
         }
 
         window.toggleSpeechRecognition = function() {
-            if (!SpeechRecognition) return feedbackBox.innerHTML = "<span class='text-red-400'>❌ 不支持语音识别，请换用 Chrome 或 Safari。</span>";
-
-            // 如果正在结算，绝对拦截
+            if (!SpeechRecognition) return feedbackBox.innerHTML = "<span class='text-red-400'>❌ 不支持语音识别，请使用 Chrome 或 Safari。</span>";
             if (isRewarding) return;
 
-            // 【情况 A：停止录音】
             if (isRecording) {
-                isProcessing = true;
-                micBtn.classList.remove('recording-pulse');
-                micText.innerText = "🔄 正在分析发音...";
-                micBtn.disabled = true; 
+                isProcessing = true; micBtn.classList.remove('recording-pulse'); micText.innerText = "🔄 正在分析发音..."; micBtn.disabled = true; 
                 try { recognition.stop(); } catch(e) {}
-                
-                // 部署 3 秒分析看门狗。如果底层引擎死机不反馈，3秒后强行解锁。
                 setWatchdog(3000, "⚠️ 引擎无响应，已自动恢复，请重试。");
                 return; 
             }
 
-            // 【情况 B：开始录音】
             if (recognition) { try { recognition.abort(); } catch(e) {} }
 
             recognition = new SpeechRecognition();
-            recognition.lang = 'en-US'; 
-            recognition.interimResults = false; 
-            recognition.maxAlternatives = 1;
+            recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+            isRecording = true; isProcessing = false; hasResult = false;
 
-            isRecording = true;
-            isProcessing = false;
-            hasResult = false;
-
-            micBtn.classList.add('recording-pulse');
-            micText.innerText = "正在录音... (点击结束)";
+            micBtn.classList.add('recording-pulse'); micText.innerText = "正在录音... (点击结束)";
             feedbackBox.innerHTML = "<span class='text-white'>请朗读上方英文，读完再点一次按钮...</span>";
 
-            // 部署 8 秒录音看门狗。防止用户一直不点结束导致锁死。
             setWatchdog(8000, "⚠️ 录音超时，已自动结束。");
-
             try { recognition.start(); } catch(e) { forceResetUI(); }
 
             recognition.onresult = function(event) {
-                clearTimeout(watchdogTimer); // 拿到结果，解除看门狗
-                hasResult = true; 
+                clearTimeout(watchdogTimer); hasResult = true; 
                 const spokenText = event.results[0][0].transcript;
                 const cleanSpoken = spokenText.toLowerCase().replace(/[.,!?]/g, "").trim();
                 const cleanTarget = targetSentence.toLowerCase().replace(/[.,!?]/g, "").trim();
 
                 if (cleanSpoken.includes(cleanTarget) || cleanTarget === cleanSpoken) {
-                    feedbackBox.innerHTML = `✅ <span class="text-green-400">Perfect! 识别结果: "${spokenText}"</span>`;
-                    triggerReward(); 
+                    feedbackBox.innerHTML = `✅ <span class="text-green-400">Perfect! 识别结果: "${spokenText}"</span>`; triggerReward(); 
                 } else {
-                    feedbackBox.innerHTML = `❌ <span class="text-red-400">系统听到的是: "${spokenText}"，请重试。</span>`;
-                    // 读错了不需要结算，直接解锁
-                    forceResetUI();
+                    feedbackBox.innerHTML = `❌ <span class="text-red-400">系统听到的是: "${spokenText}"，请重试。</span>`; forceResetUI();
                 }
             };
 
             recognition.onerror = function(event) {
-                clearTimeout(watchdogTimer);
-                hasResult = true; 
-                if (event.error === 'aborted') {
-                    // 静默处理
-                } else if (event.error === 'not-allowed') {
-                    feedbackBox.innerHTML = "<span class='text-amber-400'>⚠️ 请允许麦克风权限</span>";
-                } else if (event.error === 'no-speech') {
-                    feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到声音，请大声一点。</span>";
-                } else {
-                    feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 引擎网络抖动，请重试</span>`;
-                }
+                clearTimeout(watchdogTimer); hasResult = true; 
+                if (event.error === 'aborted') {} 
+                else if (event.error === 'not-allowed') { feedbackBox.innerHTML = "<span class='text-amber-400'>⚠️ 请允许麦克风权限</span>"; } 
+                else if (event.error === 'no-speech') { feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到声音，请大声一点。</span>"; } 
+                else { feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 引擎网络抖动，请重试</span>`; }
                 forceResetUI();
             };
 
             recognition.onend = function() {
                 clearTimeout(watchdogTimer);
-                if (!hasResult && isRecording) {
-                    feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到有效发音，请重试。</span>";
-                }
+                if (!hasResult && isRecording) { feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到有效发音，请重试。</span>"; }
                 if (!isRewarding) forceResetUI();
             };
         };
@@ -257,9 +240,7 @@
         async function triggerReward() {
             if (!oasisCloud) return forceResetUI();
             
-            isRewarding = true;
-            micText.innerText = "正在向云端结算...";
-            micBtn.disabled = true;
+            isRewarding = true; micText.innerText = "正在向云端结算..."; micBtn.disabled = true;
 
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
@@ -269,14 +250,19 @@
                 if (selectErr) throw selectErr;
 
                 const updatedBalance = (profile?.wallet_balance || 0) + 0.35;
-
                 const { error: updateErr } = await oasisCloud.from('profiles').update({ wallet_balance: updatedBalance }).eq('id', user.id);
                 if (updateErr) throw updateErr;
                 
-                // 成功后更新UI动画
                 balanceEl.innerText = updatedBalance.toFixed(2);
-                balanceEl.classList.add('fade-in');
-                setTimeout(() => balanceEl.classList.remove('fade-in'), 300);
+                balanceEl.classList.add('fade-in'); setTimeout(() => balanceEl.classList.remove('fade-in'), 300);
                 
             } catch (error) {
                 console.error("云端结算失败:", error);
+                feedbackBox.innerHTML = `<span class='text-red-400'>❌ 网络抖动，同步账本失败。</span>`;
+            } finally {
+                forceResetUI();
+            }
+        }
+    </script>
+</body>
+</html>
