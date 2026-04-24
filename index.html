@@ -1,72 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V5.1 智能语音引擎(抗弱网版)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { background-color: #0a0a0a; color: #e5e5e5; font-family: -apple-system, sans-serif; }
-        .gold-btn { background: linear-gradient(135deg, #d4af37 0%, #aa8000 100%); color: #000; transition: all 0.3s; }
-        .gold-btn:active { transform: scale(0.95); opacity: 0.9; }
-        .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.1); }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        /* 录音时的呼吸灯特效 */
-        .recording-pulse { animation: pulse 1.5s infinite; background: #ef4444 !important; color: white !important; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-    </style>
-</head>
-<body class="flex items-center justify-center min-h-screen relative">
-
-    <div id="auth-panel" class="p-8 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
-        <h1 class="text-3xl font-bold text-[#d4af37] mb-2">Oasis Bridge</h1>
-        <p id="auth-subtitle" class="text-gray-500 mb-8 text-sm">欢迎回来，请登录您的云端金库</p>
-        
-        <div class="space-y-4">
-            <input id="email" type="email" placeholder="邮箱地址" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-[#d4af37]">
-            <input id="password" type="password" placeholder="密码" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-[#d4af37]">
-            <input id="confirm-password" type="password" placeholder="再次确认密码 (至少6位)" class="hidden w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-[#d4af37]">
-            
-            <button id="main-auth-btn" onclick="executeAuth()" class="w-full p-4 gold-btn rounded-xl font-bold text-lg shadow-lg">登 录</button>
-            <div class="pt-2">
-                <button onclick="toggleAuthMode()" id="switch-mode-btn" class="text-sm text-[#d4af37] underline hover:text-white transition-colors">没有账号？点击开通金库</button>
-            </div>
-        </div>
-        <p id="auth-msg" class="text-sm text-amber-500 mt-6 min-h-[1.25rem]"></p>
-    </div>
-
-    <div id="app-panel" class="hidden p-6 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
-        <div class="flex justify-between items-center mb-4">
-            <p class="text-gray-400 text-sm">ID: <span id="user-display" class="text-white font-medium"></span></p>
-            <button onclick="doSignOut()" class="text-gray-500 text-xs hover:text-[#d4af37]">退出登录</button>
-        </div>
-
-        <div class="mb-6 p-6 border border-[#d4af37]/20 rounded-2xl bg-black/50 relative overflow-hidden">
-            <p class="text-gray-500 text-xs uppercase tracking-widest mb-1">云端实时账本</p>
-            <h2 class="text-4xl font-black text-[#d4af37]"><span id="balance">0.00</span> <span class="text-lg">AED</span></h2>
-        </div>
-        
-        <div class="bg-gray-800 rounded-xl p-5 mb-6 shadow-inner text-left">
-            <span class="bg-gray-700 text-xs text-gray-300 px-2 py-1 rounded mb-3 inline-block">场景：迪拜商场购物</span>
-            <p class="text-gray-400 text-sm mb-1">请流利读出以下英文：</p>
-            <h3 id="target-sentence" class="text-2xl font-bold text-white mb-2">How much is this</h3>
-            <p class="text-sm text-[#d4af37] mb-4">中文：这个多少钱？</p>
-            
-            <div id="feedback-box" class="min-h-[3rem] p-3 rounded bg-gray-900 border border-gray-700 text-sm text-gray-400 flex items-center justify-center text-center transition-all duration-300">
-                等待您的发音...
-            </div>
-        </div>
-
-        <button id="mic-btn" onclick="startSpeechRecognition()" class="w-full p-5 gold-btn rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-2">
-            <svg id="mic-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-            <span id="mic-text">点击开始录音</span>
-        </button>
-        <p class="text-xs text-gray-500 mt-4">完全免费，不消耗任何大模型算力</p>
-    </div>
-
-    <script>
+<script>
         // ==========================================
         // 1. 云端基建初始化 (保持不变)
         // ==========================================
@@ -248,5 +180,3 @@
             resetMicUI();
         }
     </script>
-</body>
-</html>
