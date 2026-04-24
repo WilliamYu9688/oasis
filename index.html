@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V7.2 - 留存护城河版</title>
+    <title>Oasis Bridge V7.3 - 动态注册与防撞版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -26,138 +26,39 @@
 </head>
 <body class="font-sans overflow-hidden bg-slate-900">
 
-    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center">
-        <div class="mb-14 text-center">
+    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
+        <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Cloud Terminal V7.2</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Cloud Terminal V7.3</p>
         </div>
-        <div class="space-y-4">
-            <input id="email" type="email" placeholder="Email Address" class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider">
-            <input id="password" type="password" placeholder="Password" class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider">
-            <button onclick="executeAuth()" class="w-full mt-4 py-5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-transform shadow-lg shadow-amber-900/50">
-                SECURE LOGIN
-            </button>
-            <p id="auth-msg" class="text-center text-xs font-bold text-red-400 mt-4 min-h-[1rem]"></p>
+        
+        <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
+            <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
+            
+            <div class="space-y-4 relative z-10">
+                <input id="email" type="email" placeholder="Email Address" class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider placeholder-gray-500 transition-colors">
+                <input id="password" type="password" placeholder="Password" class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider placeholder-gray-500 transition-colors">
+                
+                <div id="confirm-password-container" class="overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider placeholder-gray-500 transition-colors">
+                </div>
+
+                <button id="auth-action-btn" onclick="executeAuth()" class="w-full mt-2 py-5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-all shadow-[0_10px_20px_rgba(245,158,11,0.2)]">
+                    SECURE LOGIN
+                </button>
+                <p id="auth-msg" class="text-center text-xs font-bold text-red-400 min-h-[1.5rem] mt-2"></p>
+            </div>
+
+            <div class="mt-4 text-center border-t border-white/5 pt-5 relative z-10">
+                <p class="text-xs text-gray-500 font-bold tracking-widest uppercase">
+                    <span id="auth-switch-text">New to Oasis?</span> 
+                    <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 hover:text-amber-300 transition-colors ml-2 font-black underline underline-offset-4">Create Account</button>
+                </p>
+            </div>
         </div>
     </div>
 
     <div id="step-1" class="app-screen z-50 flex flex-col p-8 justify-center hidden-screen">
         <div class="mb-14 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Select Path</p>
-        </div>
-        <div class="space-y-5">
-            <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[32px] p-8 text-left active:scale-95 transition-transform group relative overflow-hidden shadow-xl">
-                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇨🇳</div>
-                <h3 class="font-bold text-2xl tracking-tight text-white">Learn Mandarin</h3>
-                <p class="text-xs text-amber-500 mt-2 font-medium tracking-widest uppercase">Earn AED while learning</p>
-            </button>
-            <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[32px] p-8 text-left active:scale-95 transition-transform group relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇦🇪</div>
-                <h3 class="font-bold text-2xl text-amber-400 tracking-tight">我要学英语</h3>
-                <p class="text-xs text-slate-400 mt-2 font-medium tracking-widest uppercase">迪拜商务实战 · 全额回本</p>
-            </button>
-            <button onclick="exitApp()" class="w-full mt-4 py-4 rounded-[32px] bg-red-500/10 border border-red-500/20 text-red-400 font-bold tracking-widest active:scale-95 transition-transform">退出 APP</button>
-        </div>
-    </div>
-
-    <div id="step-time" class="app-screen z-45 flex flex-col p-8 justify-center hidden-screen">
-        <div class="mb-12 text-center">
-            <h2 class="text-3xl font-black tracking-tight text-white drop-shadow-md">设定每日目标</h2>
-            <p class="text-xs text-amber-500/80 mt-3 font-bold tracking-widest uppercase">Target Duration</p>
-        </div>
-        <div class="grid grid-cols-2 gap-5">
-            <button onclick="handleStepTime(15)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-all">15 Min</button>
-            <button onclick="handleStepTime(30)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-all">30 Min</button>
-            <button onclick="handleStepTime(45)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-all">45 Min</button>
-            <button onclick="handleStepTime(60)" class="glass-panel py-10 rounded-[32px] font-black text-xl text-amber-400 active:bg-amber-600 active:text-white transition-all border-amber-500/30">60 Min</button>
-        </div>
-    </div>
-
-    <div id="step-2" class="app-screen z-40 flex flex-col p-8 justify-center hidden-screen">
-        <div class="mb-12 text-center"><h2 class="text-3xl font-black tracking-tight text-white drop-shadow-md">选择难度与奖池</h2></div>
-        <div class="space-y-5">
-            <div onclick="handleStep2(1)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
-                <div><p class="font-bold text-lg text-slate-200">入门级 (L1)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">基础词汇与生活场景</p></div>
-                <div class="font-black text-white text-2xl">99<span class="text-xs text-amber-500 ml-1">AED</span></div>
-            </div>
-            <div onclick="handleStep2(2)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
-                <div><p class="font-bold text-lg text-slate-200">职场级 (L2)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">职场与商务交流</p></div>
-                <div class="font-black text-white text-2xl">299<span class="text-xs text-amber-500 ml-1">AED</span></div>
-            </div>
-            <div onclick="handleStep2(3)" class="glass-panel p-6 rounded-[32px] border-amber-500/40 flex justify-between items-center active:scale-95 transition-transform cursor-pointer relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-transparent"></div>
-                <div class="relative z-10"><p class="font-bold text-lg text-amber-400">精英级 (L3)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">高阶表达与数据模型</p></div>
-                <div class="font-black text-amber-400 text-3xl relative z-10 drop-shadow-lg">500<span class="text-xs text-amber-500 ml-1">AED</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="main-app" class="app-screen z-30 flex flex-col hidden-screen">
-        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 sticky top-0 z-40 shadow-xl">
-            <div class="grid grid-cols-3 p-5 gap-2 items-center">
-                <div class="text-center">
-                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total Earned</p>
-                    <h1 id="total-earned" class="text-base font-black text-emerald-400 transition-all drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]">0.00</h1>
-                </div>
-                <div class="text-center border-x border-white/10">
-                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Time Goal</p>
-                    <h1 id="time-display" class="text-base font-black text-white drop-shadow-md">0/30m</h1>
-                </div>
-                <div class="text-center cursor-pointer group" onclick="requestRescue()">
-                    <div class="bg-blue-500/10 rounded-xl p-1.5 group-active:scale-90 transition-transform border border-blue-500/20">
-                        <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">Assistance</p>
-                        <h1 id="ad-limit-display" class="text-sm font-black text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]">🆘 5/5</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="px-6 py-5 flex gap-3 z-20 relative">
-            <button onclick="attemptExit()" class="glass-btn p-3 rounded-2xl active:scale-90 transition-transform shadow-lg border border-white/10 text-red-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2"/></svg>
-            </button>
-            <div class="relative flex-grow flex items-center justify-end px-4 glass-btn rounded-2xl shadow-lg border border-white/10">
-                <span id="scene-display" class="text-sm font-bold text-amber-400 uppercase tracking-widest">SCENE: LOADING</span>
-            </div>
-        </div>
-
-        <div class="flex-grow flex flex-col justify-center px-5 pb-12 z-20 relative">
-            <div class="glass-panel rounded-[40px] p-7 text-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative border-t border-l border-white/10">
-                <div class="flex justify-between items-center mb-8">
-                    <div class="bg-black/30 px-4 py-2 rounded-2xl border border-white/5 text-left shadow-inner">
-                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Sentence Best</p>
-                        <p id="item-best-score" class="text-lg font-black text-amber-400">0</p>
-                    </div>
-                    <div class="bg-black/30 px-4 py-2 rounded-2xl border border-white/5 text-right shadow-inner">
-                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Sentence Earned</p>
-                        <p id="item-earned" class="text-lg font-black text-emerald-400">0.00</p>
-                    </div>
-                </div>
-
-                <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-lg transition-all">Connecting...</h2>
-                <p id="target-zh" class="text-sm text-slate-400 mb-6 min-h-[20px]"></p>
-                
-                <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center">
-                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">SYSTEM READY</p>
-                </div>
-
-                <div class="flex items-center justify-between px-1">
-                    <button onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75 transition-transform"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
-                    <button onclick="playAudio()" class="w-14 h-14 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-lg border-white/20"><svg class="w-6 h-6 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
-                    <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(245,158,11,0.3)] border-[4px] border-amber-900/40 outline-none transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                        <div id="mic-inner-ring" class="w-20 h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-10 h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
-                    </button>
-                    <div class="w-14 h-14"></div>
-                </div>
-                <p id="btn-hint" class="text-[9px] text-amber-500/70 font-bold uppercase tracking-[0.2em] mt-6">CLICK TO START</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="exit-modal" class="fixed inset-0 z-[100] modal-overlay flex flex-col justify-center p-8 hidden-screen">
-        <div class="glass-panel rounded-[40px] p-8 text-center shadow-2xl border-white/10 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent"></div>
-            <h3 class="text-2xl font-black text-red-400 mb-3 drop-shadow-md relative z-10 mt-2">目标未达成</h3>
-            <p class="text-slate-300 text-sm mb-8 leading-relaxed relative z-10">
-                您今日的 <span id="exit-target-time" class="text-white font-bold text-lg"></span> 分钟学习目标，还差 <span id="exit-remain-time" class="text-amber-400 font-bold text-lg"></span> 分钟。<br><span class="text-[10px] text-
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Select
