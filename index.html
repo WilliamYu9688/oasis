@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V6.9 FSM 状态机版</title>
+    <title>Oasis Bridge - V6.10 登录装甲版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -23,11 +23,11 @@
         <h1 class="text-3xl font-bold text-[#d4af37] mb-2 text-center italic tracking-tighter">Oasis Bridge</h1>
         <p class="text-gray-500 mb-8 text-sm uppercase tracking-widest">Global Language Indorsement</p>
         <div class="space-y-4">
-            <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white outline-none">
-            <input id="password" type="password" placeholder="Password" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white outline-none">
+            <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white outline-none focus:border-[#d4af37]">
+            <input id="password" type="password" placeholder="Password" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white outline-none focus:border-[#d4af37]">
             <button onclick="executeAuth()" class="w-full p-4 gold-btn rounded-xl font-bold">ENTER SYSTEM</button>
         </div>
-        <p id="auth-msg" class="text-sm font-medium text-amber-500 mt-6"></p>
+        <p id="auth-msg" class="text-sm font-medium text-amber-500 mt-6 min-h-[1.25rem]"></p>
     </div>
 
     <div id="app-panel" class="hidden p-6 glass-panel rounded-2xl shadow-2xl w-full max-w-md mx-4 text-center">
@@ -60,7 +60,7 @@
 
     <script>
         // ==========================================
-        // 1. 莱文斯坦核心打分算法
+        // 1. 算法与云端配置
         // ==========================================
         function calculateSimilarity(str1, str2) {
             const s1 = str1.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
@@ -79,9 +79,6 @@
             return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
-        // ==========================================
-        // 2. 云端初始化与鉴权
-        // ==========================================
         let oasisCloud;
         function initSupabase() {
             if (window.supabase) {
@@ -90,21 +87,62 @@
         }
         initSupabase();
 
+        // ==========================================
+        // 2. 装甲级登录校验 (核心修复区)
+        // ==========================================
         async function executeAuth() {
             const msg = document.getElementById('auth-msg');
             msg.innerText = "⏳ VERIFYING...";
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-            if (error) msg.innerText = error.message; else enterApp(data.user);
+
+            // 防护 1：检查核心库是否加载
+            if (!oasisCloud) {
+                initSupabase();
+                if (!oasisCloud) {
+                    msg.innerText = "❌ 核心库未加载，请刷新网页或检查网络";
+                    return;
+                }
+            }
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // 防护 2：检查账号密码是否为空
+            if (!email || !password) {
+                msg.innerText = "⚠️ 请输入完整的邮箱和密码";
+                return;
+            }
+
+            // 防护 3：网络请求捕获异常
+            try {
+                const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
+                if (error) {
+                    msg.innerText = "❌ 登录失败: " + error.message;
+                } else {
+                    enterApp(data.user);
+                }
+            } catch (err) {
+                msg.innerText = "❌ 网络连接异常，请重试";
+            }
         }
 
         async function enterApp(user) {
-            document.getElementById('auth-panel').classList.add('hidden');
-            document.getElementById('app-panel').classList.remove('hidden');
-            const { data } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
-            if (data) document.getElementById('balance').innerText = data.wallet_balance.toFixed(2);
-            fetchNewPhrase(); 
+            try {
+                document.getElementById('auth-panel').classList.add('hidden');
+                document.getElementById('app-panel').classList.remove('hidden');
+                
+                // 防护 4：防止因 profiles 表没配置导致崩溃
+                const { data, error } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
+                if (data && data.wallet_balance !== undefined) {
+                    document.getElementById('balance').innerText = data.wallet_balance.toFixed(2);
+                } else {
+                    document.getElementById('balance').innerText = "0.00"; // 如果查不到余额，默认显示 0.00，绝不崩溃
+                }
+                
+                fetchNewPhrase(); 
+            } catch (err) {
+                console.error("初始化应用数据失败:", err);
+                fetchNewPhrase(); // 就算数据拉取失败，也要让用户能看到练习题
+            }
         }
 
         let currentPhrase = null;
@@ -121,20 +159,23 @@
                     sentenceEl.innerText = currentPhrase.text_en;
                     zhEl.innerText = currentPhrase.text_zh;
                     document.getElementById('scenario-tag').innerText = currentPhrase.scenario;
-                    setAppState('READY'); // 题目加载完毕，进入准备状态
+                    setAppState('READY'); 
+                } else {
+                    sentenceEl.innerText = "NO DATA";
+                    zhEl.innerText = "当前难度无数据，请切换难度";
+                    setAppState('READY');
                 }
             } catch (err) { sentenceEl.innerText = "CONNECT ERROR"; }
         }
 
         // ==========================================
-        // 3. 核心：有限状态机 (FSM) 引擎
+        // 3. FSM 状态机 (保持 V6.9 的完美顺滑)
         // ==========================================
-        let appState = 'INIT'; // 状态集: INIT, READY, LISTENING, ANALYZING, REWARDING
+        let appState = 'INIT'; 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null; 
         let capturedText = "";
 
-        // UI 渲染总控 (所有界面变化只由这里分发，绝对不乱)
         function renderUI() {
             const fb = document.getElementById('feedback-box');
             const btn = document.getElementById('mic-btn');
@@ -167,31 +208,25 @@
             }
         }
 
-        // 状态切换入口
-        function setAppState(newState, payload = null) {
-            // 防止高优状态被低优状态意外覆盖
+        function setAppState(newState) {
             if (appState === 'REWARDING' && newState !== 'READY') return;
             appState = newState;
             renderUI();
-
-            // 如果切入分析状态，立刻执行打分流程
             if (newState === 'ANALYZING') {
-                setTimeout(() => evaluateScore(), 600); // 强制展示 600ms 的 AI 分析话术
+                setTimeout(() => evaluateScore(), 600); 
             }
         }
 
         window.toggleSpeechRecognition = function() {
             if (!SpeechRecognition || appState === 'REWARDING' || !currentPhrase) return;
 
-            // 1. 如果正在录音，用户点击停止 -> 强制进入分析状态
             if (appState === 'LISTENING') {
                 try { recognition.stop(); } catch(e) {}
                 setAppState('ANALYZING');
                 return;
             }
 
-            // 2. 如果在 READY 状态，用户点击开始 -> 创建全新识别实例
-            capturedText = ""; // 清空上一次的残余
+            capturedText = ""; 
             setAppState('LISTENING');
             
             recognition = new SpeechRecognition(); 
@@ -210,14 +245,11 @@
                 setTimeout(() => setAppState('READY'), 2000);
             };
 
-            // 无论正常结束还是意外停止，必定触发 onend
             recognition.onend = () => { 
                 if (appState === 'LISTENING') {
-                    // 如果引擎自己停了，而且抓到了声音，进分析状态
                     if (capturedText !== "") {
                         setAppState('ANALYZING');
                     } else {
-                        // 没抓到声音（环境太安静）
                         const fb = document.getElementById('feedback-box');
                         fb.innerHTML = `<span class="text-gray-500 font-bold uppercase text-[10px]">No Speech Detected</span>`;
                         setTimeout(() => setAppState('READY'), 1500);
@@ -228,12 +260,8 @@
             recognition.start();
         };
 
-        // ==========================================
-        // 4. 打分与结算流程
-        // ==========================================
         function evaluateScore() {
             const fb = document.getElementById('feedback-box');
-            // 防御性校验
             if (!capturedText) {
                 fb.innerHTML = `<span class="text-gray-500 font-bold uppercase text-[10px]">Empty Record</span>`;
                 setTimeout(() => setAppState('READY'), 1500);
@@ -247,11 +275,26 @@
                 triggerReward(); 
             } else {
                 fb.innerHTML = `<span class="text-3xl font-black text-amber-500 mb-1">${score} 分</span><span class="text-[10px] text-gray-500 font-bold uppercase">听到内容: "${capturedText}"</span>`;
-                setTimeout(() => setAppState('READY'), 2000); // 留 2 秒看分数，然后准许重新录音
+                setTimeout(() => setAppState('READY'), 2000); 
             }
         }
 
         async function triggerReward() {
             setAppState('REWARDING');
             try {
-                const { data: { user } } = await oasisCloud.auth.
+                const { data: { user } } = await oasisCloud.auth.getUser();
+                const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
+                const newBalance = (profile?.wallet_balance || 0) + Number(currentPhrase.reward_aed);
+                await oasisCloud.from('profiles').update({ wallet_balance: newBalance }).eq('id', user.id);
+                document.getElementById('balance').innerText = newBalance.toFixed(2);
+                
+                setTimeout(async () => {
+                    await fetchNewPhrase(); 
+                }, 1500);
+            } catch (err) { 
+                setAppState('READY'); 
+            }
+        }
+    </script>
+</body>
+</html>
