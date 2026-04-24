@@ -94,13 +94,16 @@
         }
 
         // ==========================================
-        // 1 & 2. 云端连接与登录
+        // 1 & 2. 云端连接与登录 (已焊死您的真实秘钥)
         // ==========================================
         let oasisCloud;
         const msgBox = document.getElementById('auth-msg');
         function initSupabase() {
             if (window.supabase) {
-                oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
+                oasisCloud = window.supabase.createClient(
+                    'https://tpawabhfakqpjmepruzx.supabase.co', 
+                    'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB'
+                );
             }
         }
         initSupabase();
@@ -181,7 +184,6 @@
             const micBtn = document.getElementById('mic-btn');
             micBtn.classList.remove('recording-pulse');
             document.getElementById('mic-text').innerText = "点击开始录音";
-            // 只有当有题目的时候才解锁按钮
             if(currentPhrase) micBtn.disabled = false;
         }
 
