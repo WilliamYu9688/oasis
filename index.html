@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V5.0 智能语音引擎</title>
+    <title>Oasis Bridge - V5.1 智能语音引擎(抗弱网版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -54,7 +54,7 @@
             <h3 id="target-sentence" class="text-2xl font-bold text-white mb-2">How much is this</h3>
             <p class="text-sm text-[#d4af37] mb-4">中文：这个多少钱？</p>
             
-            <div id="feedback-box" class="min-h-[3rem] p-3 rounded bg-gray-900 border border-gray-700 text-sm text-gray-400 flex items-center justify-center">
+            <div id="feedback-box" class="min-h-[3rem] p-3 rounded bg-gray-900 border border-gray-700 text-sm text-gray-400 flex items-center justify-center text-center transition-all duration-300">
                 等待您的发音...
             </div>
         </div>
@@ -63,7 +63,7 @@
             <svg id="mic-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
             <span id="mic-text">点击开始录音</span>
         </button>
-        <p class="text-xs text-gray-500 mt-4">首次点击将请求麦克风权限，完全免费</p>
+        <p class="text-xs text-gray-500 mt-4">完全免费，不消耗任何大模型算力</p>
     </div>
 
     <script>
@@ -93,7 +93,7 @@
         let isLoginMode = true; 
 
         // ==========================================
-        // 2. 账号与登录逻辑 (复用 V4.8)
+        // 2. 账号与登录逻辑
         // ==========================================
         window.toggleAuthMode = function() {
             isLoginMode = !isLoginMode; 
@@ -166,15 +166,16 @@
         };
 
         // ==========================================
-        // 3. 核心引擎：Web Speech API 智能打分系统 (本周重点)
+        // 3. 核心引擎：V5.1 防卡死语音打分系统
         // ==========================================
-        const targetSentence = "How much is this"; // 目标句子
+        const targetSentence = "How much is this"; 
         const micBtn = document.getElementById('mic-btn');
         const micText = document.getElementById('mic-text');
         const feedbackBox = document.getElementById('feedback-box');
         
-        // 兼容不同的浏览器内核
+        // 兼容内核
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null; // 全局实例，方便随时熔断重置
 
         window.startSpeechRecognition = function() {
             if (!SpeechRecognition) {
@@ -182,46 +183,63 @@
                 return;
             }
 
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US'; // 设置识别语言为英语
-            recognition.interimResults = false; // 只返回最终确定的结果
+            // 防御性编程：如果之前有卡死的录音进程，强制停止
+            if (recognition) { 
+                try { recognition.stop(); } catch(e) {} 
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; 
+            recognition.interimResults = false; 
             recognition.maxAlternatives = 1;
 
-            // UI 状态：正在录音
+            // UI 状态更新为“录音中”
             micBtn.classList.add('recording-pulse');
             micText.innerText = "正在聆听...";
-            feedbackBox.innerHTML = "<span class='text-white'>请朗读上方的英文句子...</span>";
+            feedbackBox.innerHTML = "<span class='text-white'>请清晰朗读上方的英文...</span>";
 
-            // 开始监听麦克风
-            recognition.start();
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("启动失败", e);
+                resetMicUI();
+            }
 
             // 成功监听到声音并返回结果
             recognition.onresult = function(event) {
                 const spokenText = event.results[0][0].transcript;
                 
-                // 进行宽容度匹配 (全转小写，去除标点)
+                // 宽容度处理 (全小写，去标点)
                 const cleanSpoken = spokenText.toLowerCase().replace(/[.,!?]/g, "").trim();
                 const cleanTarget = targetSentence.toLowerCase().replace(/[.,!?]/g, "").trim();
 
                 if (cleanSpoken.includes(cleanTarget) || cleanTarget === cleanSpoken) {
-                    // 读对了！
                     feedbackBox.innerHTML = `✅ <span class="text-green-400">Perfect! 识别结果: "${spokenText}"</span>`;
-                    triggerReward(); // 触发云端打钱逻辑
+                    triggerReward(); 
                 } else {
-                    // 读错了
-                    feedbackBox.innerHTML = `❌ <span class="text-red-400">再试一次！系统听到的是: "${spokenText}"</span>`;
+                    feedbackBox.innerHTML = `❌ <span class="text-red-400">系统听到的是: "${spokenText}"，请重试。</span>`;
                 }
             };
 
-            // 录音结束恢复 UI
+            // 录音自然结束
             recognition.onspeechend = function() {
                 recognition.stop();
                 resetMicUI();
             };
 
-            // 错误处理 (比如用户拒绝了麦克风权限)
+            // 错误拦截与自愈逻辑
             recognition.onerror = function(event) {
-                feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 麦克风出错: ${event.error}</span>`;
+                console.warn("语音引擎报告错误:", event.error);
+                
+                if (event.error === 'not-allowed') {
+                    feedbackBox.innerHTML = "<span class='text-amber-400'>⚠️ 请在浏览器弹窗中【允许麦克风权限】后重试</span>";
+                } else if (event.error === 'network') {
+                    feedbackBox.innerHTML = "<span class='text-amber-500'>🔄 识别网络抖动，请再点击一次录音按钮</span>";
+                } else if (event.error === 'no-speech') {
+                    feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到声音，请大声一点。</span>";
+                } else {
+                    feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 引擎错误: ${event.error}，请重试</span>`;
+                }
                 resetMicUI();
             };
         };
@@ -232,7 +250,7 @@
         }
 
         // ==========================================
-        // 4. 商业闭环：读对后向云端申请结算
+        // 4. 商业闭环：向云端申请结算
         // ==========================================
         async function triggerReward() {
             if (!oasisCloud) return;
@@ -240,16 +258,14 @@
             micBtn.disabled = true;
 
             const { data: { user } } = await oasisCloud.auth.getUser();
-            if (!user) return;
+            if (!user) { resetMicUI(); return; }
 
-            // 获取最新余额并加钱
             const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
             const updatedBalance = (profile?.wallet_balance || 0) + 0.35;
 
             const { error } = await oasisCloud.from('profiles').update({ wallet_balance: updatedBalance }).eq('id', user.id);
             
             if (!error) {
-                // 更新页面金库数字，并加个小动画
                 balanceEl.innerText = updatedBalance.toFixed(2);
                 balanceEl.classList.add('fade-in');
                 setTimeout(() => balanceEl.classList.remove('fade-in'), 300);
