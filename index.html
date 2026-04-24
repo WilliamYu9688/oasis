@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V6.8 瞬时分析版</title>
+    <title>Oasis Bridge - V6.9 FSM 状态机版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -59,6 +59,9 @@
     </div>
 
     <script>
+        // ==========================================
+        // 1. 莱文斯坦核心打分算法
+        // ==========================================
         function calculateSimilarity(str1, str2) {
             const s1 = str1.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
             const s2 = str2.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, " ");
@@ -76,6 +79,9 @@
             return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
+        // ==========================================
+        // 2. 云端初始化与鉴权
+        // ==========================================
         let oasisCloud;
         function initSupabase() {
             if (window.supabase) {
@@ -101,8 +107,6 @@
             fetchNewPhrase(); 
         }
 
-        function doSignOut() { location.reload(); }
-
         let currentPhrase = null;
         async function fetchNewPhrase() {
             if (!oasisCloud) return;
@@ -117,90 +121,137 @@
                     sentenceEl.innerText = currentPhrase.text_en;
                     zhEl.innerText = currentPhrase.text_zh;
                     document.getElementById('scenario-tag').innerText = currentPhrase.scenario;
-                    document.getElementById('feedback-box').innerHTML = "<span class='text-gray-500 font-bold uppercase tracking-widest'>System Ready</span>";
-                    document.getElementById('mic-btn').disabled = false;
+                    setAppState('READY'); // 题目加载完毕，进入准备状态
                 }
             } catch (err) { sentenceEl.innerText = "CONNECT ERROR"; }
         }
 
+        // ==========================================
+        // 3. 核心：有限状态机 (FSM) 引擎
+        // ==========================================
+        let appState = 'INIT'; // 状态集: INIT, READY, LISTENING, ANALYZING, REWARDING
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null; 
-        let isRecording = false; 
-        let isRewarding = false;
+        let capturedText = "";
 
-        function finishTurn(finalText) {
-            if (isRewarding) return;
+        // UI 渲染总控 (所有界面变化只由这里分发，绝对不乱)
+        function renderUI() {
             const fb = document.getElementById('feedback-box');
-            // 营销话术：AI正在分析
-            fb.innerHTML = `<span class="text-blue-400 animate-pulse font-bold tracking-widest uppercase">🔄 AI 正在分析您的发音...</span>`;
-            
-            // 给予 500ms 的视觉延迟，增加“分析感”
-            setTimeout(() => {
-                const score = calculateSimilarity(finalText, currentPhrase.text_en);
-                if (score >= 90) {
-                    fb.innerHTML = `<span class="text-4xl font-black text-green-400 mb-1">${score}</span><span class="text-[10px] text-gray-500 font-bold uppercase tracking-tighter italic">识别内容: "${finalText}"</span>`;
-                    triggerReward(); 
-                } else {
-                    fb.innerHTML = `<span class="text-3xl font-black text-amber-500 mb-1">${score} 分</span><span class="text-[10px] text-gray-500 font-bold uppercase">听到内容: "${finalText}"</span>`;
-                    resetUIState();
-                }
-            }, 600);
+            const btn = document.getElementById('mic-btn');
+            const text = document.getElementById('mic-text');
+
+            switch(appState) {
+                case 'READY':
+                    fb.innerHTML = "<span class='text-gray-500 font-bold uppercase tracking-widest'>System Ready</span>";
+                    btn.classList.remove('recording-pulse');
+                    btn.disabled = false;
+                    text.innerText = "START RECORDING";
+                    break;
+                case 'LISTENING':
+                    fb.innerHTML = `<span class="text-amber-400 animate-pulse font-bold tracking-widest uppercase">🎙️ 聆听中, 请朗读...</span>`;
+                    btn.classList.add('recording-pulse');
+                    btn.disabled = false;
+                    text.innerText = "STOP (STOP)";
+                    break;
+                case 'ANALYZING':
+                    fb.innerHTML = `<span class="text-blue-400 animate-pulse font-bold tracking-widest uppercase">🔄 AI 正在分析您的发音...</span>`;
+                    btn.classList.remove('recording-pulse');
+                    btn.disabled = true;
+                    text.innerText = "ANALYZING...";
+                    break;
+                case 'REWARDING':
+                    btn.classList.remove('recording-pulse');
+                    btn.disabled = true;
+                    text.innerText = "SETTLING...";
+                    break;
+            }
         }
 
-        function resetUIState() {
-            isRecording = false;
-            const btn = document.getElementById('mic-btn');
-            btn.classList.remove('recording-pulse');
-            btn.disabled = false;
-            document.getElementById('mic-text').innerText = "START RECORDING";
+        // 状态切换入口
+        function setAppState(newState, payload = null) {
+            // 防止高优状态被低优状态意外覆盖
+            if (appState === 'REWARDING' && newState !== 'READY') return;
+            appState = newState;
+            renderUI();
+
+            // 如果切入分析状态，立刻执行打分流程
+            if (newState === 'ANALYZING') {
+                setTimeout(() => evaluateScore(), 600); // 强制展示 600ms 的 AI 分析话术
+            }
         }
 
         window.toggleSpeechRecognition = function() {
-            if (!SpeechRecognition || isRewarding || !currentPhrase) return;
-            const fb = document.getElementById('feedback-box');
+            if (!SpeechRecognition || appState === 'REWARDING' || !currentPhrase) return;
 
-            if (isRecording) {
+            // 1. 如果正在录音，用户点击停止 -> 强制进入分析状态
+            if (appState === 'LISTENING') {
                 try { recognition.stop(); } catch(e) {}
+                setAppState('ANALYZING');
                 return;
             }
 
-            isRecording = true;
+            // 2. 如果在 READY 状态，用户点击开始 -> 创建全新识别实例
+            capturedText = ""; // 清空上一次的残余
+            setAppState('LISTENING');
+            
             recognition = new SpeechRecognition(); 
             recognition.lang = 'en-US'; 
-            recognition.continuous = false; // 商业级单句精识别
+            recognition.continuous = false; 
             recognition.interimResults = false; 
 
-            document.getElementById('mic-btn').classList.add('recording-pulse'); 
-            document.getElementById('mic-text').innerText = "STOP (STOP)";
-            fb.innerHTML = `<span class="text-amber-400 animate-pulse font-bold tracking-widest uppercase">🎙️ 系统正在聆听，请朗读...</span>`;
-            
-            recognition.start();
-
             recognition.onresult = (event) => {
-                const spoken = event.results[0][0].transcript;
-                finishTurn(spoken);
+                capturedText = event.results[0][0].transcript;
             };
 
-            recognition.onerror = () => resetUIState();
-            recognition.onend = () => { if(!isRewarding) resetUIState(); };
+            recognition.onerror = (e) => {
+                if (appState !== 'LISTENING') return;
+                const fb = document.getElementById('feedback-box');
+                fb.innerHTML = `<span class="text-red-400 font-bold uppercase text-[10px]">⚠️ Error: ${e.error}</span>`;
+                setTimeout(() => setAppState('READY'), 2000);
+            };
+
+            // 无论正常结束还是意外停止，必定触发 onend
+            recognition.onend = () => { 
+                if (appState === 'LISTENING') {
+                    // 如果引擎自己停了，而且抓到了声音，进分析状态
+                    if (capturedText !== "") {
+                        setAppState('ANALYZING');
+                    } else {
+                        // 没抓到声音（环境太安静）
+                        const fb = document.getElementById('feedback-box');
+                        fb.innerHTML = `<span class="text-gray-500 font-bold uppercase text-[10px]">No Speech Detected</span>`;
+                        setTimeout(() => setAppState('READY'), 1500);
+                    }
+                }
+            };
+
+            recognition.start();
         };
 
-        async function triggerReward() {
-            isRewarding = true; 
-            document.getElementById('mic-text').innerText = "SETTLING...";
-            try {
-                const { data: { user } } = await oasisCloud.auth.getUser();
-                const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
-                const newBalance = (profile?.wallet_balance || 0) + Number(currentPhrase.reward_aed);
-                await oasisCloud.from('profiles').update({ wallet_balance: newBalance }).eq('id', user.id);
-                document.getElementById('balance').innerText = newBalance.toFixed(2);
-                setTimeout(async () => {
-                    await fetchNewPhrase(); 
-                    isRewarding = false;
-                    resetUIState();
-                }, 1500);
-            } catch (err) { isRewarding = false; resetUIState(); }
+        // ==========================================
+        // 4. 打分与结算流程
+        // ==========================================
+        function evaluateScore() {
+            const fb = document.getElementById('feedback-box');
+            // 防御性校验
+            if (!capturedText) {
+                fb.innerHTML = `<span class="text-gray-500 font-bold uppercase text-[10px]">Empty Record</span>`;
+                setTimeout(() => setAppState('READY'), 1500);
+                return;
+            }
+
+            const score = calculateSimilarity(capturedText, currentPhrase.text_en);
+            
+            if (score >= 90) {
+                fb.innerHTML = `<span class="text-4xl font-black text-green-400 mb-1">${score}</span><span class="text-[10px] text-gray-500 font-bold uppercase tracking-tighter italic">识别内容: "${capturedText}"</span>`;
+                triggerReward(); 
+            } else {
+                fb.innerHTML = `<span class="text-3xl font-black text-amber-500 mb-1">${score} 分</span><span class="text-[10px] text-gray-500 font-bold uppercase">听到内容: "${capturedText}"</span>`;
+                setTimeout(() => setAppState('READY'), 2000); // 留 2 秒看分数，然后准许重新录音
+            }
         }
-    </script>
-</body>
-</html>
+
+        async function triggerReward() {
+            setAppState('REWARDING');
+            try {
+                const { data: { user } } = await oasisCloud.auth.
