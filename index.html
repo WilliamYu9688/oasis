@@ -68,11 +68,10 @@
 
     <script>
         // ==========================================
-        // 1. 云端基建初始化 (Supabase)
+        // 1. 云端基建初始化 (保持不变)
         // ==========================================
         let oasisCloud;
         const msgBox = document.getElementById('auth-msg');
-
         try {
             if (window.supabase) {
                 oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
@@ -93,25 +92,19 @@
         let isLoginMode = true; 
 
         // ==========================================
-        // 2. 账号与登录逻辑
+        // 2. 账号与登录逻辑 (保持不变)
         // ==========================================
         window.toggleAuthMode = function() {
             isLoginMode = !isLoginMode; 
             msgBox.innerText = ""; 
             if (isLoginMode) {
-                confirmPwdInput.classList.add('hidden');
-                confirmPwdInput.classList.remove('fade-in');
-                mainAuthBtn.innerText = "登 录";
-                switchModeBtn.innerText = "没有账号？点击开通金库";
-                authSubtitle.innerText = "欢迎回来，请登录您的云端金库";
-                pwdInput.placeholder = "密码";
+                confirmPwdInput.classList.add('hidden'); confirmPwdInput.classList.remove('fade-in');
+                mainAuthBtn.innerText = "登 录"; switchModeBtn.innerText = "没有账号？点击开通金库";
+                authSubtitle.innerText = "欢迎回来，请登录您的云端金库"; pwdInput.placeholder = "密码";
             } else {
-                confirmPwdInput.classList.remove('hidden');
-                confirmPwdInput.classList.add('fade-in'); 
-                mainAuthBtn.innerText = "注 册 新 账 号";
-                switchModeBtn.innerText = "已有账号？直接登录";
-                authSubtitle.innerText = "只需两步，创建您的专属账本";
-                pwdInput.placeholder = "设置密码 (至少6位)";
+                confirmPwdInput.classList.remove('hidden'); confirmPwdInput.classList.add('fade-in'); 
+                mainAuthBtn.innerText = "注 册 新 账 号"; switchModeBtn.innerText = "已有账号？直接登录";
+                authSubtitle.innerText = "只需两步，创建您的专属账本"; pwdInput.placeholder = "设置密码 (至少6位)";
             }
         };
 
@@ -122,68 +115,52 @@
 
         async function doSignUp() {
             const email = document.getElementById('email').value;
-            const pwd1 = pwdInput.value;
-            const pwd2 = confirmPwdInput.value;
+            const pwd1 = pwdInput.value; const pwd2 = confirmPwdInput.value;
             if (!email || !pwd1 || !pwd2) return msgBox.innerText = "⚠️ 请完整填写"; 
             if (pwd1 !== pwd2) return msgBox.innerText = "❌ 密码不一致"; 
-            
             msgBox.innerText = "⏳ 正在开通...";
-            const { data, error } = await oasisCloud.auth.signUp({ email, password: pwd1 });
-            if (error) { msgBox.innerText = "❌ " + error.message; } 
-            else {
-                msgBox.innerText = "✅ 注册成功！请登录。";
-                pwdInput.value = ''; confirmPwdInput.value = '';
-                setTimeout(toggleAuthMode, 1500);
-            }
+            const { error } = await oasisCloud.auth.signUp({ email, password: pwd1 });
+            if (error) msgBox.innerText = "❌ " + error.message; 
+            else { msgBox.innerText = "✅ 注册成功！请登录。"; pwdInput.value = ''; confirmPwdInput.value = ''; setTimeout(toggleAuthMode, 1500); }
         }
 
         async function doSignIn() {
-            const email = document.getElementById('email').value;
-            const password = pwdInput.value;
+            const email = document.getElementById('email').value; const password = pwdInput.value;
             if(!email || !password) return msgBox.innerText = "⚠️ 请输入完整信息"; 
-            
             msgBox.innerText = "⏳ 验证中...";
             const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
             if (error) msgBox.innerText = "❌ " + error.message; else enterApp(data.user);
         }
 
         async function enterApp(user) {
-            authPanel.classList.add('hidden');
-            appPanel.classList.remove('hidden');
+            authPanel.classList.add('hidden'); appPanel.classList.remove('hidden');
             userDisplay.innerText = user.email.split('@')[0];
-            const { data, error } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
+            const { data } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
             if (data) balanceEl.innerText = data.wallet_balance.toFixed(2);
         }
 
         window.doSignOut = async function() {
             await oasisCloud.auth.signOut();
-            appPanel.classList.add('hidden');
-            authPanel.classList.remove('hidden');
-            msgBox.innerText = "✅ 已登出";
-            document.getElementById('email').value = '';
-            pwdInput.value = ''; confirmPwdInput.value = '';
+            appPanel.classList.add('hidden'); authPanel.classList.remove('hidden');
+            msgBox.innerText = "✅ 已登出"; document.getElementById('email').value = ''; pwdInput.value = ''; confirmPwdInput.value = '';
             if(!isLoginMode) toggleAuthMode();
         };
 
         // ==========================================
-        // 3. 核心引擎：V5.1 防卡死语音打分系统
+        // 3. 核心引擎：V5.2 极致润滑版 (修复 aborted 误报)
         // ==========================================
         const targetSentence = "How much is this"; 
         const micBtn = document.getElementById('mic-btn');
         const micText = document.getElementById('mic-text');
         const feedbackBox = document.getElementById('feedback-box');
         
-        // 兼容内核
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null; // 全局实例，方便随时熔断重置
+        let recognition = null; 
 
         window.startSpeechRecognition = function() {
-            if (!SpeechRecognition) {
-                feedbackBox.innerHTML = "<span class='text-red-400'>❌ 您的浏览器不支持语音识别，请使用 Chrome 或 Safari。</span>";
-                return;
-            }
+            if (!SpeechRecognition) return feedbackBox.innerHTML = "<span class='text-red-400'>❌ 您的浏览器不支持，请使用 Chrome 或 Safari。</span>";
 
-            // 防御性编程：如果之前有卡死的录音进程，强制停止
+            // 如果连按了按钮，安静地停掉旧的，不抛出异常
             if (recognition) { 
                 try { recognition.stop(); } catch(e) {} 
             }
@@ -193,23 +170,16 @@
             recognition.interimResults = false; 
             recognition.maxAlternatives = 1;
 
-            // UI 状态更新为“录音中”
+            // 为了防止连按导致 aborted，点下去瞬间禁用按钮
+            micBtn.disabled = true;
             micBtn.classList.add('recording-pulse');
             micText.innerText = "正在聆听...";
             feedbackBox.innerHTML = "<span class='text-white'>请清晰朗读上方的英文...</span>";
 
-            try {
-                recognition.start();
-            } catch(e) {
-                console.error("启动失败", e);
-                resetMicUI();
-            }
+            try { recognition.start(); } catch(e) { resetMicUI(); }
 
-            // 成功监听到声音并返回结果
             recognition.onresult = function(event) {
                 const spokenText = event.results[0][0].transcript;
-                
-                // 宽容度处理 (全小写，去标点)
                 const cleanSpoken = spokenText.toLowerCase().replace(/[.,!?]/g, "").trim();
                 const cleanTarget = targetSentence.toLowerCase().replace(/[.,!?]/g, "").trim();
 
@@ -218,23 +188,27 @@
                     triggerReward(); 
                 } else {
                     feedbackBox.innerHTML = `❌ <span class="text-red-400">系统听到的是: "${spokenText}"，请重试。</span>`;
+                    resetMicUI();
                 }
             };
 
-            // 录音自然结束
             recognition.onspeechend = function() {
-                recognition.stop();
+                try { recognition.stop(); } catch(e) {}
                 resetMicUI();
             };
 
-            // 错误拦截与自愈逻辑
             recognition.onerror = function(event) {
-                console.warn("语音引擎报告错误:", event.error);
+                // 终极拦截：如果是 aborted，直接当作没发生，恢复按钮状态即可
+                if (event.error === 'aborted') {
+                    console.log("录音被平滑重置");
+                    resetMicUI();
+                    return; 
+                }
                 
                 if (event.error === 'not-allowed') {
                     feedbackBox.innerHTML = "<span class='text-amber-400'>⚠️ 请在浏览器弹窗中【允许麦克风权限】后重试</span>";
                 } else if (event.error === 'network') {
-                    feedbackBox.innerHTML = "<span class='text-amber-500'>🔄 识别网络抖动，请再点击一次录音按钮</span>";
+                    feedbackBox.innerHTML = "<span class='text-amber-500'>🔄 网络抖动，请再试一次</span>";
                 } else if (event.error === 'no-speech') {
                     feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到声音，请大声一点。</span>";
                 } else {
@@ -247,13 +221,14 @@
         function resetMicUI() {
             micBtn.classList.remove('recording-pulse');
             micText.innerText = "点击开始录音";
+            micBtn.disabled = false; // 重新启用按钮
         }
 
         // ==========================================
         // 4. 商业闭环：向云端申请结算
         // ==========================================
         async function triggerReward() {
-            if (!oasisCloud) return;
+            if (!oasisCloud) { resetMicUI(); return; }
             micText.innerText = "正在向云端结算...";
             micBtn.disabled = true;
 
@@ -270,9 +245,7 @@
                 balanceEl.classList.add('fade-in');
                 setTimeout(() => balanceEl.classList.remove('fade-in'), 300);
             }
-
-            micBtn.disabled = false;
-            micText.innerText = "继续读下一句";
+            resetMicUI();
         }
     </script>
 </body>
