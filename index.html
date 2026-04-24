@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oasis Bridge - V5.4 毫秒级响应版</title>
+    <title>Oasis Bridge - V5.5 究极看门狗版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -14,7 +14,7 @@
         .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.1); }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        /* 录音时的呼吸灯特效 */
+        /* 录音特效 */
         .recording-pulse { animation: pulse 1.5s infinite; background: #ef4444 !important; color: white !important; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
@@ -68,7 +68,7 @@
 
     <script>
         // ==========================================
-        // 1 & 2. 账号与云端逻辑 (保持不变)
+        // 1 & 2. 账号与云端逻辑
         // ==========================================
         let oasisCloud;
         const msgBox = document.getElementById('auth-msg');
@@ -134,7 +134,7 @@
         };
 
         // ==========================================
-        // 3. 核心引擎：V5.4 严格状态机管控
+        // 3. 核心引擎：V5.5 看门狗强制重置版
         // ==========================================
         const targetSentence = "How much is this"; 
         const micBtn = document.getElementById('mic-btn');
@@ -144,26 +144,48 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null; 
         
-        // 引入三大核心状态锁
-        let isRecording = false;  // 是否正在录音
-        let isProcessing = false; // 是否正在等待分析结果
-        let isRewarding = false;  // 是否正在向云端结算 AED
-        let hasResult = false;    // 本次录音是否拿到了有效文字
+        // 状态锁
+        let isRecording = false;  
+        let isProcessing = false; 
+        let isRewarding = false;  
+        let hasResult = false;    
+
+        // 新增：全局看门狗 (防止任何状态卡死)
+        let watchdogTimer = null;
+        function setWatchdog(ms, warningMsg) {
+            clearTimeout(watchdogTimer);
+            watchdogTimer = setTimeout(() => {
+                if (warningMsg) feedbackBox.innerHTML = `<span class='text-amber-400'>${warningMsg}</span>`;
+                forceResetUI(); // 只要超时，不废话直接重置整个UI和锁
+            }, ms);
+        }
+
+        function forceResetUI() {
+            clearTimeout(watchdogTimer);
+            isRecording = false;
+            isProcessing = false;
+            isRewarding = false;
+            micBtn.classList.remove('recording-pulse');
+            micText.innerText = "点击开始录音";
+            micBtn.disabled = false;
+        }
 
         window.toggleSpeechRecognition = function() {
             if (!SpeechRecognition) return feedbackBox.innerHTML = "<span class='text-red-400'>❌ 不支持语音识别，请换用 Chrome 或 Safari。</span>";
 
-            // 如果正在等待底层出结果，或者正在打钱，严禁任何操作
-            if (isProcessing || isRewarding) return;
+            // 如果正在结算，绝对拦截
+            if (isRewarding) return;
 
             // 【情况 A：停止录音】
-            if (isRecording && recognition) {
-                // 立刻切断交互，给用户最直接的视觉反馈
+            if (isRecording) {
                 isProcessing = true;
                 micBtn.classList.remove('recording-pulse');
                 micText.innerText = "🔄 正在分析发音...";
                 micBtn.disabled = true; 
                 try { recognition.stop(); } catch(e) {}
+                
+                // 部署 3 秒分析看门狗。如果底层引擎死机不反馈，3秒后强行解锁。
+                setWatchdog(3000, "⚠️ 引擎无响应，已自动恢复，请重试。");
                 return; 
             }
 
@@ -175,7 +197,6 @@
             recognition.interimResults = false; 
             recognition.maxAlternatives = 1;
 
-            // 初始化所有状态
             isRecording = true;
             isProcessing = false;
             hasResult = false;
@@ -184,10 +205,14 @@
             micText.innerText = "正在录音... (点击结束)";
             feedbackBox.innerHTML = "<span class='text-white'>请朗读上方英文，读完再点一次按钮...</span>";
 
-            try { recognition.start(); } catch(e) { resetMicUI(); }
+            // 部署 8 秒录音看门狗。防止用户一直不点结束导致锁死。
+            setWatchdog(8000, "⚠️ 录音超时，已自动结束。");
+
+            try { recognition.start(); } catch(e) { forceResetUI(); }
 
             recognition.onresult = function(event) {
-                hasResult = true; // 打上成功拿到结果的标记
+                clearTimeout(watchdogTimer); // 拿到结果，解除看门狗
+                hasResult = true; 
                 const spokenText = event.results[0][0].transcript;
                 const cleanSpoken = spokenText.toLowerCase().replace(/[.,!?]/g, "").trim();
                 const cleanTarget = targetSentence.toLowerCase().replace(/[.,!?]/g, "").trim();
@@ -197,72 +222,61 @@
                     triggerReward(); 
                 } else {
                     feedbackBox.innerHTML = `❌ <span class="text-red-400">系统听到的是: "${spokenText}"，请重试。</span>`;
+                    // 读错了不需要结算，直接解锁
+                    forceResetUI();
                 }
             };
 
             recognition.onerror = function(event) {
-                hasResult = true; // 拦截默认错误，防止被 onend 覆盖
+                clearTimeout(watchdogTimer);
+                hasResult = true; 
                 if (event.error === 'aborted') {
-                    // 用户主动停止，静默处理
+                    // 静默处理
                 } else if (event.error === 'not-allowed') {
                     feedbackBox.innerHTML = "<span class='text-amber-400'>⚠️ 请允许麦克风权限</span>";
                 } else if (event.error === 'no-speech') {
                     feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到声音，请大声一点。</span>";
                 } else {
-                    feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 引擎错误: ${event.error}</span>`;
+                    feedbackBox.innerHTML = `<span class='text-red-400'>⚠️ 引擎网络抖动，请重试</span>`;
                 }
+                forceResetUI();
             };
 
             recognition.onend = function() {
-                // 核心修复：如果录音结束了，既没成功也没报错，说明没收到有效声音
+                clearTimeout(watchdogTimer);
                 if (!hasResult && isRecording) {
-                    feedbackBox.innerHTML = "<span class='text-gray-400'>录音已结束，未检测到有效发音，请重试。</span>";
+                    feedbackBox.innerHTML = "<span class='text-gray-400'>未检测到有效发音，请重试。</span>";
                 }
-                resetMicUI();
+                if (!isRewarding) forceResetUI();
             };
         };
 
-        // 统一的 UI 恢复中心
-        function resetMicUI() {
-            // 如果正在向云端发钱，绝对不允许重置按钮（防止冲突）
-            if (isRewarding) return; 
-            
-            isRecording = false;
-            isProcessing = false;
-            micBtn.classList.remove('recording-pulse');
-            micText.innerText = "点击开始录音";
-            micBtn.disabled = false;
-        }
-
         // ==========================================
-        // 4. 商业闭环：向云端申请结算
+        // 4. 商业闭环：结算必须加 Try-Finally 保底
         // ==========================================
         async function triggerReward() {
-            if (!oasisCloud) return;
+            if (!oasisCloud) return forceResetUI();
             
-            // 锁定打钱状态
             isRewarding = true;
             micText.innerText = "正在向云端结算...";
             micBtn.disabled = true;
 
-            const { data: { user } } = await oasisCloud.auth.getUser();
-            if (!user) { isRewarding = false; resetMicUI(); return; }
+            try {
+                const { data: { user } } = await oasisCloud.auth.getUser();
+                if (!user) throw new Error("用户未登录");
 
-            const { data: profile } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
-            const updatedBalance = (profile?.wallet_balance || 0) + 0.35;
+                const { data: profile, error: selectErr } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', user.id).single();
+                if (selectErr) throw selectErr;
 
-            const { error } = await oasisCloud.from('profiles').update({ wallet_balance: updatedBalance }).eq('id', user.id);
-            
-            if (!error) {
+                const updatedBalance = (profile?.wallet_balance || 0) + 0.35;
+
+                const { error: updateErr } = await oasisCloud.from('profiles').update({ wallet_balance: updatedBalance }).eq('id', user.id);
+                if (updateErr) throw updateErr;
+                
+                // 成功后更新UI动画
                 balanceEl.innerText = updatedBalance.toFixed(2);
                 balanceEl.classList.add('fade-in');
                 setTimeout(() => balanceEl.classList.remove('fade-in'), 300);
-            }
-            
-            // 打钱完毕，解除锁定并全面恢复 UI
-            isRewarding = false;
-            resetMicUI();
-        }
-    </script>
-</body>
-</html>
+                
+            } catch (error) {
+                console.error("云端结算失败:", error);
