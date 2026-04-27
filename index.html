@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V8.0 - 工业加固版</title>
+    <title>Oasis Bridge V8.1 - 逻辑解锁与语料纠错版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -17,6 +17,7 @@
         .hidden-screen { display: none !important; }
         .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; }
         input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body class="font-sans overflow-hidden bg-slate-900">
@@ -24,7 +25,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">STABLE V8.0</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">STABLE V8.1</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
@@ -137,7 +138,7 @@
             <button onclick="closeModal('store-modal')" class="absolute top-8 right-8 text-white">✕</button>
             <div class="space-y-4">
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
-                    <h4 class="text-lg font-bold text-white">LUM 权限</h4>
+                    <h4 class="text-lg font-bold text-white">LUM 画像系统</h4>
                     <button onclick="buyItem(50, 'LUM')" class="w-full mt-4 py-3 bg-blue-600 rounded-xl text-white font-black">50 AED 兑换</button>
                 </div>
             </div>
@@ -145,16 +146,12 @@
     </div>
 
     <script>
-        // Supabase 配置
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
         let currentUser = null; let isRegisterMode = false; let currentPhrase = null;
         let walletBalance = 0; let appState = 'READY'; let recognition = null; let capturedText = "";
         let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
-        // ==========================================
-        // V8.0 核心修复：数字映射与状态加固
-        // ==========================================
         function normalizeText(str, lang) {
             if(!str) return "";
             let s = str.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
@@ -193,8 +190,10 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
 
         async function updateLumDisplay() {
-            const { count } = await oasisCloud.from('user_errors').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
-            document.getElementById('lum-count').innerText = count || 0;
+            try {
+                const { count } = await oasisCloud.from('user_errors').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+                document.getElementById('lum-count').innerText = count || 0;
+            } catch(e) {}
         }
 
         function startApp() {
@@ -203,11 +202,8 @@
             fetchNewPhrase();
         }
 
-        // ==========================================
-        // V8.0 关键：获取新题时必须重置所有按钮状态
-        // ==========================================
         async function fetchNewPhrase() {
-            setAppState('READY'); // 强制重置按钮状态
+            setAppState('READY');
             document.getElementById('target-text').innerText = "Loading...";
             const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel).eq('lang', state.path);
             if(!data || data.length === 0) return document.getElementById('target-text').innerText = "Empty Data";
@@ -219,83 +215,78 @@
             document.getElementById('lum-diagnosis').innerHTML = "";
         }
 
-        // ==========================================
-        // V8.0 修复：录音对象在 start 前必须尝试回收上一个对象
-        // ==========================================
         function toggleRecord() {
-            if (appState === 'REWARDING' || appState === 'ANALYZING') return;
+            if (appState !== 'READY') return;
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (appState === 'LISTENING') { 
-                if (recognition) recognition.stop();
-                setAppState('ANALYZING');
-                return; 
-            }
-
-            // 启动录音
             capturedText = "";
-            if (recognition) { try { recognition.stop(); } catch(e) {} } // 强行回收
-            
+            if (recognition) { try { recognition.stop(); } catch(e) {} }
             recognition = new SpeechRec();
             recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            recognition.interimResults = false;
-            
             recognition.onresult = (e) => { capturedText = e.results[0][0].transcript; };
             recognition.onend = () => { if(appState === 'LISTENING') setAppState('ANALYZING'); };
-            recognition.onerror = (e) => { console.error(e); setAppState('READY'); };
-            
-            try {
-                recognition.start();
-                setAppState('LISTENING');
-            } catch(e) {
-                console.error("Recognition Start Error", e);
-                setAppState('READY');
-            }
+            recognition.onerror = () => { setAppState('READY'); };
+            try { recognition.start(); setAppState('LISTENING'); } catch(e) { setAppState('READY'); }
         }
 
+        // ==========================================
+        // V8.1 核心修复：异步超时保险
+        // ==========================================
         async function evaluateLogic() {
             const fb = document.getElementById('score-display');
             const targetText = document.getElementById('target-text').innerText.replace(/"/g, "");
             const score = calculateSimilarity(capturedText, targetText);
             
-            // LUM 分析
-            const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-            const aWords = normalizeText(targetText, state.path).split(/\s+/);
-            const bWords = normalizeText(capturedText, state.path).split(/\s+/);
-            let missed = aWords.filter(w => w && !bWords.includes(w));
-            
-            if (missed.length > 0) {
-                const records = missed.map(word => {
-                    const tag = document.createElement('span'); tag.className = 'lum-tag'; tag.innerText = word.toUpperCase(); diag.appendChild(tag);
-                    return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: word, error_tag: 'Missed' };
-                });
-                await oasisCloud.from('user_errors').insert(records);
-                updateLumDisplay();
-            }
+            setAppState('ANALYZING'); // 锁定 UI
 
-            // 奖励结算
-            let reward = (score >= 90) ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
-            if (reward > 0) {
-                walletBalance += reward;
-                await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id);
-                document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
+            // 强制超时保护：如果数据库 3.5 秒没响应，强制继续
+            const forceTimeout = setTimeout(() => {
+                if(appState === 'ANALYZING') {
+                    console.warn("DB Timeout - Forcing state reset");
+                    fetchNewPhrase();
+                }
+            }, 3500);
+
+            try {
+                // 1. LUM 分析
+                const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
+                const aWords = normalizeText(targetText, state.path).split(/\s+/);
+                const bWords = normalizeText(capturedText, state.path).split(/\s+/);
+                let missed = aWords.filter(w => w && !bWords.includes(w));
+                
+                if (missed.length > 0) {
+                    const records = missed.map(word => {
+                        const tag = document.createElement('span'); tag.className = 'lum-tag'; tag.innerText = word.toUpperCase(); diag.appendChild(tag);
+                        return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: word, error_tag: 'Missed' };
+                    });
+                    await oasisCloud.from('user_errors').insert(records);
+                    updateLumDisplay();
+                }
+
+                // 2. 奖励结算
+                let reward = (score >= 90) ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
+                if (reward > 0) {
+                    walletBalance += reward;
+                    await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id);
+                    document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
+                }
+                fb.innerHTML = `<span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500">Heard: "${capturedText}"</p>`;
+                
+                clearTimeout(forceTimeout);
+                setTimeout(() => { fetchNewPhrase(); }, 1800);
+            } catch(err) {
+                console.error("Evaluation Error", err);
+                clearTimeout(forceTimeout);
+                fetchNewPhrase();
             }
-            fb.innerHTML = `<span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500">Heard: "${capturedText}"</p>`;
-            
-            setAppState('REWARDING');
-            setTimeout(() => { fetchNewPhrase(); }, 2000);
         }
 
         function setAppState(s) {
             appState = s;
             const btn = document.getElementById('record-btn');
             const rfBtn = document.getElementById('refresh-btn');
-            if (s === 'LISTENING') {
-                btn.classList.add('recording-active');
-            } else {
-                btn.classList.remove('recording-active');
-            }
-            // 锁定刷新按钮防止逻辑冲突
+            if (s === 'LISTENING') btn.classList.add('recording-active');
+            else btn.classList.remove('recording-active');
+            
             if (s === 'ANALYZING' || s === 'REWARDING') {
                 btn.disabled = true; rfBtn.disabled = true;
             } else {
@@ -312,7 +303,11 @@
             return Math.round((1 - d[m][n] / Math.max(m, n)) * 100);
         }
 
-        function playAudio() { window.speechSynthesis.speak(new SpeechSynthesisUtterance(document.getElementById('target-text').innerText)); }
+        function playAudio() { 
+            const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText);
+            u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            window.speechSynthesis.speak(u); 
+        }
         function openStore() { document.getElementById('store-modal').classList.remove('hidden-screen'); }
         async function buyItem(p, n) { 
             if (walletBalance < p) return alert("余额不足"); 
