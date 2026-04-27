@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V7.8 - 全功能 LUM 进化版</title>
+    <title>Oasis Bridge V7.9 - 语料净化与数字兼容版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -18,6 +18,8 @@
         .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
+        .money-jump { animation: jump 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; }
+        @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body class="font-sans overflow-hidden bg-slate-900">
@@ -25,7 +27,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">LUM Terminal V7.8</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">LUM Terminal V7.9</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -89,7 +91,7 @@
     </div>
 
     <div id="main-app" class="app-screen z-30 flex flex-col hidden-screen">
-        <div class="glass-panel border-b border-white/5 sticky top-0 z-40 shadow-xl">
+        <div class="glass-panel border-b border-white/5 sticky top-0 z-40">
             <div class="grid grid-cols-3 p-5 gap-2 items-center">
                 <div class="text-center cursor-pointer" onclick="openStore()">
                     <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">👛 WALLET</p>
@@ -107,7 +109,7 @@
         </div>
 
         <div class="flex-grow flex flex-col justify-center px-5 pb-12 z-20 relative mt-4">
-            <div class="glass-panel rounded-[40px] p-7 text-center shadow-2xl relative border-t border-white/10">
+            <div class="glass-panel rounded-[40px] p-7 text-center shadow-2xl border-t border-white/10">
                 <div class="mb-4 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 tracking-widest uppercase">SCENE: STANDBY</span>
                 </div>
@@ -118,7 +120,7 @@
                 <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
 
                 <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center">
-                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">SYSTEM READY</p>
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">READY</p>
                 </div>
 
                 <div class="flex items-center justify-between px-1">
@@ -144,7 +146,7 @@
                     <button onclick="buyItem(50, 'LUM 权限')" class="w-full mt-4 py-3 bg-blue-600 rounded-xl text-white font-black">50 AED 兑换</button>
                 </div>
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
-                    <h4 class="text-lg font-bold text-amber-400">青海河床盲盒</h4>
+                    <h4 class="text-lg font-bold text-amber-400">青海河床原石盲盒</h4>
                     <button onclick="buyItem(150, '原石盲盒')" class="w-full mt-4 py-3 bg-amber-600 rounded-xl text-white font-black">150 AED 抽取</button>
                 </div>
             </div>
@@ -160,7 +162,20 @@
         let walletBalance = 0; let appState = 'READY'; let recognition = null; let capturedText = "";
         let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
-        // --- 鉴权逻辑 (完全恢复 V7.6) ---
+        // ==========================================
+        // V7.9 数字标准化函数：核心逻辑升级
+        // ==========================================
+        function normalizeText(str, lang) {
+            let s = str.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
+            if (lang === 'cn') {
+                // 将汉字数字统一映射为阿拉伯数字，解决识别冲突
+                const mapping = { '一': '1', '二': '2', '三': '3', '四': '4', '五': '5', '六': '6', '七': '7', '八': '8', '九': '9', '十': '10' };
+                for (let key in mapping) { s = s.replace(new RegExp(key, 'g'), mapping[key]); }
+            }
+            return s;
+        }
+
+        // --- 鉴权与引导 (恢复 V7.8) ---
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
             document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
@@ -171,34 +186,29 @@
         async function executeAuth() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            let result;
-            if (isRegisterMode) result = await oasisCloud.auth.signUp({ email, password });
-            else result = await oasisCloud.auth.signInWithPassword({ email, password });
-
+            let result = isRegisterMode ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
             if (result.error) { document.getElementById('auth-msg').innerText = "❌ " + result.error.message; return; }
             currentUser = result.data.user;
             const { data: profile } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
             if (!profile) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
             walletBalance = profile?.wallet_balance || 0;
             document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
-            
             document.getElementById('auth-screen').classList.add('hidden-screen');
             document.getElementById('step-1').classList.remove('hidden-screen');
         }
 
-        // --- 流程控制 (完全恢复 V7.6) ---
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         function handleStep2(lvl) { state.dbLevel = lvl; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
         function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
 
-        // --- LUM 分析引擎 (集成 V7.7) ---
+        // --- LUM 与业务引擎 ---
         async function runLUMAnalysis(captured, target, phraseId) {
             const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-            const clean = (s) => s.toLowerCase().replace(/[^\w\s\d]/g, "").trim().split(/\s+/);
-            const tWords = clean(target); const cWords = clean(captured);
-            let missed = tWords.filter(w => !cWords.includes(w));
+            const a = normalizeText(target, state.path).split(/\s+/);
+            const b = normalizeText(captured, state.path).split(/\s+/);
+            let missed = a.filter(word => !b.includes(word));
             
             if (missed.length > 0) {
                 const records = missed.map(word => {
@@ -207,7 +217,7 @@
                 });
                 await oasisCloud.from('user_errors').insert(records);
                 updateLumDisplay();
-            } else { diag.innerHTML = "<span class='text-emerald-400 text-[10px] font-bold tracking-widest'>✨ PERFECT</span>"; }
+            } else { diag.innerHTML = "<span class='text-emerald-400 text-[10px] font-bold tracking-widest'>✨ PERFECT ARTICULATION</span>"; }
         }
 
         async function updateLumDisplay() {
@@ -215,7 +225,6 @@
             document.getElementById('lum-count').innerText = count || 0;
         }
 
-        // --- 核心业务循环 ---
         function startApp() {
             updateLumDisplay();
             setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`; } }, 1000);
@@ -226,7 +235,8 @@
             document.getElementById('target-text').innerText = "Loading...";
             const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel).eq('lang', state.path);
             currentPhrase = data[Math.floor(Math.random() * data.length)];
-            document.getElementById('target-text').innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
+            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            document.getElementById('target-text').innerText = `"${t}"`;
             document.getElementById('target-zh').innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-widest'>READY</p>";
@@ -238,7 +248,7 @@
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (appState === 'LISTENING') { recognition.stop(); setAppState('ANALYZING'); return; }
             capturedText = ""; recognition = new SpeechRec(); recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            recognition.onresult = (e) => capturedText = e.results[0][0].transcript;
+            recognition.onresult = (e) => capturedText = Array.from(e.results).map(r => r[0].transcript).join('');
             recognition.onend = () => { if(appState === 'LISTENING') setAppState('ANALYZING'); };
             recognition.start(); setAppState('LISTENING');
         }
@@ -254,6 +264,8 @@
                 walletBalance += reward;
                 await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id);
                 document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
+                document.getElementById('total-earned').classList.add('money-jump');
+                setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
             }
             fb.innerHTML = `<span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500 mt-2">Heard: "${capturedText}"</p>`;
             setTimeout(() => { if (reward > 0) fetchNewPhrase(); else setAppState('READY'); }, 2000);
@@ -261,23 +273,30 @@
 
         function setAppState(s) {
             appState = s; const btn = document.getElementById('record-btn');
-            if (s === 'LISTENING') btn.classList.add('recording-active');
-            else btn.classList.remove('recording-active');
+            if (s === 'LISTENING') btn.classList.add('recording-active'); else btn.classList.remove('recording-active');
             if (s === 'ANALYZING') evaluateLogic();
         }
 
         function calculateSimilarity(s1, s2) {
-            const c = (s) => s.toLowerCase().replace(/[^\w\s\d]/g, "");
-            const a = c(s1), b = c(s2); if (a === b) return 100;
+            const a = normalizeText(s1, state.path); const b = normalizeText(s2, state.path);
+            if (a === b) return 100;
             const m = a.length, n = b.length, d = Array.from({length: m+1}, () => new Uint32Array(n+1));
             for(let i=0; i<=m; i++) d[i][0] = i; for(let j=0; j<=n; j++) d[0][j] = j;
             for(let i=1; i<=m; i++) for(let j=1; j<=n; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
             return Math.round((1 - d[m][n] / Math.max(m, n)) * 100);
         }
 
-        function playAudio() { window.speechSynthesis.speak(new SpeechSynthesisUtterance(document.getElementById('target-text').innerText)); }
+        function playAudio() { 
+            const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText);
+            u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            window.speechSynthesis.speak(u); 
+        }
         function openStore() { document.getElementById('store-modal').classList.remove('hidden-screen'); }
-        async function buyItem(p, n) { if (walletBalance < p) return alert("余额不足"); walletBalance -= p; await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id); document.getElementById('total-earned').innerText = walletBalance.toFixed(2); alert("兑换成功: " + n); closeModal('store-modal'); }
+        async function buyItem(p, n) { 
+            if (walletBalance < p) return alert("余额不足"); 
+            walletBalance -= p; await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id); 
+            document.getElementById('total-earned').innerText = walletBalance.toFixed(2); alert("兑换成功: " + n); closeModal('store-modal'); 
+        }
     </script>
 </body>
 </html>
