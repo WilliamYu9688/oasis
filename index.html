@@ -3,259 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V7.7 - LUM 标签进化版</title>
+    <title>Oasis Bridge V7.8 - 全功能 LUM 进化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
         .app-screen { background: radial-gradient(circle at top right, #1f2937, #030712 80%); color: #f3f4f6; min-height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; overflow-y: auto; }
-        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+        .glass-btn { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; }
         @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 100% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } }
         .hidden-screen { display: none !important; }
-        .lum-tag { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; }
-        input { background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none; }
+        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
-<body class="font-sans bg-slate-900">
+<body class="font-sans overflow-hidden bg-slate-900">
 
-    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center">
+    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
-            <h1 class="text-5xl font-black text-amber-500 italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em]">LUM ENGINE V7.7</p>
+            <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">LUM Terminal V7.8</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full">
+            <h2 id="auth-title" class="text-2xl font-black text-white mb-6 text-center">System Login</h2>
             <form onsubmit="event.preventDefault(); executeAuth();" class="space-y-4">
-                <input id="email" type="email" placeholder="Email" class="w-full p-5 rounded-2xl">
-                <input id="password" type="password" placeholder="Password" class="w-full p-5 rounded-2xl">
-                <button type="submit" id="auth-action-btn" class="w-full py-5 rounded-2xl bg-amber-600 text-white font-black">进入系统</button>
-                <p id="auth-msg" class="text-center text-xs text-red-400 min-h-[1.5rem]"></p>
+                <input id="email" type="email" placeholder="Email" required class="w-full p-5 rounded-2xl">
+                <input id="password" type="password" placeholder="Password" required class="w-full p-5 rounded-2xl">
+                <div id="confirm-password-container" class="overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-5 rounded-2xl">
+                </div>
+                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-5 rounded-2xl bg-amber-600 text-white font-black">ENTER OASIS</button>
+                <p id="auth-msg" class="text-center text-xs font-bold text-red-400 min-h-[1.5rem] mt-2"></p>
             </form>
+            <div class="mt-4 text-center border-t border-white/5 pt-5">
+                <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 text-xs font-black underline">Create New Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="step-1" class="app-screen z-50 flex flex-col p-8 justify-center hidden-screen">
+        <div class="mb-14 text-center"><h1 class="text-5xl font-black text-gold-gradient italic">Oasis Bridge</h1></div>
+        <div class="space-y-5">
+            <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[32px] p-8 text-left shadow-xl relative overflow-hidden">
+                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇨🇳</div>
+                <h3 class="font-bold text-2xl text-white">Learn Mandarin</h3>
+                <p class="text-xs text-amber-500 mt-2 font-bold uppercase tracking-widest">Digital Nomad Path</p>
+            </button>
+            <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[32px] p-8 text-left shadow-xl relative overflow-hidden border-amber-500/30">
+                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇦🇪</div>
+                <h3 class="font-bold text-2xl text-amber-400">我要学英语</h3>
+                <p class="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest">中东职场实战包</p>
+            </button>
+        </div>
+    </div>
+
+    <div id="step-time" class="app-screen z-45 flex flex-col p-8 justify-center hidden-screen">
+        <div class="mb-12 text-center"><h2 class="text-3xl font-black text-white">设定今日目标</h2></div>
+        <div class="grid grid-cols-2 gap-5">
+            <button onclick="handleStepTime(15)" class="glass-panel py-10 rounded-[32px] font-black text-xl">15 Min</button>
+            <button onclick="handleStepTime(30)" class="glass-panel py-10 rounded-[32px] font-black text-xl">30 Min</button>
+            <button onclick="handleStepTime(45)" class="glass-panel py-10 rounded-[32px] font-black text-xl">45 Min</button>
+            <button onclick="handleStepTime(60)" class="glass-panel py-10 rounded-[32px] font-black text-xl text-amber-400 border-amber-500/30">60 Min</button>
+        </div>
+    </div>
+
+    <div id="step-2" class="app-screen z-40 flex flex-col p-8 justify-center hidden-screen">
+        <div class="mb-12 text-center"><h2 class="text-3xl font-black text-white">选择难度等级</h2></div>
+        <div class="space-y-5">
+            <div onclick="handleStep2(1)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center cursor-pointer">
+                <div><p class="font-bold text-lg text-slate-200">入门级 (L1)</p></div>
+                <div class="font-black text-white text-2xl">99<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            </div>
+            <div onclick="handleStep2(2)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center cursor-pointer">
+                <div><p class="font-bold text-lg text-slate-200">职场级 (L2)</p></div>
+                <div class="font-black text-white text-2xl">299<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            </div>
+            <div onclick="handleStep2(3)" class="glass-panel p-6 rounded-[32px] border-amber-500/40 flex justify-between items-center cursor-pointer bg-amber-600/5">
+                <div><p class="font-bold text-lg text-amber-400">精英级 (L3)</p></div>
+                <div class="font-black text-amber-400 text-3xl">500<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            </div>
         </div>
     </div>
 
     <div id="main-app" class="app-screen z-30 flex flex-col hidden-screen">
-        <div class="glass-panel border-b border-white/5 p-5 grid grid-cols-3 gap-2 sticky top-0 z-40">
-            <div class="text-center cursor-pointer" onclick="openStore()">
-                <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">👛 WALLET</p>
-                <h1 id="total-earned" class="text-sm font-black text-emerald-400">0.00</h1>
-            </div>
-            <div class="text-center border-x border-white/10">
-                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">TIME</p>
-                <h1 id="time-display" class="text-base font-black">0/30m</h1>
-            </div>
-            <div class="text-center">
-                <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">LUM TAGS</p>
-                <h1 id="lum-count" class="text-sm font-black text-blue-400">0 FOUND</h1>
+        <div class="glass-panel border-b border-white/5 sticky top-0 z-40 shadow-xl">
+            <div class="grid grid-cols-3 p-5 gap-2 items-center">
+                <div class="text-center cursor-pointer" onclick="openStore()">
+                    <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">👛 WALLET</p>
+                    <h1 id="total-earned" class="text-sm font-black text-emerald-400">0.00</h1>
+                </div>
+                <div class="text-center border-x border-white/10">
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">TIME</p>
+                    <h1 id="time-display" class="text-base font-black">0/30m</h1>
+                </div>
+                <div class="text-center">
+                    <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">LUM TAGS</p>
+                    <h1 id="lum-count" class="text-sm font-black text-blue-400">0</h1>
+                </div>
             </div>
         </div>
 
-        <div class="flex-grow flex flex-col justify-center px-5 pb-10">
-            <div class="glass-panel rounded-[40px] p-7 text-center relative">
-                <div id="scene-badge" class="mb-4 inline-block px-3 py-1 bg-amber-500/20 rounded-full border border-amber-500/30">
-                    <span id="scene-display" class="text-[10px] font-black text-amber-500 tracking-widest uppercase">SCENE: STANDBY</span>
+        <div class="flex-grow flex flex-col justify-center px-5 pb-12 z-20 relative mt-4">
+            <div class="glass-panel rounded-[40px] p-7 text-center shadow-2xl relative border-t border-white/10">
+                <div class="mb-4 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
+                    <span id="scene-display" class="text-[9px] font-black text-amber-500 tracking-widest uppercase">SCENE: STANDBY</span>
                 </div>
 
-                <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center text-white italic">"Ready for Analysis"</h2>
-                <p id="target-zh" class="text-sm text-slate-400 mb-6 min-h-[20px]"></p>
+                <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center italic text-white leading-tight">"Connecting..."</h2>
+                <p id="target-zh" class="text-sm text-slate-400 mb-6"></p>
                 
-                <div id="lum-diagnosis" class="min-h-[40px] mb-4 flex flex-wrap justify-center gap-2"></div>
+                <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
 
-                <div id="score-display" class="h-20 mb-6 flex flex-col items-center justify-center">
-                    <p class="text-gray-500 text-[10px] font-bold tracking-widest">AWAITING INPUT</p>
+                <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">SYSTEM READY</p>
                 </div>
 
-                <div class="flex items-center justify-center gap-8">
-                    <button onclick="fetchNewPhrase()" class="w-12 h-12 glass-panel rounded-full flex items-center justify-center active:scale-75 transition-transform">🔄</button>
-                    <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-lg transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
+                <div class="flex items-center justify-between px-1">
+                    <button onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75">🔄</button>
+                    <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-xl transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                         <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg>
                     </button>
-                    <button onclick="playAudio()" class="w-12 h-12 glass-panel rounded-full flex items-center justify-center active:scale-75">🔊</button>
+                    <button onclick="playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75">🔊</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="store-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-end hidden-screen">
+        <div class="glass-panel rounded-t-[40px] p-8 h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-3xl font-black text-emerald-400">Oasis Store</h3>
+                <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full text-white">✕</button>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
+                    <h4 class="text-lg font-bold text-white">LUM 错题画像权限</h4>
+                    <button onclick="buyItem(50, 'LUM 权限')" class="w-full mt-4 py-3 bg-blue-600 rounded-xl text-white font-black">50 AED 兑换</button>
+                </div>
+                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
+                    <h4 class="text-lg font-bold text-amber-400">青海河床盲盒</h4>
+                    <button onclick="buyItem(150, '原石盲盒')" class="w-full mt-4 py-3 bg-amber-600 rounded-xl text-white font-black">150 AED 抽取</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 核心配置与初始化
-        // ==========================================
         const supabaseUrl = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const supabaseKey = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         const oasisCloud = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        let currentUser = null;
-        let currentPhrase = null;
-        let appState = 'READY';
-        let walletBalance = 0;
-        let recognition = null;
-        let capturedText = "";
+        let currentUser = null; let isRegisterMode = false; let currentPhrase = null;
+        let walletBalance = 0; let appState = 'READY'; let recognition = null; let capturedText = "";
+        let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
-        // ==========================================
-        // LUM 差分对比算法：找出你到底读错了哪个词
-        // ==========================================
+        // --- 鉴权逻辑 (完全恢复 V7.6) ---
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
+            document.getElementById('confirm-password-container').style.opacity = isRegisterMode ? "1" : "0";
+            document.getElementById('auth-title').innerText = isRegisterMode ? "Create Account" : "System Login";
+        }
+
+        async function executeAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            let result;
+            if (isRegisterMode) result = await oasisCloud.auth.signUp({ email, password });
+            else result = await oasisCloud.auth.signInWithPassword({ email, password });
+
+            if (result.error) { document.getElementById('auth-msg').innerText = "❌ " + result.error.message; return; }
+            currentUser = result.data.user;
+            const { data: profile } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+            if (!profile) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
+            walletBalance = profile?.wallet_balance || 0;
+            document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
+            
+            document.getElementById('auth-screen').classList.add('hidden-screen');
+            document.getElementById('step-1').classList.remove('hidden-screen');
+        }
+
+        // --- 流程控制 (完全恢复 V7.6) ---
+        function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        function handleStep2(lvl) { state.dbLevel = lvl; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
+        function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
+
+        // --- LUM 分析引擎 (集成 V7.7) ---
         async function runLUMAnalysis(captured, target, phraseId) {
-            const diagnosisBox = document.getElementById('lum-diagnosis');
-            diagnosisBox.innerHTML = "";
-            
-            // 文本预处理：转小写，去标点
+            const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
             const clean = (s) => s.toLowerCase().replace(/[^\w\s\d]/g, "").trim().split(/\s+/);
-            const targetWords = clean(target);
-            const capturedWords = clean(captured);
+            const tWords = clean(target); const cWords = clean(captured);
+            let missed = tWords.filter(w => !cWords.includes(w));
             
-            // 找出目标句中存在但识别文本中缺失的单词（即错读/漏读）
-            let missedWords = targetWords.filter(word => !capturedWords.includes(word));
-            
-            if (missedWords.length > 0) {
-                const errorRecords = [];
-                missedWords.forEach(word => {
-                    // 1. UI 反馈
-                    const tag = document.createElement('span');
-                    tag.className = 'lum-tag';
-                    tag.innerText = `Missed: ${word.toUpperCase()}`;
-                    diagnosisBox.appendChild(tag);
-
-                    // 2. 准备入库标签
-                    let label = 'Pronunciation';
-                    if (/\d+/.test(word)) label = 'Number_Accuracy';
-                    if (word.length > 8) label = 'Complex_Word';
-
-                    errorRecords.push({
-                        user_id: currentUser.id,
-                        phrase_id: phraseId,
-                        wrong_word: word,
-                        error_tag: label
-                    });
+            if (missed.length > 0) {
+                const records = missed.map(word => {
+                    const tag = document.createElement('span'); tag.className = 'lum-tag'; tag.innerText = word.toUpperCase(); diag.appendChild(tag);
+                    return { user_id: currentUser.id, phrase_id: phraseId, wrong_word: word, error_tag: /\d+/.test(word) ? 'Number' : 'Pronunciation' };
                 });
-
-                // 3. 静默同步到 Supabase (user_errors 表)
-                try {
-                    await oasisCloud.from('user_errors').insert(errorRecords);
-                    updateLumCountDisplay();
-                } catch(e) { console.error("LUM Sync Error", e); }
-            } else {
-                diagnosisBox.innerHTML = "<span class='text-emerald-400 text-[10px] font-bold uppercase tracking-widest'>✨ Perfect Articulation (LUM Verified)</span>";
-            }
+                await oasisCloud.from('user_errors').insert(records);
+                updateLumDisplay();
+            } else { diag.innerHTML = "<span class='text-emerald-400 text-[10px] font-bold tracking-widest'>✨ PERFECT</span>"; }
         }
 
-        async function updateLumCountDisplay() {
+        async function updateLumDisplay() {
             const { count } = await oasisCloud.from('user_errors').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
-            document.getElementById('lum-count').innerText = `${count || 0} TAGS`;
+            document.getElementById('lum-count').innerText = count || 0;
         }
 
-        // ==========================================
-        // 核心评估引擎：集成相似度打分与 LUM
-        // ==========================================
+        // --- 核心业务循环 ---
+        function startApp() {
+            updateLumDisplay();
+            setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`; } }, 1000);
+            fetchNewPhrase();
+        }
+
+        async function fetchNewPhrase() {
+            document.getElementById('target-text').innerText = "Loading...";
+            const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel).eq('lang', state.path);
+            currentPhrase = data[Math.floor(Math.random() * data.length)];
+            document.getElementById('target-text').innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
+            document.getElementById('target-zh').innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
+            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-widest'>READY</p>";
+            document.getElementById('lum-diagnosis').innerHTML = "";
+            setAppState('READY');
+        }
+
+        function toggleRecord() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (appState === 'LISTENING') { recognition.stop(); setAppState('ANALYZING'); return; }
+            capturedText = ""; recognition = new SpeechRec(); recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            recognition.onresult = (e) => capturedText = e.results[0][0].transcript;
+            recognition.onend = () => { if(appState === 'LISTENING') setAppState('ANALYZING'); };
+            recognition.start(); setAppState('LISTENING');
+        }
+
         async function evaluateLogic() {
             const fb = document.getElementById('score-display');
-            if (!capturedText || !currentPhrase) { setAppState('READY'); return; }
-
             const target = (document.getElementById('target-text').innerText).replace(/"/g, "");
-            
-            // 1. 基础评分 (Levenshtein 算法)
             const score = calculateSimilarity(capturedText, target);
-            
-            // 2. 运行 LUM 诊断
             await runLUMAnalysis(capturedText, target, currentPhrase.id);
-
-            // 3. 结算奖励 (简化逻辑)
-            let reward = 0;
-            if (score >= 90) reward = currentPhrase.reward_aed;
-            else if (score >= 60) reward = currentPhrase.reward_aed * 0.5;
-
+            
+            let reward = (score >= 90) ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
             if (reward > 0) {
                 walletBalance += reward;
                 await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id);
                 document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
             }
-
-            const color = score >= 80 ? 'text-emerald-400' : 'text-amber-400';
-            fb.innerHTML = `<span class="text-5xl font-black ${color}">${score}</span><br><span class="text-[10px] text-slate-500 uppercase">Heard: "${capturedText}"</span>`;
-            
-            setTimeout(() => setAppState('READY'), 2000);
-        }
-
-        // ==========================================
-        // 鉴权与基础逻辑
-        // ==========================================
-        async function executeAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-            
-            if (error) { document.getElementById('auth-msg').innerText = "❌ Login Failed"; return; }
-            
-            currentUser = data.user;
-            const { data: profile } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).single();
-            walletBalance = profile.wallet_balance || 0;
-            document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
-            
-            document.getElementById('auth-screen').classList.add('hidden-screen');
-            document.getElementById('main-app').classList.remove('hidden-screen');
-            updateLumCountDisplay();
-            fetchNewPhrase();
-        }
-
-        async function fetchNewPhrase() {
-            const { data } = await oasisCloud.from('phrases').select('*').limit(100);
-            currentPhrase = data[Math.floor(Math.random() * data.length)];
-            document.getElementById('target-text').innerText = `"${currentPhrase.text_en}"`;
-            document.getElementById('target-zh').innerText = currentPhrase.text_zh;
-            document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
-            document.getElementById('lum-diagnosis').innerHTML = "";
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold tracking-widest'>SYSTEM READY</p>";
-        }
-
-        function toggleRecord() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return alert("Browser not supported");
-
-            if (appState === 'LISTENING') {
-                recognition.stop();
-                setAppState('ANALYZING');
-                return;
-            }
-
-            capturedText = "";
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.onresult = (e) => { capturedText = e.results[0][0].transcript; };
-            recognition.onend = () => { if(appState === 'LISTENING') setAppState('ANALYZING'); };
-            recognition.start();
-            setAppState('LISTENING');
+            fb.innerHTML = `<span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500 mt-2">Heard: "${capturedText}"</p>`;
+            setTimeout(() => { if (reward > 0) fetchNewPhrase(); else setAppState('READY'); }, 2000);
         }
 
         function setAppState(s) {
-            appState = s;
-            const btn = document.getElementById('record-btn');
+            appState = s; const btn = document.getElementById('record-btn');
             if (s === 'LISTENING') btn.classList.add('recording-active');
             else btn.classList.remove('recording-active');
             if (s === 'ANALYZING') evaluateLogic();
         }
 
         function calculateSimilarity(s1, s2) {
-            const clean = (s) => s.toLowerCase().replace(/[^\w\s]/g, "");
-            const a = clean(s1), b = clean(s2);
-            if (a === b) return 100;
-            const m = a.length, n = b.length;
-            const d = Array.from({length: m+1}, () => new Uint32Array(n+1));
-            for(let i=0; i<=m; i++) d[i][0] = i;
-            for(let j=0; j<=n; j++) d[0][j] = j;
-            for(let i=1; i<=m; i++) {
-                for(let j=1; j<=n; j++) {
-                    const cost = a[i-1] === b[j-1] ? 0 : 1;
-                    d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost);
-                }
-            }
+            const c = (s) => s.toLowerCase().replace(/[^\w\s\d]/g, "");
+            const a = c(s1), b = c(s2); if (a === b) return 100;
+            const m = a.length, n = b.length, d = Array.from({length: m+1}, () => new Uint32Array(n+1));
+            for(let i=0; i<=m; i++) d[i][0] = i; for(let j=0; j<=n; j++) d[0][j] = j;
+            for(let i=1; i<=m; i++) for(let j=1; j<=n; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
             return Math.round((1 - d[m][n] / Math.max(m, n)) * 100);
         }
 
-        function playAudio() {
-            if(!currentPhrase) return;
-            const u = new SpeechSynthesisUtterance(currentPhrase.text_en);
-            u.lang = 'en-US';
-            window.speechSynthesis.speak(u);
-        }
+        function playAudio() { window.speechSynthesis.speak(new SpeechSynthesisUtterance(document.getElementById('target-text').innerText)); }
+        function openStore() { document.getElementById('store-modal').classList.remove('hidden-screen'); }
+        async function buyItem(p, n) { if (walletBalance < p) return alert("余额不足"); walletBalance -= p; await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id); document.getElementById('total-earned').innerText = walletBalance.toFixed(2); alert("兑换成功: " + n); closeModal('store-modal'); }
     </script>
 </body>
 </html>
