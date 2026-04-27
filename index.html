@@ -3,126 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V9.0 - 磐石架构版</title>
+    <title>Oasis Bridge V9.1 - 全量基建满血版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
         .app-screen { background: radial-gradient(circle at top right, #1f2937, #030712 80%); color: #f3f4f6; min-height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; overflow-y: auto; }
         .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
-        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; }
+        .glass-btn { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
         @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 100% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } }
         .hidden-screen { display: none !important; }
         .lum-tag { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; }
         button:disabled { opacity: 0.5 !important; cursor: not-allowed !important; filter: grayscale(100%); }
-        input { background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none; }
+        input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); transition: border-color 0.3s; }
+        input:focus { border-color: #fbbf24; }
     </style>
 </head>
 <body class="font-sans overflow-hidden bg-slate-900">
 
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
-            <h1 class="text-5xl font-black text-amber-500 italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em]">ARCHITECTURE V9.0</p>
+            <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">FULL SYSTEM V9.1</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
+            <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
             <form onsubmit="event.preventDefault(); executeAuth();" class="space-y-4">
-                <input id="email" type="email" placeholder="Email" required class="w-full p-5 rounded-2xl">
-                <input id="password" type="password" placeholder="Password" required class="w-full p-5 rounded-2xl">
-                <button type="submit" id="auth-action-btn" class="w-full py-5 rounded-2xl bg-amber-600 text-white font-black">SYSTEM LOGIN</button>
-                <p id="auth-msg" class="text-center text-xs text-red-400 min-h-[1.5rem] mt-2"></p>
+                <input id="email" type="email" placeholder="Email Address" required class="w-full p-5 rounded-2xl font-bold tracking-wider text-sm">
+                <input id="password" type="password" placeholder="Password" required class="w-full p-5 rounded-2xl font-bold tracking-wider text-sm">
+                <div id="confirm-password-container" class="overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-5 rounded-2xl font-bold tracking-wider text-sm">
+                </div>
+                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-all shadow-[0_10px_20px_rgba(245,158,11,0.2)]">ENTER OASIS</button>
+                <p id="auth-msg" class="text-center text-xs font-bold text-red-400 min-h-[1.5rem] mt-2"></p>
             </form>
+            <div class="mt-4 border-t border-white/5 pt-5">
+                <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 text-xs font-black underline tracking-widest uppercase">Create New Account</button>
+            </div>
         </div>
     </div>
 
     <div id="step-1" class="app-screen z-50 flex flex-col p-8 justify-center hidden-screen text-center">
-        <h2 class="text-2xl font-black mb-8">Select Your Path</h2>
+        <div class="mb-14 text-center"><h1 class="text-5xl font-black text-gold-gradient italic">Select Path</h1></div>
         <div class="space-y-5">
-            <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[32px] p-8 text-left"><h3 class="font-bold text-2xl">Learn Mandarin</h3><p class="text-xs text-amber-500 font-bold mt-1">For Digital Nomads</p></button>
-            <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[32px] p-8 text-left border-amber-500/30"><h3 class="font-bold text-2xl text-amber-400">我要学英语</h3><p class="text-xs text-slate-400 font-bold mt-1">中东职场实战包</p></button>
+            <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[32px] p-8 text-left shadow-xl relative overflow-hidden active:scale-95 transition-transform">
+                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇨🇳</div>
+                <h3 class="font-bold text-2xl text-white">Learn Mandarin</h3>
+                <p class="text-xs text-amber-500 mt-2 font-bold uppercase tracking-widest">Digital Nomad Path</p>
+            </button>
+            <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[32px] p-8 text-left shadow-xl relative overflow-hidden border-amber-500/30 active:scale-95 transition-transform">
+                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇦🇪</div>
+                <h3 class="font-bold text-2xl text-amber-400">我要学英语</h3>
+                <p class="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest">中东职场实战包</p>
+            </button>
         </div>
     </div>
 
     <div id="step-time" class="app-screen z-45 flex flex-col p-8 justify-center hidden-screen text-center">
-        <h2 class="text-2xl font-black mb-8">Set Daily Goal</h2>
+        <div class="mb-12 text-center"><h2 class="text-3xl font-black text-white">设定今日目标</h2><p class="text-xs text-amber-500 mt-2 tracking-widest uppercase font-bold">Target Duration</p></div>
         <div class="grid grid-cols-2 gap-5">
-            <button onclick="handleStepTime(15)" class="glass-panel py-10 rounded-[32px] font-bold">15 Mins</button>
-            <button onclick="handleStepTime(30)" class="glass-panel py-10 rounded-[32px] font-bold">30 Mins</button>
+            <button onclick="handleStepTime(15)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-colors">15 Min</button>
+            <button onclick="handleStepTime(30)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-colors">30 Min</button>
+            <button onclick="handleStepTime(45)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-colors">45 Min</button>
+            <button onclick="handleStepTime(60)" class="glass-panel py-10 rounded-[32px] font-black text-xl text-amber-400 border-amber-500/30 active:bg-amber-600 active:text-white transition-colors">60 Min</button>
         </div>
     </div>
 
     <div id="step-2" class="app-screen z-40 flex flex-col p-8 justify-center hidden-screen text-center">
-        <h2 class="text-2xl font-black mb-8">Difficulty Level</h2>
+        <div class="mb-12 text-center"><h2 class="text-3xl font-black text-white">选择难度等级</h2><p class="text-xs text-amber-500 mt-2 tracking-widest uppercase font-bold">Select Difficulty</p></div>
         <div class="space-y-5">
-            <button onclick="handleStep2(1)" class="w-full glass-panel p-6 rounded-[32px] font-bold text-lg">L1 - Foundation</button>
-            <button onclick="handleStep2(2)" class="w-full glass-panel p-6 rounded-[32px] font-bold text-lg">L2 - Professional</button>
-            <button onclick="handleStep2(3)" class="w-full glass-panel p-6 rounded-[32px] font-bold text-lg border-amber-500/40 text-amber-400">L3 - Executive</button>
+            <div onclick="handleStep2(1)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
+                <div><p class="font-bold text-lg text-slate-200">入门级 (L1)</p><p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-bold">基础交流与生存</p></div>
+                <div class="font-black text-white text-2xl">99<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            </div>
+            <div onclick="handleStep2(2)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center cursor-pointer active:scale-95 transition-transform">
+                <div><p class="font-bold text-lg text-slate-200">职场级 (L2)</p><p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-bold">项目与跨部门协作</p></div>
+                <div class="font-black text-white text-2xl">299<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            </div>
+            <div onclick="handleStep2(3)" class="glass-panel p-6 rounded-[32px] border-amber-500/40 flex justify-between items-center cursor-pointer bg-amber-600/5 active:scale-95 transition-transform">
+                <div><p class="font-bold text-lg text-amber-400">精英级 (L3)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">高管战略与专业黑话</p></div>
+                <div class="font-black text-amber-400 text-3xl drop-shadow-md">500<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            </div>
         </div>
     </div>
 
     <div id="main-app" class="app-screen z-30 flex flex-col hidden-screen">
-        <div class="glass-panel border-b border-white/5 sticky top-0 p-5 grid grid-cols-3 gap-2 items-center">
-            <div class="text-center cursor-pointer" onclick="openStore()">
-                <p class="text-[8px] text-emerald-300">👛 WALLET</p><h1 id="total-earned" class="text-sm font-black text-emerald-400">0.00</h1>
+        <div class="glass-panel border-b border-white/5 sticky top-0 p-5 grid grid-cols-3 gap-2 items-center z-40 shadow-xl">
+            <div class="text-center cursor-pointer group" onclick="openStore()">
+                <div class="bg-emerald-500/10 rounded-xl p-1.5 group-active:scale-90 transition-transform border border-emerald-500/20">
+                    <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">👛 OPEN STORE</p>
+                    <h1 id="total-earned" class="text-sm font-black text-emerald-400">0.00</h1>
+                </div>
             </div>
             <div class="text-center border-x border-white/10">
-                <p class="text-[8px] text-slate-400">TIME</p><h1 id="time-display" class="text-sm font-black">0/30m</h1>
+                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">TIME GOAL</p>
+                <h1 id="time-display" class="text-base font-black">0/30m</h1>
             </div>
             <div class="text-center">
-                <p class="text-[8px] text-blue-300">LUM TAGS</p><h1 id="lum-count" class="text-sm font-black text-blue-400">0</h1>
+                <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">LUM TAGS</p>
+                <h1 id="lum-count" class="text-sm font-black text-blue-400">0</h1>
             </div>
         </div>
 
-        <div class="flex-grow flex flex-col justify-center px-5 pb-12 mt-4 text-center">
-            <div class="glass-panel rounded-[40px] p-7 shadow-2xl relative border-t border-white/10">
-                <div id="scene-badge" class="mb-4 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20"><span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase">STANDBY</span></div>
-                <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center text-white italic leading-tight">"Loading..."</h2>
+        <div class="flex-grow flex flex-col justify-center px-5 pb-12 mt-4 text-center z-20">
+            <div class="glass-panel rounded-[40px] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative border-t border-white/10">
+                <div id="scene-badge" class="mb-4 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
+                    <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
+                </div>
+
+                <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center text-white italic leading-tight drop-shadow-md">"System Ready..."</h2>
                 <p id="target-zh" class="text-sm text-slate-400 mb-6 min-h-[20px]"></p>
                 
                 <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
-                <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center"><p class="text-gray-500 text-[10px] font-bold">READY</p></div>
                 
-                <div class="flex items-center justify-between">
-                    <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-panel rounded-full text-xl">🔄</button>
-                    <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-xl transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg>
+                <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">AWAITING INPUT</p>
+                </div>
+                
+                <div class="flex items-center justify-between px-2">
+                    <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-14 h-14 glass-btn rounded-full flex items-center justify-center active:scale-75 transition-transform">🔄</button>
+                    
+                    <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(245,158,11,0.3)] transition-all outline-none border-[4px] border-amber-900/40" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
+                        <svg class="w-10 h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg>
                     </button>
-                    <button id="play-btn" onclick="playAudio()" class="w-12 h-12 glass-panel rounded-full text-xl">🔊</button>
+                    
+                    <button id="play-btn" onclick="playAudio()" class="w-14 h-14 glass-btn rounded-full flex items-center justify-center active:scale-75 transition-transform">🔊</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="store-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-end hidden-screen">
-        <div class="glass-panel rounded-t-[40px] p-8 h-[80vh] overflow-y-auto">
-            <h3 class="text-3xl font-black text-emerald-400 mb-6">Oasis Store</h3>
-            <button onclick="closeModal('store-modal')" class="absolute top-8 right-8 text-white text-xl">✕</button>
+    <div id="store-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-end hidden-screen transition-all duration-300">
+        <div class="glass-panel rounded-t-[40px] p-8 h-[80vh] overflow-y-auto border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-3xl font-black text-emerald-400">Oasis Store</h3>
+                    <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Spend your AED</p>
+                </div>
+                <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full flex justify-center items-center text-white active:scale-90">✕</button>
+            </div>
+            
             <div class="space-y-4">
-                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
-                    <h4 class="text-lg font-bold text-white">LUM 画像系统</h4>
-                    <button onclick="buyItem(50, 'LUM 权限')" class="w-full mt-4 py-3 bg-blue-600 rounded-xl text-white font-black">50 AED 兑换</button>
+                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
+                    <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
+                    <p class="text-[10px] text-gray-400 pr-10">解锁大用户标签模型(LUM)底层权限，实时追踪发音弱点。</p>
+                    <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full mt-4 py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black active:scale-95 shadow-lg">50 AED 兑换</button>
+                    <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
+                </div>
+                
+                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
+                    <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
+                    <p class="text-[10px] text-gray-400 pr-10">源自青海河床的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
+                    <button onclick="buyItem(150, '原石盲盒')" class="w-full mt-4 py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black active:scale-95 shadow-lg">150 AED 抽取</button>
+                    <div class="absolute top-4 right-4 text-4xl opacity-20">🪨</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Supabase 配置
+        // Supabase 云端金库连接
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
+        // 全局状态管理
         let currentUser = null; 
         let currentPhrase = null; 
         let walletBalance = 0; 
         let appState = 'READY'; 
         let recognition = null; 
         let capturedText = "";
-        let watchdogTimer = null; // 防死锁看门狗
-        let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
+        let watchdogTimer = null; // 防止系统死锁的看门狗
+        let isRegisterMode = false;
+        
+        // 核心用户设置 (路径、时长、难度)
+        let state = { 
+            path: 'en',       // 'en' 学英语, 'cn' 学中文
+            targetTime: 30,   // 目标分钟数
+            currentTime: 0,   // 当前累计时间
+            dbLevel: 1        // 难度级别
+        };
 
-        // 核心数字标准化：中英双向映射兼容
+        // --- 1. 数字兼容与文本标准化 ---
         function normalize(s, lang) {
             if(!s) return "";
             let res = s.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
+            // 如果用户正在学中文，他们说出的“二十”要转为“20”方便比对
             if(lang === 'cn') {
                 const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
                 for(let k in map) res = res.replace(new RegExp(k, 'g'), map[k]);
@@ -130,103 +197,143 @@
             return res;
         }
 
-        async function executeAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-            
-            if (error) { 
-                // 如果登录失败，尝试注册
-                const regRes = await oasisCloud.auth.signUp({ email, password });
-                if (regRes.error) return document.getElementById('auth-msg').innerText = "❌ " + regRes.error.message;
-                currentUser = regRes.data.user;
-            } else {
-                currentUser = data.user;
-            }
-
-            const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-            if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
-            walletBalance = prof?.wallet_balance || 0;
-            document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
-            document.getElementById('auth-screen').classList.add('hidden-screen');
-            document.getElementById('step-1').classList.remove('hidden-screen');
+        // --- 2. 鉴权与注册体系 ---
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
+            document.getElementById('confirm-password-container').style.opacity = isRegisterMode ? "1" : "0";
+            document.getElementById('auth-title').innerText = isRegisterMode ? "Create Account" : "System Login";
+            document.getElementById('auth-action-btn').innerText = isRegisterMode ? "REGISTER & ENTER" : "ENTER OASIS";
+            document.getElementById('auth-switch-btn').innerText = isRegisterMode ? "Already have an account?" : "Create New Account";
+            document.getElementById('auth-msg').innerText = "";
         }
 
-        function handleStep1(p) { state.path = p; document.getElementById('step-1').classList.add('hidden-screen'); document.getElementById('step-time').classList.remove('hidden-screen'); }
-        function handleStepTime(t) { state.targetTime = t; document.getElementById('step-time').classList.add('hidden-screen'); document.getElementById('step-2').classList.remove('hidden-screen'); }
-        function handleStep2(l) { state.dbLevel = l; document.getElementById('step-2').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
+        async function executeAuth() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('auth-action-btn');
+            
+            if(!email || !password) return document.getElementById('auth-msg').innerText = "⚠️ 邮箱和密码不能为空";
+            
+            btn.innerText = "PROCESSING..."; btn.disabled = true;
 
+            try {
+                if (isRegisterMode) {
+                    const confirmPwd = document.getElementById('confirm-password').value.trim();
+                    if (password !== confirmPwd) throw new Error("密码输入不一致");
+                    if (password.length < 6) throw new Error("密码至少需要6位");
+                    
+                    const { data, error } = await oasisCloud.auth.signUp({ email, password });
+                    if (error) throw error;
+                    if (!data.user) throw new Error("注册失败，请检查邮箱格式");
+                    currentUser = data.user;
+                } else {
+                    const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    currentUser = data.user;
+                }
+
+                // 初始化或获取用户钱包
+                const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+                if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
+                walletBalance = prof?.wallet_balance || 0;
+                document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
+                
+                // 推进到下一步：路径选择
+                hideAll();
+                document.getElementById('step-1').classList.remove('hidden-screen');
+
+            } catch (err) {
+                document.getElementById('auth-msg').innerText = "❌ " + (err.message.includes("already registered") ? "邮箱已被注册" : err.message);
+            } finally {
+                btn.innerText = isRegisterMode ? "REGISTER & ENTER" : "ENTER OASIS"; 
+                btn.disabled = false;
+            }
+        }
+
+        // --- 3. 基础设置引导 ---
+        function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        function handleStep2(l) { state.dbLevel = l; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
+        function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
+
+        // --- 4. 核心系统启动与定时器 ---
         function startApp() {
             updateLumDisplay();
-            setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`; } }, 1000);
+            // 学习时长计时器
+            setInterval(() => { 
+                if(state.currentTime < state.targetTime) { 
+                    state.currentTime += (1/60); 
+                    document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`; 
+                } 
+            }, 1000);
             fetchNewPhrase();
         }
 
-        // 统一行列架构的取词逻辑
+        // --- 5. 语料分发引擎 ---
         async function fetchNewPhrase() {
             setAppState('READY');
-            const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
-            if(!data || data.length === 0) return document.getElementById('target-text').innerText = "No Data in DB";
-            
-            currentPhrase = data[Math.floor(Math.random() * data.length)];
-            
-            // 英文路径考英文看中文，中文路径考中文看英文
-            const mainText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const subText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            
-            document.getElementById('target-text').innerText = `"${mainText}"`;
-            document.getElementById('target-zh').innerText = subText;
-            document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
+            document.getElementById('target-text').innerText = "Loading data...";
+            document.getElementById('target-zh').innerText = "";
             document.getElementById('lum-diagnosis').innerHTML = "";
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px]'>READY</p>";
+            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-widest'>SYSTEM READY</p>";
+            
+            try {
+                // 根据设定的难度拉取同一张表
+                const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
+                if(!data || data.length === 0) return document.getElementById('target-text').innerText = "No Data in DB";
+                
+                currentPhrase = data[Math.floor(Math.random() * data.length)];
+                
+                // 【核心逻辑】：根据用户选择的路线（state.path），决定谁是考题，谁是翻译
+                const mainText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                const subText  = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+                
+                document.getElementById('target-text').innerText = `"${mainText}"`;
+                document.getElementById('target-zh').innerText = subText;
+                document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
+            } catch(e) {
+                console.error("Fetch Error:", e);
+                document.getElementById('target-text').innerText = "Network Error";
+            }
         }
 
-        // ==========================================
-        // V9.0 核心重构：防死锁录音引擎
-        // ==========================================
+        // --- 6. 永不死锁的 Web Speech 录音机 ---
         function toggleRecord() {
-            // 严格保护：如果在处理中，直接拒绝新的点击
+            // 保护机制：结算中严禁干扰
             if (appState === 'ANALYZING' || appState === 'REWARDING') return;
 
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             
+            // 如果正在录音，主动停止并去打分
             if (appState === 'LISTENING') {
-                if (recognition) {
-                    try { recognition.stop(); } catch(e) {} // 用户主动停止
-                }
+                if (recognition) { try { recognition.stop(); } catch(e) {} }
                 setAppState('ANALYZING');
                 return;
             }
 
-            // 【关键修复】每次开启新录音前，必须暴力清空旧实例
-            if (recognition) {
-                try { recognition.abort(); } catch(e) {} 
-            }
+            // 暴力清场：确保没有残留的监听实例
+            if (recognition) { try { recognition.abort(); } catch(e) {} }
 
             capturedText = "";
             recognition = new SpeechRec();
             recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            recognition.continuous = false; // 避免移动端无限挂起
+            recognition.continuous = false; 
             recognition.interimResults = false;
 
-            recognition.onresult = (e) => { 
-                capturedText = e.results[0][0].transcript; 
-            };
+            recognition.onresult = (e) => { capturedText = e.results[0][0].transcript; };
+            recognition.onspeechend = () => { try { recognition.stop(); } catch(e) {} };
             
-            recognition.onspeechend = () => {
-                try { recognition.stop(); } catch(e) {}
-            };
-
             recognition.onend = () => { 
                 if (appState === 'LISTENING') {
                     if (capturedText) evaluate();
-                    else setAppState('READY'); // 没听到声音，直接复位
+                    else setAppState('READY'); // 没说话自动复位
                 }
             };
 
             recognition.onerror = (e) => { 
                 console.warn("Speech API Error:", e.error);
-                setAppState('READY'); // 任何异常立刻释放按钮
+                setAppState('READY'); 
             };
 
             try { 
@@ -238,39 +345,40 @@
             }
         }
 
+        // --- 7. LUM 差分打分与经济系统 ---
         async function evaluate() {
             setAppState('ANALYZING');
             
-            // 【看门狗机制】防止 async 阻塞导致界面永久卡死
+            // 绝对看门狗：如果 6 秒后还没跑完，强行踢回 READY 保护 UI
             clearTimeout(watchdogTimer);
             watchdogTimer = setTimeout(() => {
                 if (appState === 'ANALYZING' || appState === 'REWARDING') {
-                    console.error("Evaluation Watchdog Timeout - Force Reset");
-                    setAppState('READY');
+                    console.error("Watchdog Timeout - Force Reset");
                     fetchNewPhrase();
                 }
             }, 6000);
 
             try {
-                const target = document.getElementById('target-text').innerText.replace(/"/g, "");
-                const score = calculateSimilarity(capturedText, target);
+                const targetText = document.getElementById('target-text').innerText.replace(/"/g, "");
+                const score = calculateSimilarity(capturedText, targetText);
                 
-                // LUM 诊断 (分离处理，防止中断主线)
-                const a = normalize(target, state.path).split(/\s+/);
-                const b = normalize(capturedText, state.path).split(/\s+/);
-                const missed = a.filter(w => w && !b.includes(w));
+                // 7.1 LUM 错题标签提取
+                const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
+                const targetWords = normalize(targetText, state.path).split(/\s+/);
+                const spokenWords = normalize(capturedText, state.path).split(/\s+/);
+                const missedWords = targetWords.filter(w => w && !spokenWords.includes(w));
                 
-                if(missed.length > 0) {
-                    const tags = missed.map(w => {
-                        const el = document.createElement('span'); el.className='lum-tag'; el.innerText=w.toUpperCase();
-                        document.getElementById('lum-diagnosis').appendChild(el);
-                        return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: w, error_tag: 'Missed' };
+                if(missedWords.length > 0) {
+                    const errorRecords = missedWords.map(word => {
+                        const tag = document.createElement('span'); tag.className='lum-tag'; tag.innerText = word.toUpperCase();
+                        diag.appendChild(tag);
+                        return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: word, error_tag: 'Missed' };
                     });
-                    // Fire and forget
-                    oasisCloud.from('user_errors').insert(tags).then(() => updateLumDisplay()).catch(()=>{});
+                    // 静默上传错题本，不阻塞主流程
+                    oasisCloud.from('user_errors').insert(errorRecords).then(() => updateLumDisplay()).catch(e => console.warn(e));
                 }
 
-                // 奖励结算
+                // 7.2 钱包打款与云端同步
                 let reward = score >= 90 ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
                 if (reward > 0) {
                     walletBalance += reward;
@@ -278,40 +386,39 @@
                     document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
                 }
                 
-                document.getElementById('score-display').innerHTML = `<span class="text-5xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500 mt-1">Heard: "${capturedText}"</p>`;
+                // 7.3 UI 渲染
+                document.getElementById('score-display').innerHTML = `
+                    <span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'} drop-shadow-md">${score}</span><br>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">Heard: "${capturedText}"</p>
+                `;
                 
                 setAppState('REWARDING');
                 
-                // 正常走完，清除看门狗，切下一题
+                // 成功走完，撤销看门狗，2 秒后自动切下一题
                 clearTimeout(watchdogTimer);
                 setTimeout(() => { fetchNewPhrase(); }, 2000);
 
             } catch (error) {
-                console.error("Eval execution failed:", error);
+                console.error("Evaluation Error:", error);
                 clearTimeout(watchdogTimer);
                 setAppState('READY');
             }
         }
 
-        // 统一控制 UI 组件的可用状态
+        // --- 8. 工具方法与状态机控制 ---
         function setAppState(s) {
             appState = s;
             const btn = document.getElementById('record-btn');
-            const refreshBtn = document.getElementById('refresh-btn');
+            const rfBtn = document.getElementById('refresh-btn');
             
-            if (s === 'LISTENING') {
-                btn.classList.add('recording-active');
-            } else {
-                btn.classList.remove('recording-active');
-            }
+            if (s === 'LISTENING') btn.classList.add('recording-active');
+            else btn.classList.remove('recording-active');
             
-            // 锁定逻辑：如果正在分析或结算，禁用所有操作按钮
+            // 锁定按钮，防止乱点
             if (s === 'ANALYZING' || s === 'REWARDING') {
-                btn.disabled = true;
-                refreshBtn.disabled = true;
+                btn.disabled = true; rfBtn.disabled = true;
             } else {
-                btn.disabled = false;
-                refreshBtn.disabled = false;
+                btn.disabled = false; rfBtn.disabled = false;
             }
         }
 
@@ -325,7 +432,8 @@
         }
 
         function playAudio() { 
-            const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText);
+            const textToSpeak = document.getElementById('target-text').innerText.replace(/"/g, "");
+            const u = new SpeechSynthesisUtterance(textToSpeak);
             u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
             window.speechSynthesis.speak(u); 
         }
@@ -337,12 +445,17 @@
             } catch(e) {}
         }
         
-        function openStore() { document.getElementById('store-modal').classList.toggle('hidden-screen'); }
+        function openStore() { document.getElementById('store-modal').classList.remove('hidden-screen'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
-        async function buyItem(p, n) { 
-            if (walletBalance < p) return alert("余额不足"); 
-            walletBalance -= p; await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id); 
-            document.getElementById('total-earned').innerText = walletBalance.toFixed(2); alert("兑换成功: " + n); closeModal('store-modal'); 
+        async function buyItem(price, itemName) { 
+            if (walletBalance < price) return alert("⚠️ 余额不足，请继续学习获取 AED。"); 
+            if (confirm(`确定要花费 ${price} AED 兑换 [${itemName}] 吗？`)) {
+                walletBalance -= price; 
+                await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id); 
+                document.getElementById('total-earned').innerText = walletBalance.toFixed(2); 
+                alert(`🎉 兑换成功: ${itemName}`); 
+                closeModal('store-modal'); 
+            }
         }
     </script>
 </body>
