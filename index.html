@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V9.6 - 流水记录满血版</title>
+    <title>Oasis Bridge V9.7 - 麦克风单例解药版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -28,7 +28,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">FULL SYSTEM V9.6</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">SYSTEM V9.7</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
@@ -235,14 +235,40 @@
         let currentPhrase = null; 
         let walletBalance = 0; 
         let appState = 'READY'; 
-        let recognition = null; 
         let capturedText = "";
         let watchdogTimer = null; 
         let appInterval = null;
         let isRegisterMode = false;
-        
+        let sessionHistory = []; 
         let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
-        let sessionHistory = []; // 本地暂存本次会话的流水
+
+        // 【终极修复：全局单例语音引擎】
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let globalRecognition = null;
+        if (SpeechRec) {
+            globalRecognition = new SpeechRec();
+            globalRecognition.continuous = false;
+            globalRecognition.interimResults = false;
+            
+            globalRecognition.onresult = (e) => { 
+                capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); 
+            };
+            
+            globalRecognition.onend = () => { 
+                if (appState === 'LISTENING' || appState === 'PROCESSING') {
+                    if (capturedText && capturedText.trim() !== "") evaluate();
+                    else setAppState('READY'); 
+                }
+            };
+
+            globalRecognition.onerror = (e) => { 
+                console.warn("Speech API Error:", e.error);
+                if (e.error === 'not-allowed') {
+                    alert("⚠️ 请允许浏览器访问麦克风权限！");
+                }
+                setAppState('READY'); 
+            };
+        }
 
         function normalize(s, lang) {
             if(!s) return "";
@@ -304,14 +330,14 @@
             }
         }
 
-        // --- 流程引导与退出 ---
+        // --- 引导与退出 ---
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         function handleStep2(l) { state.dbLevel = l; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
         
         function promptExit() {
             if (appState === 'LISTENING') {
-                if (recognition) { try { recognition.abort(); } catch(e){} }
+                if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} }
                 setAppState('READY');
             }
             document.getElementById('exit-modal').classList.remove('hidden-screen');
@@ -329,7 +355,7 @@
 
         function startApp() {
             updateLumDisplay();
-            sessionHistory = []; // 清空本次会话的流水
+            sessionHistory = []; 
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { 
                 if(state.currentTime < state.targetTime) { 
@@ -340,7 +366,6 @@
             fetchNewPhrase();
         }
 
-        // --- 语料获取 ---
         async function fetchNewPhrase() {
             setAppState('READY');
             document.getElementById('target-text').innerText = "Loading data...";
@@ -353,7 +378,7 @@
             try {
                 const { data, error } = await oasisCloud.from('phrases').select('*');
                 if (error || !data || data.length === 0) {
-                    document.getElementById('db-error-msg').innerText = "⚠️ DB Offline: Using Local Cache";
+                    document.getElementById('db-error-msg').innerText = "⚠️ Offline Mode: Using Local Cache";
                     pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
                 } else {
                     pool = data.filter(d => d.difficulty == state.dbLevel);
@@ -374,50 +399,42 @@
             document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
         }
 
-        // --- 录音机 ---
+        // --- 单例录音机 ---
         function toggleRecord() {
             if (appState === 'PROCESSING' || appState === 'REWARDING') return;
-            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!globalRecognition) {
+                alert("⚠️ 您的浏览器不支持语音识别，请尝试使用 Chrome 或 Edge 浏览器。");
+                return;
+            }
             
             if (appState === 'LISTENING') {
                 setAppState('PROCESSING');
-                if (recognition) { try { recognition.stop(); } catch(e) {} }
+                try { globalRecognition.stop(); } catch(e) {}
+                
+                // 保险绳
                 setTimeout(() => {
                     if (appState === 'PROCESSING') {
                         if (capturedText && capturedText.trim() !== "") evaluate();
                         else setAppState('READY');
                     }
-                }, 1000);
+                }, 1500);
                 return;
             }
 
-            if (recognition) { try { recognition.abort(); } catch(e) {} }
-
             capturedText = "";
-            recognition = new SpeechRec();
-            recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            recognition.continuous = false; 
-            recognition.interimResults = false;
-
-            recognition.onresult = (e) => { 
-                capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); 
-            };
-            
-            recognition.onend = () => { 
-                if (appState === 'LISTENING' || appState === 'PROCESSING') {
-                    if (capturedText && capturedText.trim() !== "") evaluate();
-                    else setAppState('READY'); 
-                }
-            };
-            recognition.onerror = (e) => { setAppState('READY'); };
+            globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
 
             try { 
-                recognition.start(); 
+                globalRecognition.start(); 
                 setAppState('LISTENING'); 
-            } catch(e) { setAppState('READY'); }
+            } catch(e) { 
+                console.error("Mic Error:", e);
+                setAppState('READY'); 
+            }
         }
 
-        // --- 差分打分与【记录每句流水账】 ---
+        // --- 打分与流水账 ---
         async function evaluate() {
             setAppState('PROCESSING');
             
@@ -433,7 +450,6 @@
                 const targetText = document.getElementById('target-text').innerText.replace(/"/g, "");
                 const score = calculateSimilarity(capturedText, targetText);
                 
-                // LUM 标签处理
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 const targetWords = normalize(targetText, state.path).split(/\s+/);
                 const spokenWords = normalize(capturedText, state.path).split(/\s+/);
@@ -448,21 +464,13 @@
                     oasisCloud.from('user_errors').insert(errorRecords).then(() => updateLumDisplay()).catch(e => {});
                 }
 
-                // 算钱
                 let reward = score >= 90 ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
                 
-                // 【核心修复】：保存单句流水记录到数据库和本地
+                // 记录流水
                 if (currentPhrase.id) {
-                    const logItem = {
-                        user_id: currentUser.id,
-                        phrase_id: currentPhrase.id,
-                        score: score,
-                        reward_aed: reward
-                    };
-                    // 异步插入数据库
-                    oasisCloud.from('practice_history').insert([logItem]).catch(e => console.warn("Log Save Error:", e));
+                    const logItem = { user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: reward };
+                    oasisCloud.from('practice_history').insert([logItem]).catch(e => {});
                     
-                    // 记录到本次会话，用于 UI 显示
                     sessionHistory.unshift({
                         text: targetText,
                         score: score,
@@ -532,7 +540,6 @@
         
         function openStore() { document.getElementById('store-modal').classList.remove('hidden-screen'); }
         
-        // 【新增】：打开并渲染流水记录面板
         function openHistory() {
             const listContainer = document.getElementById('history-list');
             listContainer.innerHTML = "";
