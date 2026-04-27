@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V12 - 商业闭环完全联动版</title>
+    <title>Oasis Bridge V14 - 数值底层统一版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -33,7 +33,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V12</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V14</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
@@ -150,6 +150,8 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
 
+                <p id="db-error-msg" class="text-[9px] text-amber-400 font-bold mb-2 uppercase tracking-wider"></p>
+
                 <h2 id="target-text" class="text-2xl font-bold mb-3 min-h-[90px] flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-lg transition-all">Connecting...</h2>
                 <p id="target-zh" class="text-sm text-slate-400 mb-4 min-h-[20px]"></p>
                 
@@ -234,26 +236,29 @@
     <script>
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
+        // 【核心修复】：所有的本地兜底 reward_aed 全部统一拉平为 0.50
         const LOCAL_CACHE = [
-            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.35 },
-            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.35 },
-            { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.35 },
-            { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.35 },
-            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.35 },
-            { id: 906, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.75 },
-            { id: 907, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.75 },
-            { id: 908, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.75 },
-            { id: 909, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.75 },
-            { id: 910, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.75 },
-            { id: 911, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 1.50 },
-            { id: 912, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 1.50 },
-            { id: 913, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 1.50 },
-            { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 1.50 },
-            { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 1.50 }
+            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
+            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.50 },
+            { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 },
+            { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
+            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
+            { id: 906, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
+            { id: 907, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
+            { id: 908, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
+            { id: 909, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
+            { id: 910, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
+            { id: 911, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 912, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
+            { id: 913, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
+            { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 }
         ];
         const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
 
         let currentUser = null; let isRegisterMode = false;
+        
+        // 绝对的 0.50 阶梯返现铁律
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         let savedAdLimit = localStorage.getItem('ob_v7_adlim');
         
@@ -317,7 +322,6 @@
                 const { data: prof } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', currentUser.id).maybeSingle();
                 if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
                 
-                // 【核心统一】：全局只使用 state.cloudBalance
                 state.cloudBalance = prof?.wallet_balance || 0;
                 document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                 hideAll(); document.getElementById('step-1').classList.remove('hidden-screen');
@@ -344,6 +348,7 @@
             const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
             textEl.innerText = "Loading..."; zhEl.innerText = "";
             document.getElementById('lum-diagnosis').innerHTML = "";
+            document.getElementById('db-error-msg').innerText = "";
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('READY');
 
@@ -372,7 +377,6 @@
             syncPhraseState();
         }
 
-        // 【彻底联动】：实时刷新左上角的历史最高分与已赚金额
         function syncPhraseState() {
             if(!currentPhrase) return;
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
@@ -420,7 +424,7 @@
             return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
-        // 单例语音引擎
+        // 单例语音
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let globalRecognition = null; let capturedText = "";
         
@@ -431,7 +435,7 @@
             globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
             globalRecognition.onend = () => { 
                 if (appState === 'LISTENING' || appState === 'PROCESSING') {
-                    if (capturedText && capturedText.trim() !== "") evaluateLogic();
+                    if (capturedText !== "") evaluateLogic();
                     else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase tracking-widest text-[10px]">未能识别到语音</p>`; setTimeout(() => setAppState('READY'), 1500); }
                 }
             };
@@ -462,9 +466,6 @@
             }
         }
 
-        // ==========================================
-        // 【核心大圆满】：完美的商业流水分发机制
-        // ==========================================
         async function evaluateLogic() {
             setAppState('PROCESSING');
             
@@ -477,23 +478,30 @@
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const score = calculateSimilarity(capturedText, targetText);
 
-                // 1. 本地算法：更新历史最高分与尝试次数
+                const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
+                const targetWords = normalize(targetText, state.path).split(/\s+/);
+                const spokenWords = normalize(capturedText, state.path).split(/\s+/);
+                const missedWords = targetWords.filter(w => w && !spokenWords.includes(w));
+                if(missedWords.length > 0) {
+                    const errs = missedWords.map(w => {
+                        const tag = document.createElement('span'); tag.className='lum-tag'; tag.innerText = w.toUpperCase(); diag.appendChild(tag);
+                        return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: w, error_tag: 'Missed' };
+                    });
+                    if(currentPhrase.id && currentPhrase.id > 1000) oasisCloud.from('user_errors').insert(errs).then().catch(e=>{});
+                }
+
                 if (score > (state.scores[targetText] || 0)) { state.scores[targetText] = score; state.attempts[targetText] = 0; } 
                 else { state.attempts[targetText] = (state.attempts[targetText] || 0) + 1; }
 
-                // 2. 本地算法：计算阶梯奖励差额
                 let scoreTier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
                 const finalTier = Math.max(scoreTier, state.adBoostMap[targetText] || 0);
                 
-                const baseReward = parseFloat(currentPhrase.reward_aed) || 0.35; 
-                const currentRewardRatio = finalTier === 5 ? 1 : (finalTier === 4 ? 0.8 : (finalTier === 3 ? 0.6 : (finalTier === 2 ? 0.4 : (finalTier === 1 ? 0.2 : 0))));
-                const targetReward = baseReward * currentRewardRatio; 
+                // 【核心修正】：直接使用绝对数组 rewardStages，完全脱离不确定的数据库字段
+                const targetReward = rewardStages[finalTier]; 
                 const currentEarned = state.earnedMap[targetText] || 0;
                 
-                // 本次赚取的真实差额
                 const diff = Math.round((targetReward - currentEarned) * 100) / 100;
 
-                // 3. UI 拼装：展示所听到的文字
                 let fbHtml = `<span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-2 block">听到了: "${capturedText}"</span>`;
                 
                 if (diff > 0) {
@@ -501,73 +509,40 @@
                     state.cloudBalance += diff; 
                     state.earnedMap[targetText] = targetReward; 
                     
-                    // 【特效重归】：全局钱包数字跳动特效
                     document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                    document.getElementById('total-earned').classList.add('money-jump'); 
-                    setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
-                    
-                    // 【特效重归】：下方绿色高亮 +X AED 返现提示
+                    document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     fbHtml += `<span class="text-[11px] text-emerald-400 font-bold tracking-widest uppercase drop-shadow-md block mt-1">+${diff.toFixed(2)} AED Earned</span>`;
                     
-                    // 异步向数据库钱包打钱
                     oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).catch(e=>{});
                 } else {
-                    if (currentEarned >= baseReward && baseReward > 0) fbHtml += `<span class="text-[10px] text-blue-400 mt-1 font-bold uppercase tracking-widest block">🎉 Fully Rewarded</span>`;
+                    if (currentEarned >= 0.50) fbHtml += `<span class="text-[10px] text-blue-400 mt-1 font-bold uppercase tracking-widest block">🎉 Fully Rewarded (0.50 AED)</span>`;
                     else if (currentEarned >= targetReward) fbHtml += `<span class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest block">No New Tier Reached</span>`;
                 }
 
-                // 4. 商业留存逻辑：广告救济按钮触发
+                if(currentPhrase.id) {
+                    sessionHistory.unshift({ text: targetText, score: score, aed: diff > 0 ? diff : 0, time: new Date().toLocaleTimeString() });
+                    if(currentPhrase.id > 1000) oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff > 0 ? diff : 0 }]).catch(e=>{});
+                }
+
                 if (finalTier < 5 && ((finalTier === 0 && state.attempts[targetText] >= 3) || (finalTier > 0 && state.attempts[targetText] >= 2)) && state.adLimit > 0) {
                     fbHtml += `<p class="text-[10px] text-blue-400 mt-2 font-bold animate-pulse tracking-widest uppercase cursor-pointer py-1 px-3 bg-blue-900/30 rounded-full inline-block border border-blue-500/30" onclick="requestRescue()">💡 Need Help? Tap Here 🆘</p>`;
                 }
 
-                // 5. 渲染中央打分面板
                 const colorClass = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
                 document.getElementById('score-display').innerHTML = `<span class="text-5xl font-black ${colorClass} drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] leading-none">${score}</span><br>${fbHtml}`;
                 
-                // 6. 数据保存与单句面板强联动
-                saveData(); 
-                syncPhraseState(); // 实时更新左上方的“Sentence Best”和“Sentence Earned”
+                saveData(); syncPhraseState();
+                
                 setAppState('REWARDING');
-
-                // 7. LUM 静默诊断与同步 (绝对安全，不阻塞UI)
-                try {
-                    const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-                    const tWords = normalize(targetText, state.path).split(/\s+/);
-                    const sWords = normalize(capturedText, state.path).split(/\s+/);
-                    const missedWords = tWords.filter(w => w && !sWords.includes(w));
-                    if(missedWords.length > 0) {
-                        const errs = missedWords.map(w => {
-                            const tag = document.createElement('span'); tag.className='lum-tag'; tag.innerText = w.toUpperCase(); diag.appendChild(tag);
-                            return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: w, error_tag: 'Missed' };
-                        });
-                        if(currentPhrase.id && currentPhrase.id > 1000) oasisCloud.from('user_errors').insert(errs).catch(e=>{});
-                    }
-                } catch(e) {}
-
-                // 8. 记录每次录音的系统流水
-                if(currentPhrase.id) {
-                    sessionHistory.unshift({ text: targetText, score: score, aed: diff > 0 ? diff : 0, time: new Date().toLocaleTimeString() });
-                    if(currentPhrase.id > 1000) {
-                        oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff > 0 ? diff : 0 }]).catch(e=>{});
-                    }
-                }
-
-                // 9. 智能切题节奏
                 clearTimeout(watchdogTimer);
-                if (diff > 0) { setTimeout(() => fetchNewPhrase(), 2200); } else { setTimeout(() => setAppState('READY'), 1800); }
+                if (diff > 0) { setTimeout(() => fetchNewPhrase(), 2000); } else { setTimeout(() => setAppState('READY'), 1500); }
 
             } catch (error) {
-                console.error("Critical Eval Error:", error);
-                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase text-[10px]">Error calculating score</p>`;
-                clearTimeout(watchdogTimer); 
-                setTimeout(() => setAppState('READY'), 1500);
+                clearTimeout(watchdogTimer); setAppState('READY');
             }
         }
 
-        // --- 广告救援退出 ---
-        function promptExit() {
-            if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
+        function attemptExit() {
             if (state.currentTime < state.targetTime) {
                 document.getElementById('exit-target-time').innerText = state.targetTime;
                 document.getElementById('exit-remain-time').innerText = Math.ceil(state.targetTime - state.currentTime);
@@ -575,23 +550,24 @@
             } else { forceExit(); }
         }
         function forceExit() { if (timeInterval) { clearInterval(timeInterval); timeInterval = null; } saveData(); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
-        
+        function promptExit() {
+            if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
+            attemptExit();
+        }
+
         function requestRescue() {
             if (appState === 'REWARDING' || !currentPhrase) return;
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             const scoreTier = state.scores[t] >= 100 ? 5 : (state.scores[t] >= 90 ? 4 : (state.scores[t] >= 80 ? 3 : (state.scores[t] >= 70 ? 2 : (state.scores[t] >= 60 ? 1 : 0))));
             const finalTier = Math.max(scoreTier, state.adBoostMap[t] || 0);
 
-            if (finalTier >= 5) return alert("老板，这句已拿满最高档啦！");
+            if (finalTier >= 5) return alert("老板，这句已拿满最高档 0.50 AED 啦！");
             if (state.adLimit <= 0) {
                 document.getElementById('rescue-title').innerText = "救济额度已耗尽"; document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>补充 3 次特权</span>！";
                 document.getElementById('rescue-action-btn').innerText = "获取额外次数"; document.getElementById('rescue-action-btn').onclick = () => watchAd('refill');
                 document.getElementById('rescue-modal').classList.remove('hidden-screen'); return;
             }
-            const baseReward = parseFloat(currentPhrase.reward_aed) || 0.35;
-            const nextRatio = (finalTier + 1) === 5 ? 1 : ((finalTier + 1) === 4 ? 0.8 : ((finalTier + 1) === 3 ? 0.6 : ((finalTier + 1) === 2 ? 0.4 : 0.2)));
-            const nextVal = Math.round(((baseReward * nextRatio) - (state.earnedMap[t] || 0)) * 100) / 100;
-            
+            const nextVal = Math.round((rewardStages[finalTier + 1] - (state.earnedMap[t] || 0)) * 100) / 100;
             document.getElementById('rescue-title').innerText = "专属系统助力"; document.getElementById('rescue-desc').innerHTML = `为您补齐下一阶梯奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`;
             document.getElementById('rescue-action-btn').innerText = `获取救济 (剩余 ${state.adLimit} 次)`; document.getElementById('rescue-action-btn').onclick = () => watchAd('boost');
             document.getElementById('rescue-modal').classList.remove('hidden-screen');
@@ -611,14 +587,10 @@
                 state.adLimit--; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const scoreTier = state.scores[t] >= 100 ? 5 : (state.scores[t] >= 90 ? 4 : (state.scores[t] >= 80 ? 3 : (state.scores[t] >= 70 ? 2 : (state.scores[t] >= 60 ? 1 : 0))));
                 const nextTier = Math.min(5, Math.max(scoreTier, state.adBoostMap[t] || 0) + 1); state.adBoostMap[t] = nextTier;
-                
-                const baseReward = parseFloat(currentPhrase.reward_aed) || 0.35;
-                const nextRatio = nextTier === 5 ? 1 : (nextTier === 4 ? 0.8 : (nextTier === 3 ? 0.6 : (nextTier === 2 ? 0.4 : 0.2)));
-                const diff = Math.round(((baseReward * nextRatio) - (state.earnedMap[t] || 0)) * 100) / 100;
-
+                const diff = Math.round((rewardStages[nextTier] - (state.earnedMap[t] || 0)) * 100) / 100;
                 if (diff > 0) { 
                     state.cloudBalance += diff; oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).catch(e=>{});
-                    state.earnedMap[t] = baseReward * nextRatio; 
+                    state.earnedMap[t] = rewardStages[nextTier]; 
                     document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold tracking-widest uppercase">🛡️ +${diff.toFixed(2)} AED Boosted</p>`;
@@ -629,7 +601,6 @@
             }
         }
 
-        // --- 历史流水面板 ---
         function openHistory() {
             const listContainer = document.getElementById('history-list');
             listContainer.innerHTML = "";
@@ -663,6 +634,13 @@
             window.speechSynthesis.speak(u); 
         }
 
+        async function updateLumDisplay() {
+            try {
+                const { count } = await oasisCloud.from('user_errors').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+                document.getElementById('lum-count').innerText = count || 0;
+            } catch(e) {}
+        }
+        
         function openStore() { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); document.getElementById('store-modal').classList.remove('hidden-screen'); }
         async function buyItem(price, itemName) {
             if (state.cloudBalance < price) return alert(`⚠️ 您的余额不足！\n\n当前余额: ${state.cloudBalance.toFixed(2)} AED\n商品价格: ${price.toFixed(2)} AED\n\n请继续朗读获取更多奖励！`);
