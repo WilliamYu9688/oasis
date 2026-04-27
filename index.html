@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V9.7 - 麦克风单例解药版</title>
+    <title>Oasis Bridge V9.8 - 商业闭环与极速响应版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -28,7 +28,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">SYSTEM V9.7</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">COMMERCIAL V9.8</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
@@ -149,21 +149,8 @@
     </div>
 
     <div id="exit-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-center items-center hidden-screen transition-all duration-300 px-5">
-        <div class="glass-panel p-8 rounded-[40px] max-w-sm w-full text-center border border-white/10 shadow-2xl">
-            <h3 class="text-2xl font-black text-white mb-2">Pause Learning?</h3>
-            <p class="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">Your progress is saved</p>
-            
-            <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 relative overflow-hidden shadow-inner">
-                <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
-                <p class="text-xs text-gray-400 mt-3 font-bold">Watch a short video to sponsor Oasis</p>
-                <button onclick="alert('广告加载中... 播放完毕后 AED 翻倍！')" class="w-full mt-3 py-3 bg-gradient-to-r from-emerald-500/20 to-emerald-700/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-black tracking-widest active:scale-95 transition-transform">WATCH & DOUBLE AED</button>
+        <div id="exit-content" class="glass-panel p-8 rounded-[40px] max-w-sm w-full text-center border border-white/10 shadow-2xl">
             </div>
-            
-            <div class="space-y-3">
-                <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest shadow-lg active:scale-95 transition-transform">RETURN TO LEARNING</button>
-                <button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 font-bold tracking-widest active:scale-95 transition-transform">DIRECT EXIT</button>
-            </div>
-        </div>
     </div>
 
     <div id="store-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-end hidden-screen transition-all duration-300">
@@ -210,7 +197,6 @@
     <script>
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
-        // 本地缓存数据，绝对遵守 20% 数字率
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.35 },
             { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.35 },
@@ -242,32 +228,21 @@
         let sessionHistory = []; 
         let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
-        // 【终极修复：全局单例语音引擎】
+        // 全局单例引擎，拒绝死锁
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         let globalRecognition = null;
         if (SpeechRec) {
             globalRecognition = new SpeechRec();
             globalRecognition.continuous = false;
             globalRecognition.interimResults = false;
-            
-            globalRecognition.onresult = (e) => { 
-                capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); 
-            };
-            
+            globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
             globalRecognition.onend = () => { 
                 if (appState === 'LISTENING' || appState === 'PROCESSING') {
                     if (capturedText && capturedText.trim() !== "") evaluate();
                     else setAppState('READY'); 
                 }
             };
-
-            globalRecognition.onerror = (e) => { 
-                console.warn("Speech API Error:", e.error);
-                if (e.error === 'not-allowed') {
-                    alert("⚠️ 请允许浏览器访问麦克风权限！");
-                }
-                setAppState('READY'); 
-            };
+            globalRecognition.onerror = (e) => { setAppState('READY'); };
         }
 
         function normalize(s, lang) {
@@ -295,7 +270,6 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('auth-action-btn');
-            
             if(!email || !password) return document.getElementById('auth-msg').innerText = "⚠️ 邮箱和密码不能为空";
             btn.innerText = "PROCESSING..."; btn.disabled = true;
 
@@ -330,26 +304,10 @@
             }
         }
 
-        // --- 引导与退出 ---
+        // --- 引导与启动 ---
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         function handleStep2(l) { state.dbLevel = l; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
-        
-        function promptExit() {
-            if (appState === 'LISTENING') {
-                if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} }
-                setAppState('READY');
-            }
-            document.getElementById('exit-modal').classList.remove('hidden-screen');
-        }
-
-        function confirmExit() {
-            if(appInterval) clearInterval(appInterval);
-            document.getElementById('exit-modal').classList.add('hidden-screen');
-            hideAll();
-            document.getElementById('step-1').classList.remove('hidden-screen'); 
-        }
-
         function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal', 'exit-modal', 'history-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
 
@@ -366,6 +324,7 @@
             fetchNewPhrase();
         }
 
+        // --- 语料获取 ---
         async function fetchNewPhrase() {
             setAppState('READY');
             document.getElementById('target-text').innerText = "Loading data...";
@@ -378,13 +337,11 @@
             try {
                 const { data, error } = await oasisCloud.from('phrases').select('*');
                 if (error || !data || data.length === 0) {
-                    document.getElementById('db-error-msg').innerText = "⚠️ Offline Mode: Using Local Cache";
                     pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
                 } else {
                     pool = data.filter(d => d.difficulty == state.dbLevel);
                 }
             } catch(e) {
-                document.getElementById('db-error-msg').innerText = "⚠️ Network Issue: Using Local Cache";
                 pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
             }
 
@@ -399,20 +356,14 @@
             document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
         }
 
-        // --- 单例录音机 ---
+        // --- 录音控制 ---
         function toggleRecord() {
             if (appState === 'PROCESSING' || appState === 'REWARDING') return;
-            
-            if (!globalRecognition) {
-                alert("⚠️ 您的浏览器不支持语音识别，请尝试使用 Chrome 或 Edge 浏览器。");
-                return;
-            }
+            if (!globalRecognition) return alert("⚠️ 浏览器不支持，请使用 Chrome。");
             
             if (appState === 'LISTENING') {
                 setAppState('PROCESSING');
                 try { globalRecognition.stop(); } catch(e) {}
-                
-                // 保险绳
                 setTimeout(() => {
                     if (appState === 'PROCESSING') {
                         if (capturedText && capturedText.trim() !== "") evaluate();
@@ -424,32 +375,45 @@
 
             capturedText = "";
             globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-
-            try { 
-                globalRecognition.start(); 
-                setAppState('LISTENING'); 
-            } catch(e) { 
-                console.error("Mic Error:", e);
-                setAppState('READY'); 
-            }
+            try { globalRecognition.start(); setAppState('LISTENING'); } catch(e) { setAppState('READY'); }
         }
 
-        // --- 打分与流水账 ---
-        async function evaluate() {
+        // --- 极速 UI 响应打分 + 静默 DB 同步 ---
+        function evaluate() {
             setAppState('PROCESSING');
             
             clearTimeout(watchdogTimer);
             watchdogTimer = setTimeout(() => {
                 if (appState === 'PROCESSING' || appState === 'REWARDING') {
-                    setAppState('READY');
-                    fetchNewPhrase();
+                    setAppState('READY'); fetchNewPhrase();
                 }
             }, 6000);
 
             try {
                 const targetText = document.getElementById('target-text').innerText.replace(/"/g, "");
                 const score = calculateSimilarity(capturedText, targetText);
+                let reward = score >= 90 ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
+
+                // 【核心修复1】：乐观极速 UI 更新！不再被 await 阻塞
+                document.getElementById('score-display').innerHTML = `
+                    <span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'} drop-shadow-md">${score}</span><br>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">Heard: "${capturedText}"</p>
+                `;
                 
+                if (reward > 0) {
+                    walletBalance += reward;
+                    document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
+                    // 异步更新云端钱包
+                    oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id).then().catch(e => console.warn(e));
+                }
+
+                // 异步处理流水记录
+                if (currentPhrase.id) {
+                    sessionHistory.unshift({ text: targetText, score: score, aed: reward, time: new Date().toLocaleTimeString() });
+                    oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: reward }]).then().catch(e => console.warn(e));
+                }
+
+                // 异步处理 LUM 标签
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 const targetWords = normalize(targetText, state.path).split(/\s+/);
                 const spokenWords = normalize(capturedText, state.path).split(/\s+/);
@@ -464,32 +428,6 @@
                     oasisCloud.from('user_errors').insert(errorRecords).then(() => updateLumDisplay()).catch(e => {});
                 }
 
-                let reward = score >= 90 ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
-                
-                // 记录流水
-                if (currentPhrase.id) {
-                    const logItem = { user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: reward };
-                    oasisCloud.from('practice_history').insert([logItem]).catch(e => {});
-                    
-                    sessionHistory.unshift({
-                        text: targetText,
-                        score: score,
-                        aed: reward,
-                        time: new Date().toLocaleTimeString()
-                    });
-                }
-
-                if (reward > 0) {
-                    walletBalance += reward;
-                    await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id);
-                    document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
-                }
-                
-                document.getElementById('score-display').innerHTML = `
-                    <span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'} drop-shadow-md">${score}</span><br>
-                    <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">Heard: "${capturedText}"</p>
-                `;
-                
                 setAppState('REWARDING');
                 clearTimeout(watchdogTimer);
                 setTimeout(() => { fetchNewPhrase(); }, 2000);
@@ -500,19 +438,70 @@
             }
         }
 
+        // --- 恢复的退出广告模块逻辑 ---
+        function promptExit() {
+            if (appState === 'LISTENING') {
+                if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} }
+                setAppState('READY');
+            }
+            
+            const content = document.getElementById('exit-content');
+            if (state.currentTime >= state.targetTime) {
+                // 达标退出
+                content.innerHTML = `
+                    <h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Achieved!</h3>
+                    <p class="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">You completed ${state.targetTime} mins today</p>
+                    <div class="space-y-3">
+                        <button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-700 text-white font-black tracking-widest shadow-lg active:scale-95 transition-transform">EXIT OASIS</button>
+                        <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl bg-gray-800/80 text-white font-bold tracking-widest active:scale-95 transition-transform">KEEP LEARNING</button>
+                    </div>
+                `;
+            } else {
+                // 未达标，看广告补时
+                let left = Math.ceil(state.targetTime - state.currentTime);
+                content.innerHTML = `
+                    <h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3>
+                    <p class="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">${left} mins remaining today</p>
+                    <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 relative overflow-hidden shadow-inner">
+                        <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
+                        <p class="text-xs text-gray-400 mt-1 font-bold">Watch a short video to instantly complete your daily goal.</p>
+                        <button onclick="watchAdToComplete()" class="w-full mt-3 py-3 bg-gradient-to-r from-amber-500/20 to-amber-700/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-black tracking-widest active:scale-95 transition-transform">WATCH AD & COMPLETE GOAL</button>
+                    </div>
+                    <div class="space-y-3">
+                        <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 font-black tracking-widest shadow-lg active:scale-95 transition-transform">KEEP LEARNING</button>
+                        <button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 font-bold tracking-widest active:scale-95 transition-transform">EXIT ANYWAY</button>
+                    </div>
+                `;
+            }
+            document.getElementById('exit-modal').classList.remove('hidden-screen');
+        }
+
+        function watchAdToComplete() {
+            alert("正在加载视频广告... (演示环境)");
+            setTimeout(() => {
+                state.currentTime = state.targetTime;
+                document.getElementById('time-display').innerText = `${state.targetTime}/${state.targetTime}m`;
+                alert("🎉 恭喜！广告观看完毕，今日时长目标已自动达成！");
+                promptExit(); // 刷新退出版面状态
+            }, 1000);
+        }
+
+        function confirmExit() {
+            if(appInterval) clearInterval(appInterval);
+            document.getElementById('exit-modal').classList.add('hidden-screen');
+            hideAll();
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
+        }
+
+        // --- UI与杂项 ---
         function setAppState(s) {
             appState = s;
             const btn = document.getElementById('record-btn');
             const rfBtn = document.getElementById('refresh-btn');
-            
             if (s === 'LISTENING') btn.classList.add('recording-active');
             else btn.classList.remove('recording-active');
-            
-            if (s === 'PROCESSING' || s === 'REWARDING') {
-                btn.disabled = true; rfBtn.disabled = true;
-            } else {
-                btn.disabled = false; rfBtn.disabled = false;
-            }
+            if (s === 'PROCESSING' || s === 'REWARDING') { btn.disabled = true; rfBtn.disabled = true; } 
+            else { btn.disabled = false; rfBtn.disabled = false; }
         }
 
         function calculateSimilarity(s1, s2) {
@@ -543,7 +532,6 @@
         function openHistory() {
             const listContainer = document.getElementById('history-list');
             listContainer.innerHTML = "";
-            
             if (sessionHistory.length === 0) {
                 listContainer.innerHTML = `<p class="text-center text-slate-500 mt-10 font-bold text-xs uppercase tracking-widest">No records in this session yet.</p>`;
             } else {
