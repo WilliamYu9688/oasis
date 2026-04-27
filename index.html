@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V7.9 - 语料净化与数字兼容版</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Oasis Bridge V8.0 - 工业加固版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
         .app-screen { background: radial-gradient(circle at top right, #1f2937, #030712 80%); color: #f3f4f6; min-height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; overflow-y: auto; }
@@ -15,11 +15,8 @@
         .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; }
         @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 100% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } }
         .hidden-screen { display: none !important; }
-        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; }
         input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
-        .money-jump { animation: jump 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; }
-        @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body class="font-sans overflow-hidden bg-slate-900">
@@ -27,21 +24,21 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">LUM Terminal V7.9</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">STABLE V8.0</p>
         </div>
-        <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full">
-            <h2 id="auth-title" class="text-2xl font-black text-white mb-6 text-center">System Login</h2>
+        <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
+            <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
             <form onsubmit="event.preventDefault(); executeAuth();" class="space-y-4">
                 <input id="email" type="email" placeholder="Email" required class="w-full p-5 rounded-2xl">
                 <input id="password" type="password" placeholder="Password" required class="w-full p-5 rounded-2xl">
                 <div id="confirm-password-container" class="overflow-hidden transition-all duration-500 max-h-0 opacity-0">
                     <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-5 rounded-2xl">
                 </div>
-                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-5 rounded-2xl bg-amber-600 text-white font-black">ENTER OASIS</button>
+                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-5 rounded-2xl bg-amber-600 text-white font-black">ENTER SYSTEM</button>
                 <p id="auth-msg" class="text-center text-xs font-bold text-red-400 min-h-[1.5rem] mt-2"></p>
             </form>
-            <div class="mt-4 text-center border-t border-white/5 pt-5">
-                <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 text-xs font-black underline">Create New Account</button>
+            <div class="mt-4 border-t border-white/5 pt-5">
+                <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 text-xs font-black underline">Create Account</button>
             </div>
         </div>
     </div>
@@ -108,10 +105,10 @@
             </div>
         </div>
 
-        <div class="flex-grow flex flex-col justify-center px-5 pb-12 z-20 relative mt-4">
+        <div class="flex-grow flex flex-col justify-center px-5 pb-12 mt-4">
             <div class="glass-panel rounded-[40px] p-7 text-center shadow-2xl border-t border-white/10">
                 <div class="mb-4 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
-                    <span id="scene-display" class="text-[9px] font-black text-amber-500 tracking-widest uppercase">SCENE: STANDBY</span>
+                    <span id="scene-display" class="text-[9px] font-black text-amber-500 tracking-widest uppercase italic">LUM ENGINE ACTIVE</span>
                 </div>
 
                 <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center italic text-white leading-tight">"Connecting..."</h2>
@@ -120,15 +117,15 @@
                 <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
 
                 <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center">
-                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">READY</p>
+                    <p class="text-gray-500 text-[10px] font-bold uppercase">SYSTEM READY</p>
                 </div>
 
                 <div class="flex items-center justify-between px-1">
-                    <button onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75">🔄</button>
+                    <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75">🔄</button>
                     <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-xl transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                         <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg>
                     </button>
-                    <button onclick="playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75">🔊</button>
+                    <button id="play-btn" onclick="playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75">🔊</button>
                 </div>
             </div>
         </div>
@@ -136,57 +133,42 @@
 
     <div id="store-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-end hidden-screen">
         <div class="glass-panel rounded-t-[40px] p-8 h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-3xl font-black text-emerald-400">Oasis Store</h3>
-                <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full text-white">✕</button>
-            </div>
+            <h3 class="text-3xl font-black text-emerald-400 mb-6">Oasis Store</h3>
+            <button onclick="closeModal('store-modal')" class="absolute top-8 right-8 text-white">✕</button>
             <div class="space-y-4">
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
-                    <h4 class="text-lg font-bold text-white">LUM 错题画像权限</h4>
-                    <button onclick="buyItem(50, 'LUM 权限')" class="w-full mt-4 py-3 bg-blue-600 rounded-xl text-white font-black">50 AED 兑换</button>
-                </div>
-                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5">
-                    <h4 class="text-lg font-bold text-amber-400">青海河床原石盲盒</h4>
-                    <button onclick="buyItem(150, '原石盲盒')" class="w-full mt-4 py-3 bg-amber-600 rounded-xl text-white font-black">150 AED 抽取</button>
+                    <h4 class="text-lg font-bold text-white">LUM 权限</h4>
+                    <button onclick="buyItem(50, 'LUM')" class="w-full mt-4 py-3 bg-blue-600 rounded-xl text-white font-black">50 AED 兑换</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const supabaseUrl = 'https://tpawabhfakqpjmepruzx.supabase.co';
-        const supabaseKey = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
-        const oasisCloud = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Supabase 配置
+        const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
         let currentUser = null; let isRegisterMode = false; let currentPhrase = null;
         let walletBalance = 0; let appState = 'READY'; let recognition = null; let capturedText = "";
         let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
         // ==========================================
-        // V7.9 数字标准化函数：核心逻辑升级
+        // V8.0 核心修复：数字映射与状态加固
         // ==========================================
         function normalizeText(str, lang) {
+            if(!str) return "";
             let s = str.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
             if (lang === 'cn') {
-                // 将汉字数字统一映射为阿拉伯数字，解决识别冲突
                 const mapping = { '一': '1', '二': '2', '三': '3', '四': '4', '五': '5', '六': '6', '七': '7', '八': '8', '九': '9', '十': '10' };
                 for (let key in mapping) { s = s.replace(new RegExp(key, 'g'), mapping[key]); }
             }
             return s;
         }
 
-        // --- 鉴权与引导 (恢复 V7.8) ---
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
-            document.getElementById('confirm-password-container').style.opacity = isRegisterMode ? "1" : "0";
-            document.getElementById('auth-title').innerText = isRegisterMode ? "Create Account" : "System Login";
-        }
-
         async function executeAuth() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            let result = isRegisterMode ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
+            const result = isRegisterMode ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
             if (result.error) { document.getElementById('auth-msg').innerText = "❌ " + result.error.message; return; }
             currentUser = result.data.user;
             const { data: profile } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
@@ -197,28 +179,18 @@
             document.getElementById('step-1').classList.remove('hidden-screen');
         }
 
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
+            document.getElementById('confirm-password-container').style.opacity = isRegisterMode ? "1" : "0";
+            document.getElementById('auth-title').innerText = isRegisterMode ? "Create Account" : "System Login";
+        }
+
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         function handleStep2(lvl) { state.dbLevel = lvl; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
         function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
-
-        // --- LUM 与业务引擎 ---
-        async function runLUMAnalysis(captured, target, phraseId) {
-            const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-            const a = normalizeText(target, state.path).split(/\s+/);
-            const b = normalizeText(captured, state.path).split(/\s+/);
-            let missed = a.filter(word => !b.includes(word));
-            
-            if (missed.length > 0) {
-                const records = missed.map(word => {
-                    const tag = document.createElement('span'); tag.className = 'lum-tag'; tag.innerText = word.toUpperCase(); diag.appendChild(tag);
-                    return { user_id: currentUser.id, phrase_id: phraseId, wrong_word: word, error_tag: /\d+/.test(word) ? 'Number' : 'Pronunciation' };
-                });
-                await oasisCloud.from('user_errors').insert(records);
-                updateLumDisplay();
-            } else { diag.innerHTML = "<span class='text-emerald-400 text-[10px] font-bold tracking-widest'>✨ PERFECT ARTICULATION</span>"; }
-        }
 
         async function updateLumDisplay() {
             const { count } = await oasisCloud.from('user_errors').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
@@ -231,50 +203,104 @@
             fetchNewPhrase();
         }
 
+        // ==========================================
+        // V8.0 关键：获取新题时必须重置所有按钮状态
+        // ==========================================
         async function fetchNewPhrase() {
+            setAppState('READY'); // 强制重置按钮状态
             document.getElementById('target-text').innerText = "Loading...";
             const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel).eq('lang', state.path);
+            if(!data || data.length === 0) return document.getElementById('target-text').innerText = "Empty Data";
             currentPhrase = data[Math.floor(Math.random() * data.length)];
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             document.getElementById('target-text').innerText = `"${t}"`;
             document.getElementById('target-zh').innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-widest'>READY</p>";
+            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold'>READY</p>";
             document.getElementById('lum-diagnosis').innerHTML = "";
-            setAppState('READY');
         }
 
+        // ==========================================
+        // V8.0 修复：录音对象在 start 前必须尝试回收上一个对象
+        // ==========================================
         function toggleRecord() {
+            if (appState === 'REWARDING' || appState === 'ANALYZING') return;
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (appState === 'LISTENING') { recognition.stop(); setAppState('ANALYZING'); return; }
-            capturedText = ""; recognition = new SpeechRec(); recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            recognition.onresult = (e) => capturedText = Array.from(e.results).map(r => r[0].transcript).join('');
+            
+            if (appState === 'LISTENING') { 
+                if (recognition) recognition.stop();
+                setAppState('ANALYZING');
+                return; 
+            }
+
+            // 启动录音
+            capturedText = "";
+            if (recognition) { try { recognition.stop(); } catch(e) {} } // 强行回收
+            
+            recognition = new SpeechRec();
+            recognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            recognition.interimResults = false;
+            
+            recognition.onresult = (e) => { capturedText = e.results[0][0].transcript; };
             recognition.onend = () => { if(appState === 'LISTENING') setAppState('ANALYZING'); };
-            recognition.start(); setAppState('LISTENING');
+            recognition.onerror = (e) => { console.error(e); setAppState('READY'); };
+            
+            try {
+                recognition.start();
+                setAppState('LISTENING');
+            } catch(e) {
+                console.error("Recognition Start Error", e);
+                setAppState('READY');
+            }
         }
 
         async function evaluateLogic() {
             const fb = document.getElementById('score-display');
-            const target = (document.getElementById('target-text').innerText).replace(/"/g, "");
-            const score = calculateSimilarity(capturedText, target);
-            await runLUMAnalysis(capturedText, target, currentPhrase.id);
+            const targetText = document.getElementById('target-text').innerText.replace(/"/g, "");
+            const score = calculateSimilarity(capturedText, targetText);
             
+            // LUM 分析
+            const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
+            const aWords = normalizeText(targetText, state.path).split(/\s+/);
+            const bWords = normalizeText(capturedText, state.path).split(/\s+/);
+            let missed = aWords.filter(w => w && !bWords.includes(w));
+            
+            if (missed.length > 0) {
+                const records = missed.map(word => {
+                    const tag = document.createElement('span'); tag.className = 'lum-tag'; tag.innerText = word.toUpperCase(); diag.appendChild(tag);
+                    return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: word, error_tag: 'Missed' };
+                });
+                await oasisCloud.from('user_errors').insert(records);
+                updateLumDisplay();
+            }
+
+            // 奖励结算
             let reward = (score >= 90) ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
             if (reward > 0) {
                 walletBalance += reward;
                 await oasisCloud.from('profiles').update({ wallet_balance: walletBalance }).eq('id', currentUser.id);
                 document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
-                document.getElementById('total-earned').classList.add('money-jump');
-                setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
             }
-            fb.innerHTML = `<span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500 mt-2">Heard: "${capturedText}"</p>`;
-            setTimeout(() => { if (reward > 0) fetchNewPhrase(); else setAppState('READY'); }, 2000);
+            fb.innerHTML = `<span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span><br><p class="text-[10px] text-slate-500">Heard: "${capturedText}"</p>`;
+            
+            setAppState('REWARDING');
+            setTimeout(() => { fetchNewPhrase(); }, 2000);
         }
 
         function setAppState(s) {
-            appState = s; const btn = document.getElementById('record-btn');
-            if (s === 'LISTENING') btn.classList.add('recording-active'); else btn.classList.remove('recording-active');
-            if (s === 'ANALYZING') evaluateLogic();
+            appState = s;
+            const btn = document.getElementById('record-btn');
+            const rfBtn = document.getElementById('refresh-btn');
+            if (s === 'LISTENING') {
+                btn.classList.add('recording-active');
+            } else {
+                btn.classList.remove('recording-active');
+            }
+            // 锁定刷新按钮防止逻辑冲突
+            if (s === 'ANALYZING' || s === 'REWARDING') {
+                btn.disabled = true; rfBtn.disabled = true;
+            } else {
+                btn.disabled = false; rfBtn.disabled = false;
+            }
         }
 
         function calculateSimilarity(s1, s2) {
@@ -286,11 +312,7 @@
             return Math.round((1 - d[m][n] / Math.max(m, n)) * 100);
         }
 
-        function playAudio() { 
-            const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText);
-            u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            window.speechSynthesis.speak(u); 
-        }
+        function playAudio() { window.speechSynthesis.speak(new SpeechSynthesisUtterance(document.getElementById('target-text').innerText)); }
         function openStore() { document.getElementById('store-modal').classList.remove('hidden-screen'); }
         async function buyItem(p, n) { 
             if (walletBalance < p) return alert("余额不足"); 
