@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V9.1 - 全量基建满血版</title>
+    <title>Oasis Bridge V9.2 - 终极防死锁版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -26,7 +26,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">FULL SYSTEM V9.1</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">ULTIMATE V9.2</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
@@ -144,15 +144,13 @@
                 </div>
                 <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full flex justify-center items-center text-white active:scale-90">✕</button>
             </div>
-            
             <div class="space-y-4">
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
-                    <p class="text-[10px] text-gray-400 pr-10">解锁大用户标签模型(LUM)底层权限，实时追踪发音弱点。</p>
+                    <p class="text-[10px] text-gray-400 pr-10">解锁大用户标签模型底层权限，实时追踪发音弱点。</p>
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full mt-4 py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black active:scale-95 shadow-lg">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
                 </div>
-                
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
                     <p class="text-[10px] text-gray-400 pr-10">源自青海河床的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
@@ -164,32 +162,22 @@
     </div>
 
     <script>
-        // Supabase 云端金库连接
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
-        // 全局状态管理
         let currentUser = null; 
         let currentPhrase = null; 
         let walletBalance = 0; 
         let appState = 'READY'; 
         let recognition = null; 
         let capturedText = "";
-        let watchdogTimer = null; // 防止系统死锁的看门狗
+        let watchdogTimer = null; 
         let isRegisterMode = false;
         
-        // 核心用户设置 (路径、时长、难度)
-        let state = { 
-            path: 'en',       // 'en' 学英语, 'cn' 学中文
-            targetTime: 30,   // 目标分钟数
-            currentTime: 0,   // 当前累计时间
-            dbLevel: 1        // 难度级别
-        };
+        let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
-        // --- 1. 数字兼容与文本标准化 ---
         function normalize(s, lang) {
             if(!s) return "";
             let res = s.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
-            // 如果用户正在学中文，他们说出的“二十”要转为“20”方便比对
             if(lang === 'cn') {
                 const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
                 for(let k in map) res = res.replace(new RegExp(k, 'g'), map[k]);
@@ -197,7 +185,6 @@
             return res;
         }
 
-        // --- 2. 鉴权与注册体系 ---
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
             document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
@@ -214,7 +201,6 @@
             const btn = document.getElementById('auth-action-btn');
             
             if(!email || !password) return document.getElementById('auth-msg').innerText = "⚠️ 邮箱和密码不能为空";
-            
             btn.innerText = "PROCESSING..."; btn.disabled = true;
 
             try {
@@ -233,13 +219,11 @@
                     currentUser = data.user;
                 }
 
-                // 初始化或获取用户钱包
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
                 if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
                 walletBalance = prof?.wallet_balance || 0;
                 document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
                 
-                // 推进到下一步：路径选择
                 hideAll();
                 document.getElementById('step-1').classList.remove('hidden-screen');
 
@@ -251,16 +235,13 @@
             }
         }
 
-        // --- 3. 基础设置引导 ---
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         function handleStep2(l) { state.dbLevel = l; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
         function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
 
-        // --- 4. 核心系统启动与定时器 ---
         function startApp() {
             updateLumDisplay();
-            // 学习时长计时器
             setInterval(() => { 
                 if(state.currentTime < state.targetTime) { 
                     state.currentTime += (1/60); 
@@ -270,7 +251,6 @@
             fetchNewPhrase();
         }
 
-        // --- 5. 语料分发引擎 ---
         async function fetchNewPhrase() {
             setAppState('READY');
             document.getElementById('target-text').innerText = "Loading data...";
@@ -279,13 +259,11 @@
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-widest'>SYSTEM READY</p>";
             
             try {
-                // 根据设定的难度拉取同一张表
                 const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
                 if(!data || data.length === 0) return document.getElementById('target-text').innerText = "No Data in DB";
                 
                 currentPhrase = data[Math.floor(Math.random() * data.length)];
                 
-                // 【核心逻辑】：根据用户选择的路线（state.path），决定谁是考题，谁是翻译
                 const mainText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const subText  = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
                 
@@ -294,25 +272,33 @@
                 document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
             } catch(e) {
                 console.error("Fetch Error:", e);
-                document.getElementById('target-text').innerText = "Network Error";
             }
         }
 
-        // --- 6. 永不死锁的 Web Speech 录音机 ---
+        // ==========================================
+        // 【核心修复】：永不死锁录音引擎
+        // ==========================================
         function toggleRecord() {
-            // 保护机制：结算中严禁干扰
-            if (appState === 'ANALYZING' || appState === 'REWARDING') return;
+            // 防御：如果是灰色锁定状态，点击无效
+            if (appState === 'PROCESSING' || appState === 'REWARDING') return;
 
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             
-            // 如果正在录音，主动停止并去打分
             if (appState === 'LISTENING') {
+                setAppState('PROCESSING'); // 马上把按钮置灰，防止二次乱点
                 if (recognition) { try { recognition.stop(); } catch(e) {} }
-                setAppState('ANALYZING');
+                
+                // 保险绳 1：如果 1 秒后 stop 没有触发 onend，强制执行打分
+                setTimeout(() => {
+                    if (appState === 'PROCESSING') {
+                        if (capturedText && capturedText.trim() !== "") evaluate();
+                        else setAppState('READY');
+                    }
+                }, 1000);
                 return;
             }
 
-            // 暴力清场：确保没有残留的监听实例
+            // 开始新录音：必须先清理战场
             if (recognition) { try { recognition.abort(); } catch(e) {} }
 
             capturedText = "";
@@ -321,13 +307,16 @@
             recognition.continuous = false; 
             recognition.interimResults = false;
 
-            recognition.onresult = (e) => { capturedText = e.results[0][0].transcript; };
-            recognition.onspeechend = () => { try { recognition.stop(); } catch(e) {} };
+            // 拼合多段结果，防止停顿截断
+            recognition.onresult = (e) => { 
+                capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); 
+            };
             
             recognition.onend = () => { 
-                if (appState === 'LISTENING') {
-                    if (capturedText) evaluate();
-                    else setAppState('READY'); // 没说话自动复位
+                // 兼容自然结束(LISTENING)和手动点击停止(PROCESSING)
+                if (appState === 'LISTENING' || appState === 'PROCESSING') {
+                    if (capturedText && capturedText.trim() !== "") evaluate();
+                    else setAppState('READY'); 
                 }
             };
 
@@ -345,15 +334,15 @@
             }
         }
 
-        // --- 7. LUM 差分打分与经济系统 ---
         async function evaluate() {
-            setAppState('ANALYZING');
+            setAppState('PROCESSING'); // 确保进入打分时，界面是锁死的
             
-            // 绝对看门狗：如果 6 秒后还没跑完，强行踢回 READY 保护 UI
+            // 保险绳 2：防数据库卡死看门狗。6秒不响应直接复活
             clearTimeout(watchdogTimer);
             watchdogTimer = setTimeout(() => {
-                if (appState === 'ANALYZING' || appState === 'REWARDING') {
-                    console.error("Watchdog Timeout - Force Reset");
+                if (appState === 'PROCESSING' || appState === 'REWARDING') {
+                    console.error("Database Timeout - Rescuing UI");
+                    setAppState('READY');
                     fetchNewPhrase();
                 }
             }, 6000);
@@ -362,7 +351,7 @@
                 const targetText = document.getElementById('target-text').innerText.replace(/"/g, "");
                 const score = calculateSimilarity(capturedText, targetText);
                 
-                // 7.1 LUM 错题标签提取
+                // LUM 标签处理 (不阻塞主线程)
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 const targetWords = normalize(targetText, state.path).split(/\s+/);
                 const spokenWords = normalize(capturedText, state.path).split(/\s+/);
@@ -374,11 +363,10 @@
                         diag.appendChild(tag);
                         return { user_id: currentUser.id, phrase_id: currentPhrase.id, wrong_word: word, error_tag: 'Missed' };
                     });
-                    // 静默上传错题本，不阻塞主流程
                     oasisCloud.from('user_errors').insert(errorRecords).then(() => updateLumDisplay()).catch(e => console.warn(e));
                 }
 
-                // 7.2 钱包打款与云端同步
+                // 算钱
                 let reward = score >= 90 ? currentPhrase.reward_aed : (score >= 60 ? currentPhrase.reward_aed * 0.5 : 0);
                 if (reward > 0) {
                     walletBalance += reward;
@@ -386,7 +374,7 @@
                     document.getElementById('total-earned').innerText = walletBalance.toFixed(2);
                 }
                 
-                // 7.3 UI 渲染
+                // 渲染分数
                 document.getElementById('score-display').innerHTML = `
                     <span class="text-5xl font-black ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'} drop-shadow-md">${score}</span><br>
                     <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">Heard: "${capturedText}"</p>
@@ -394,7 +382,7 @@
                 
                 setAppState('REWARDING');
                 
-                // 成功走完，撤销看门狗，2 秒后自动切下一题
+                // 正常跑完：清除保险绳，2秒后自动下一题
                 clearTimeout(watchdogTimer);
                 setTimeout(() => { fetchNewPhrase(); }, 2000);
 
@@ -405,17 +393,20 @@
             }
         }
 
-        // --- 8. 工具方法与状态机控制 ---
+        // ==========================================
+        // UI 状态机管理器 (严格控制按钮视觉与活性)
+        // ==========================================
         function setAppState(s) {
             appState = s;
             const btn = document.getElementById('record-btn');
             const rfBtn = document.getElementById('refresh-btn');
             
+            // 样式处理
             if (s === 'LISTENING') btn.classList.add('recording-active');
             else btn.classList.remove('recording-active');
             
-            // 锁定按钮，防止乱点
-            if (s === 'ANALYZING' || s === 'REWARDING') {
+            // 禁用逻辑处理
+            if (s === 'PROCESSING' || s === 'REWARDING') {
                 btn.disabled = true; rfBtn.disabled = true;
             } else {
                 btn.disabled = false; rfBtn.disabled = false;
