@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V7.4 - 满级护甲登录版</title>
+    <title>Oasis Bridge V7.5 - 视觉解耦增强版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -30,7 +30,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Cloud Terminal V7.4</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Cloud Terminal V7.5</p>
         </div>
         
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
@@ -199,9 +199,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // 核心一：动态注册鉴权与防御性反馈
-        // ==========================================
         let oasisCloud;
         let currentUser = null;
         let isRegisterMode = false;
@@ -237,13 +234,11 @@
             const originalBtnText = btn.innerText;
 
             if (!oasisCloud) { initSupabase(); if (!oasisCloud) return msg.innerText = "❌ 核心库未加载，请检查网络"; }
-            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             
-            // 物理防线：按钮变灰锁死，防止连点崩溃
-            btn.innerText = "PROCESSING...";
-            btn.disabled = true;
+            if (!email || !password) return msg.innerText = "⚠️ 请完整填写邮箱和密码";
+            btn.innerText = "PROCESSING..."; btn.disabled = true;
 
             try {
                 if (isRegisterMode) {
@@ -258,12 +253,10 @@
                         if(error.message.includes("already registered")) msg.innerText = "❌ 邮箱已被注册，请直接登录";
                         else msg.innerText = "❌ 注册失败: " + error.message;
                     } else {
-                        // 【核心防线】：拦截 Supabase 的邮箱验证机制
                         if (data.session === null && data.user) {
                             msg.innerHTML = "✅ <span class='text-green-400'>注册成功！请前往您的邮箱点击激活链接，然后回来登录。</span>";
                             return; 
                         }
-                        
                         msg.innerText = "✅ 注册成功！正在初始化数据金库...";
                         currentUser = data.user;
                         await ensureProfileExists(currentUser.id); 
@@ -272,10 +265,9 @@
                 } else {
                     msg.innerText = "⏳ 正在接入安全网络...";
                     const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-                    
                     if (error) { 
                         if (error.message.includes("Invalid login")) msg.innerText = "❌ 邮箱或密码错误，请核对";
-                        else if (error.message.includes("Email not confirmed")) msg.innerText = "⚠️ 您的账号还未激活，请前往邮箱点击确认链接";
+                        else if (error.message.includes("Email not confirmed")) msg.innerText = "⚠️ 账号未激活，请前往邮箱确认";
                         else msg.innerText = "❌ " + error.message; 
                     } else { 
                         currentUser = data.user; 
@@ -283,32 +275,20 @@
                         enterOnboarding(); 
                     }
                 }
-            } catch (err) { 
-                msg.innerText = "❌ 网络连接异常，请重试"; 
-            } finally {
-                // 无论成败，恢复按钮状态
-                btn.innerText = originalBtnText;
-                btn.disabled = false;
-            }
+            } catch (err) { msg.innerText = "❌ 网络连接异常，请重试"; } 
+            finally { btn.innerText = originalBtnText; btn.disabled = false; }
         }
 
         async function ensureProfileExists(userId) {
             try {
                 const { data, error } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', userId).maybeSingle();
-                if (!data) {
-                    await oasisCloud.from('profiles').insert({ id: userId, wallet_balance: 0 });
-                    state.cloudBalance = 0;
-                } else {
-                    state.cloudBalance = data.wallet_balance || 0;
-                }
+                if (!data) { await oasisCloud.from('profiles').insert({ id: userId, wallet_balance: 0 }); state.cloudBalance = 0; } 
+                else { state.cloudBalance = data.wallet_balance || 0; }
             } catch(e) { state.cloudBalance = 0; }
         }
 
-        // ==========================================
-        // 核心二：底层状态管理 (修复了 NaN 解析异常)
-        // ==========================================
         function calculateSimilarity(str1, str2) {
-            const regex = /[^\w\s\u4e00-\u9fa5]/g; 
+            const regex = /[^\w\s\u4e00-\u9fa50-9]/g; 
             const s1 = str1.toLowerCase().replace(regex, "").trim().replace(/\s+/g, " ");
             const s2 = str2.toLowerCase().replace(regex, "").trim().replace(/\s+/g, " ");
             if (s1 === s2) return 100;
@@ -356,7 +336,6 @@
             state.dbLevel = dbLevel;
             hideAll(); document.getElementById('main-app').classList.remove('hidden-screen');
             updateTopBar();
-
             if(!timeInterval) timeInterval = setInterval(() => { 
                 if(state.currentTime < state.targetTime) { state.currentTime += (1 / 60); updateTopBar(); } 
             }, 1000);
@@ -382,6 +361,9 @@
             const textEl = document.getElementById('target-text');
             const zhEl = document.getElementById('target-zh');
             textEl.innerText = "Loading..."; zhEl.innerText = "";
+            
+            // 抓取新题时，强制复位状态框为 System Ready
+            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('READY');
 
             try {
@@ -439,7 +421,7 @@
 
             switch(appState) {
                 case 'READY':
-                    fb.innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
+                    // 【核心修复】：进入 READY 时，不再强行清空 fb.innerHTML，只重置按钮和下方提示字！
                     btn.classList.remove('recording-active'); btn.disabled = false; hint.innerText = "CLICK TO START";
                     break;
                 case 'LISTENING':
@@ -475,7 +457,7 @@
             recognition.onerror = (e) => {
                 if (appState !== 'LISTENING') return;
                 document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase text-[10px]">⚠️ Error</p>`;
-                setTimeout(() => setAppState('READY'), 2000);
+                setTimeout(() => setAppState('READY'), 1500);
             };
             recognition.onend = () => { 
                 if (appState === 'LISTENING') {
@@ -523,15 +505,19 @@
             }
 
             if (finalTier < 5 && ((finalTier === 0 && state.attempts[targetText] >= 3) || (finalTier > 0 && state.attempts[targetText] >= 2)) && state.adLimit > 0) {
-                fbHtml += `<p class="text-[9px] text-blue-400 mt-1 font-bold animate-pulse tracking-widest uppercase cursor-pointer" onclick="requestRescue()">💡 Need Help? Tap Top Right 🆘</p>`;
+                fbHtml += `<p class="text-[10px] text-blue-400 mt-2 font-bold animate-pulse tracking-widest uppercase cursor-pointer py-1 px-3 bg-blue-900/30 rounded-full inline-block border border-blue-500/30" onclick="requestRescue()">💡 Need Help? Tap Here 🆘</p>`;
             }
 
             const colorClass = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
-            fb.innerHTML = `<span class="text-5xl font-black ${colorClass} drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] leading-none">${score}</span>${fbHtml}`;
+            fb.innerHTML = `<span class="text-5xl font-black ${colorClass} drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] leading-none">${score}</span><br>${fbHtml}`;
             
             saveData(); syncPhraseState();
-            if (diff > 0) { setTimeout(() => fetchNewPhrase(), 2000); } 
-            else { setTimeout(() => setAppState('READY'), 2500); }
+            if (diff > 0) { 
+                setTimeout(() => fetchNewPhrase(), 2000); 
+            } else { 
+                // 【核心修复】：等待 1 秒钟就让按钮解锁，但屏幕上的求救提示和分数会永远保留，直到下次录音！
+                setTimeout(() => setAppState('READY'), 1000); 
+            }
         }
 
         function requestRescue() {
