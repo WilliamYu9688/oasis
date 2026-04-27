@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V9.4 - 防弹逻辑版</title>
+    <title>Oasis Bridge V9.5 - 完整基建与兜底版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -26,7 +26,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">BULLETPROOF V9.4</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">FULL RECOVERY V9.5</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] max-w-md mx-auto w-full text-center">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6">System Login</h2>
@@ -91,7 +91,7 @@
 
     <div id="main-app" class="app-screen z-30 flex flex-col hidden-screen relative">
         
-        <button onclick="exitApp()" class="absolute top-6 left-5 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-90 transition-transform">
+        <button onclick="promptExit()" class="absolute top-6 left-5 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-90 transition-transform">
             ⏏ Quit
         </button>
 
@@ -118,7 +118,7 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
 
-                <p id="db-error-msg" class="text-[10px] text-red-400 font-bold mb-2 uppercase tracking-wider"></p>
+                <p id="db-error-msg" class="text-[10px] text-amber-400 font-bold mb-2 uppercase tracking-wider"></p>
 
                 <h2 id="target-text" class="text-2xl font-bold mb-4 min-h-[90px] flex items-center justify-center text-white italic leading-tight drop-shadow-md">"System Ready..."</h2>
                 <p id="target-zh" class="text-sm text-slate-400 mb-6 min-h-[20px]"></p>
@@ -142,6 +142,24 @@
         </div>
     </div>
 
+    <div id="exit-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-center items-center hidden-screen transition-all duration-300 px-5">
+        <div class="glass-panel p-8 rounded-[40px] max-w-sm w-full text-center border border-white/10 shadow-2xl">
+            <h3 class="text-2xl font-black text-white mb-2">Pause Learning?</h3>
+            <p class="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest">Your progress is saved</p>
+            
+            <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 relative overflow-hidden shadow-inner">
+                <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
+                <p class="text-xs text-gray-400 mt-3 font-bold">Watch a short video to sponsor Oasis</p>
+                <button onclick="alert('广告加载中... 播放完毕后 AED 翻倍！')" class="w-full mt-3 py-3 bg-gradient-to-r from-emerald-500/20 to-emerald-700/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-black tracking-widest active:scale-95 transition-transform">WATCH & DOUBLE AED</button>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="closeExitModal()" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest shadow-lg active:scale-95 transition-transform">RETURN TO LEARNING</button>
+                <button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 font-bold tracking-widest active:scale-95 transition-transform">DIRECT EXIT</button>
+            </div>
+        </div>
+    </div>
+
     <div id="store-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex flex-col justify-end hidden-screen transition-all duration-300">
         <div class="glass-panel rounded-t-[40px] p-8 h-[80vh] overflow-y-auto border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
             <div class="flex justify-between items-center mb-6">
@@ -151,7 +169,6 @@
                 </div>
                 <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full flex justify-center items-center text-white active:scale-90">✕</button>
             </div>
-            
             <div class="space-y-4">
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
@@ -159,7 +176,6 @@
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full mt-4 py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black active:scale-95 shadow-lg">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
                 </div>
-                
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
                     <p class="text-[10px] text-gray-400 pr-10">源自青海河床的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
@@ -173,6 +189,27 @@
     <script>
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
+        // 【核心修复】：本地缓存数据，绝对遵守 20% 数字率 (3条带数字，12条纯文字)
+        const LOCAL_CACHE = [
+            { text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.35 },
+            { text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.35 },
+            { text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.35 },
+            { text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.35 },
+            { text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.35 },
+            
+            { text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.75 },
+            { text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.75 },
+            { text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.75 },
+            { text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.75 },
+            { text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.75 },
+            
+            { text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 1.50 },
+            { text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 1.50 },
+            { text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 1.50 },
+            { text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 1.50 },
+            { text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 1.50 }
+        ];
+
         let currentUser = null; 
         let currentPhrase = null; 
         let walletBalance = 0; 
@@ -183,12 +220,7 @@
         let appInterval = null;
         let isRegisterMode = false;
         
-        let state = { 
-            path: 'en',       
-            targetTime: 30,   
-            currentTime: 0,   
-            dbLevel: 1        
-        };
+        let state = { path: 'en', targetTime: 30, currentTime: 0, dbLevel: 1 };
 
         function normalize(s, lang) {
             if(!s) return "";
@@ -200,7 +232,7 @@
             return res;
         }
 
-        // --- 鉴权与注册 ---
+        // --- 鉴权 ---
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
             document.getElementById('confirm-password-container').style.maxHeight = isRegisterMode ? "100px" : "0";
@@ -224,7 +256,6 @@
                     const confirmPwd = document.getElementById('confirm-password').value.trim();
                     if (password !== confirmPwd) throw new Error("密码输入不一致");
                     if (password.length < 6) throw new Error("密码至少需要6位");
-                    
                     const { data, error } = await oasisCloud.auth.signUp({ email, password });
                     if (error) throw error;
                     if (!data.user) throw new Error("注册失败，请检查邮箱格式");
@@ -251,23 +282,31 @@
             }
         }
 
-        // --- 流程引导与退出 ---
+        // --- 流程引导与【恢复的退出广告模块】 ---
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         function handleStep2(l) { state.dbLevel = l; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); startApp(); }
         
-        // 【修复点 2】：新增物理退出功能
-        function exitApp() {
-            if (confirm("确定要终止今天的学习吗？进度将会保存。")) {
-                if(appInterval) clearInterval(appInterval);
-                if(recognition) { try { recognition.abort(); } catch(e){} }
+        function promptExit() {
+            if (appState === 'LISTENING') {
+                if (recognition) { try { recognition.abort(); } catch(e){} }
                 setAppState('READY');
-                hideAll();
-                document.getElementById('step-1').classList.remove('hidden-screen'); // 退回路线选择
             }
+            document.getElementById('exit-modal').classList.remove('hidden-screen');
         }
 
-        function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
+        function closeExitModal() {
+            document.getElementById('exit-modal').classList.add('hidden-screen');
+        }
+
+        function confirmExit() {
+            if(appInterval) clearInterval(appInterval);
+            document.getElementById('exit-modal').classList.add('hidden-screen');
+            hideAll();
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
+        }
+
+        function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'store-modal', 'exit-modal'].forEach(id => document.getElementById(id).classList.add('hidden-screen')); }
 
         function startApp() {
             updateLumDisplay();
@@ -281,7 +320,7 @@
             fetchNewPhrase();
         }
 
-        // --- 语料获取 (防空弹修复) ---
+        // --- 语料获取 (带有本地无敌兜底机制) ---
         async function fetchNewPhrase() {
             setAppState('READY');
             document.getElementById('target-text').innerText = "Loading data...";
@@ -290,42 +329,41 @@
             document.getElementById('lum-diagnosis').innerHTML = "";
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-widest'>SYSTEM READY</p>";
             
+            let pool = [];
             try {
-                // 【修复点 3】：不再使用 eq 强过滤，改为先拉取数据，在本地兜底
+                // 尝试拉取数据库
                 const { data, error } = await oasisCloud.from('phrases').select('*');
                 
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    document.getElementById('db-error-msg').innerText = "⚠️ No phrases found in Database at all!";
-                    return document.getElementById('target-text').innerText = "Database is Empty";
+                if (error || !data || data.length === 0) {
+                    console.warn("DB missing data. Engaging Local Fallback Cache.");
+                    document.getElementById('db-error-msg').innerText = "⚠️ Offline Mode: Using Local Cache";
+                    pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
+                } else {
+                    pool = data.filter(d => d.difficulty == state.dbLevel);
                 }
-                
-                // 本地过滤难度
-                let pool = data.filter(d => d.difficulty == state.dbLevel);
-                // 兜底：如果该难度没数据，强行从所有数据里抽一条，绝不卡死
-                if (pool.length === 0) {
-                    document.getElementById('db-error-msg').innerText = "⚠️ Level mismatch. Using random fallback.";
-                    pool = data;
-                }
-                
-                currentPhrase = pool[Math.floor(Math.random() * pool.length)];
-                const mainText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                const subText  = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-                
-                document.getElementById('target-text').innerText = `"${mainText}"`;
-                document.getElementById('target-zh').innerText = subText;
-                document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
             } catch(e) {
-                console.error("Fetch Error:", e);
-                document.getElementById('db-error-msg').innerText = "DB Error: " + e.message;
-                document.getElementById('target-text').innerText = "Connection Failed";
+                console.warn("Network Error. Engaging Local Fallback Cache.");
+                document.getElementById('db-error-msg').innerText = "⚠️ Network Issue: Using Local Cache";
+                pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
             }
+
+            // 最终兜底：哪怕根据难度没滤出数据，直接随机喂缓存
+            if (pool.length === 0) {
+                pool = LOCAL_CACHE;
+            }
+            
+            currentPhrase = pool[Math.floor(Math.random() * pool.length)];
+            const mainText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            const subText  = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            
+            document.getElementById('target-text').innerText = `"${mainText}"`;
+            document.getElementById('target-zh').innerText = subText;
+            document.getElementById('scene-display').innerText = "SCENE: " + currentPhrase.scenario;
         }
 
-        // --- 录音机 ---
+        // --- 录音机 (防死锁增强) ---
         function toggleRecord() {
             if (appState === 'PROCESSING' || appState === 'REWARDING') return;
-
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             
             if (appState === 'LISTENING') {
@@ -374,7 +412,7 @@
             clearTimeout(watchdogTimer);
             watchdogTimer = setTimeout(() => {
                 if (appState === 'PROCESSING' || appState === 'REWARDING') {
-                    console.error("Watchdog Timeout - Force Reset");
+                    setAppState('READY');
                     fetchNewPhrase();
                 }
             }, 6000);
@@ -388,7 +426,7 @@
                 const spokenWords = normalize(capturedText, state.path).split(/\s+/);
                 const missedWords = targetWords.filter(w => w && !spokenWords.includes(w));
                 
-                if(missedWords.length > 0) {
+                if(missedWords.length > 0 && currentPhrase.id) {
                     const errorRecords = missedWords.map(word => {
                         const tag = document.createElement('span'); tag.className='lum-tag'; tag.innerText = word.toUpperCase();
                         diag.appendChild(tag);
