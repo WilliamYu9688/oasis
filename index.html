@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V18.1 - 退出逻辑终极修复版</title>
+    <title>Oasis Bridge V19 - 数据库云端同步版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -33,7 +33,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V18.1</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V19</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
@@ -178,13 +178,11 @@
             <div class="space-y-4">
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
-                    <p class="text-[10px] text-gray-400 leading-relaxed mb-4 pr-16">解锁大用户标签模型(LUM)底层权限，开启后每次录音将提供精准的词级纠错标记。</p>
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-sm active:scale-95 transition-all shadow-lg">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
                 </div>
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
-                    <p class="text-[10px] text-gray-400 leading-relaxed mb-4 pr-16">源自青海河床的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
                     <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-sm active:scale-95 transition-all shadow-lg">150 AED 抽取</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">🪨</div>
                 </div>
@@ -219,37 +217,18 @@
     <script>
         const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
-        const LOCAL_CACHE = [
-            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
-            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.50 },
-            { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 },
-            { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
-            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
-            { id: 906, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 907, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 908, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
-            { id: 909, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
-            { id: 910, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
-            { id: 911, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 912, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
-            { id: 913, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
-            { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 }
-        ];
-        const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
-
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v18_adlim');
-        let lastRefresh = localStorage.getItem('ob_v18_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v19_adlim');
+        let lastRefresh = localStorage.getItem('ob_v19_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v18_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v18_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v18_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v18_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v19_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v19_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v19_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v19_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
@@ -266,12 +245,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v18_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v18_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v18_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v18_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v18_adlim', state.adLimit);
-            localStorage.setItem('ob_v18_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v19_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v19_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v19_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v19_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v19_adlim', state.adLimit);
+            localStorage.setItem('ob_v19_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -321,25 +300,42 @@
             fetchNewPhrase();
         }
 
+        // ==========================================
+        // 【核心修复】：100% 依赖数据库，抛弃臃肿的本地代码
+        // ==========================================
         async function fetchNewPhrase() {
             const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
-            textEl.innerText = "Loading..."; zhEl.innerText = "";
-            document.getElementById('lum-diagnosis').innerHTML = ""; document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
+            textEl.innerText = "Loading data..."; zhEl.innerText = "";
+            document.getElementById('lum-diagnosis').innerHTML = ""; document.getElementById('db-error-msg').innerText = "";
+            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('READY');
 
-            let pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
             try {
-                const { data, error } = await oasisCloud.from('phrases').select('*');
-                if (!error && data && data.length > 0) { pool = data.filter(d => d.difficulty == state.dbLevel); }
-            } catch (err) {}
-            if (pool.length === 0) pool = LOCAL_CACHE; 
+                // 强制要求从 Supabase 获取数据
+                const { data, error } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
+                
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    document.getElementById('db-error-msg').innerText = "⚠️ 数据库中尚未录入该难度级别的语料，请检查数据库。";
+                    textEl.innerText = "Empty Data";
+                    return;
+                }
 
-            currentPhrase = pool[Math.floor(Math.random() * pool.length)];
-            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            textEl.innerText = `"${t}"`; zhEl.innerText = sub;
-            document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
-            syncPhraseState();
+                // 随机抽取一条
+                currentPhrase = data[Math.floor(Math.random() * data.length)];
+                
+                // 路径双轨解析
+                const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+                
+                textEl.innerText = `"${t}"`; zhEl.innerText = sub;
+                document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
+                
+                syncPhraseState();
+            } catch (err) {
+                document.getElementById('db-error-msg').innerText = "⚠️ 网络或数据库连接失败: " + err.message;
+                textEl.innerText = "Connection Error";
+            }
         }
 
         function syncPhraseState() {
@@ -360,24 +356,24 @@
         }
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let globalRecognition = null; let capturedText = "";
+        let globalRec = null; let capturedText = "";
         if (SpeechRec) {
-            globalRecognition = new SpeechRec(); globalRecognition.continuous = false; globalRecognition.interimResults = false;
-            globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            globalRecognition.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
-            globalRecognition.onerror = () => setAppState('READY');
+            globalRec = new SpeechRec(); globalRec.continuous = false; globalRec.interimResults = false;
+            globalRec.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
+            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
+            globalRec.onerror = () => setAppState('READY');
         }
 
         window.toggleRecord = function() {
-            if (!globalRecognition || appState === 'REWARDING' || !currentPhrase) return;
+            if (!globalRec || appState === 'REWARDING' || !currentPhrase) return;
             if (appState === 'LISTENING') { 
-                setAppState('PROCESSING'); try { globalRecognition.stop(); } catch(e) {} 
+                setAppState('PROCESSING'); try { globalRec.stop(); } catch(e) {} 
                 setTimeout(() => { if (appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else setAppState('READY'); } }, 1500);
                 return; 
             }
             capturedText = ""; setAppState('LISTENING');
-            globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            try { globalRecognition.start(); } catch(e) { setAppState('READY'); }
+            globalRec.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            try { globalRec.start(); } catch(e) { setAppState('READY'); }
         };
 
         function setAppState(s) {
@@ -453,55 +449,33 @@
         }
 
         // ==========================================
-        // 【核心修复】：文案修改与无缝退回状态机
+        // 退出拦截补时系统
         // ==========================================
         function promptExit() {
-            if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
+            if (appState === 'LISTENING') { if (globalRec) { try { globalRec.stop(); } catch(e){} } setAppState('READY'); }
             const content = document.getElementById('exit-content');
-            
             if (state.currentTime >= state.targetTime) {
-                content.innerHTML = `
-                    <h3 class="text-2xl font-black text-emerald-400 mb-2">目标已达成!</h3>
-                    <p class="text-slate-300 text-sm mb-6">您已完成 ${state.targetTime} 分钟学习。</p>
-                    <div class="space-y-3">
-                        <button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black active:scale-95 transition-transform">完成并退回主界面</button>
-                        <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl glass-btn font-bold active:scale-95 transition-transform">继续学习</button>
-                    </div>`;
+                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">目标已达成!</h3><p class="text-slate-300 text-sm mb-6">您已完成 ${state.targetTime} 分钟学习。</p>
+                    <div class="space-y-3"><button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">完成并退回主界面</button>
+                    <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl glass-btn font-bold">继续学习</button></div>`;
             } else {
                 let left = Math.ceil(state.targetTime - state.currentTime);
-                content.innerHTML = `
-                    <h3 class="text-2xl font-black text-red-400 mb-2">目标未达成</h3>
-                    <p class="text-slate-300 text-sm mb-6">距离今日目标还差 ${left} 分钟。</p>
-                    <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner">
-                        <span class="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
-                        <p class="text-xs text-gray-400 mt-2">观看短视频，立刻补充 5 分钟学习时长。</p>
-                        <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-xl text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
-                    </div>
-                    <div class="space-y-3">
-                        <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-xl text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
-                        <button onclick="confirmExit()" class="w-full py-4 bg-gray-700/30 rounded-xl text-slate-300 font-bold text-sm active:scale-95 border border-gray-600 transition-transform">退回主界面</button>
-                    </div>`;
+                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">目标未达成</h3><p class="text-slate-300 text-sm mb-6">距离今日目标还差 ${left} 分钟。</p>
+                    <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner"><span class="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
+                    <p class="text-xs text-gray-400 mt-2">观看短视频，立刻补充 5 分钟学习时长。</p>
+                    <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-xl text-xs font-black shadow-lg">观看资讯 (+5 分钟)</button></div>
+                    <div class="space-y-3"><button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-xl text-white font-bold text-sm">继续学习</button>
+                    <button onclick="confirmExit()" class="w-full py-4 bg-gray-700/30 rounded-xl text-slate-300 font-bold text-sm border border-gray-600">退回主界面</button></div>`;
             }
             document.getElementById('exit-modal').classList.remove('hidden-screen');
         }
 
         function confirmExit() { 
-            // 1. 彻底清理定时器
-            if(appInterval) { clearInterval(appInterval); appInterval = null; }
-            if(watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
-            
-            // 2. 切断麦克风
-            if (globalRecognition) { try { globalRecognition.abort(); } catch(e){} }
-            
-            // 3. 重置中间 UI 面板状态
-            setAppState('READY');
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
+            if(appInterval) clearInterval(appInterval); appInterval = null;
+            if(globalRec) { try { globalRec.abort(); } catch(e){} }
+            setAppState('READY'); document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
             saveData(); 
-            
-            // 4. 无缝切回主菜单
-            closeModal('exit-modal');
-            hideAll(); 
-            document.getElementById('step-1').classList.remove('hidden-screen'); 
+            closeModal('exit-modal'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         function requestRescue() {
