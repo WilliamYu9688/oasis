@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V18 - 退出逻辑极致版</title>
+    <title>Oasis Bridge V18.1 - 退出逻辑终极修复版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -33,7 +33,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V18</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V18.1</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
@@ -148,6 +148,8 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
 
+                <p id="db-error-msg" class="text-[9px] text-amber-400 font-bold mb-2 uppercase tracking-wider"></p>
+
                 <h2 id="target-text" class="text-2xl font-bold mb-3 min-h-[90px] flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-lg transition-all">Connecting...</h2>
                 <p id="target-zh" class="text-sm text-slate-400 mb-4 min-h-[20px]"></p>
                 <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
@@ -252,7 +254,7 @@
             dbLevel: 1, cloudBalance: 0.00 
         };
         
-        let currentPhrase = null; let timeInterval = null; let appState = 'READY';
+        let currentPhrase = null; let appInterval = null; let appState = 'READY';
         let sessionHistory = []; let watchdogTimer = null;
 
         function checkAdRefresh() {
@@ -314,7 +316,8 @@
         async function handleStep2(dbLevel) {
             state.dbLevel = dbLevel; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); 
             checkAdRefresh(); updateTopBar(); sessionHistory = []; 
-            if(!timeInterval) timeInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1 / 60); updateTopBar(); } }, 1000);
+            if(appInterval) clearInterval(appInterval);
+            appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1 / 60); updateTopBar(); } }, 1000);
             fetchNewPhrase();
         }
 
@@ -357,24 +360,24 @@
         }
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let globalRec = null; let capturedText = "";
+        let globalRecognition = null; let capturedText = "";
         if (SpeechRec) {
-            globalRec = new SpeechRec(); globalRec.continuous = false; globalRec.interimResults = false;
-            globalRec.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
-            globalRec.onerror = () => setAppState('READY');
+            globalRecognition = new SpeechRec(); globalRecognition.continuous = false; globalRecognition.interimResults = false;
+            globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
+            globalRecognition.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
+            globalRecognition.onerror = () => setAppState('READY');
         }
 
         window.toggleRecord = function() {
-            if (!globalRec || appState === 'REWARDING' || !currentPhrase) return;
+            if (!globalRecognition || appState === 'REWARDING' || !currentPhrase) return;
             if (appState === 'LISTENING') { 
-                setAppState('PROCESSING'); try { globalRec.stop(); } catch(e) {} 
+                setAppState('PROCESSING'); try { globalRecognition.stop(); } catch(e) {} 
                 setTimeout(() => { if (appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else setAppState('READY'); } }, 1500);
                 return; 
             }
             capturedText = ""; setAppState('LISTENING');
-            globalRec.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            try { globalRec.start(); } catch(e) { setAppState('READY'); }
+            globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            try { globalRecognition.start(); } catch(e) { setAppState('READY'); }
         };
 
         function setAppState(s) {
@@ -450,13 +453,12 @@
         }
 
         // ==========================================
-        // 【核心修复】：退出界面的文案与无缝切回状态机
+        // 【核心修复】：文案修改与无缝退回状态机
         // ==========================================
         function promptExit() {
-            if (appState === 'LISTENING') { if (globalRec) { try { globalRec.stop(); } catch(e){} } setAppState('READY'); }
+            if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
             const content = document.getElementById('exit-content');
             
-            // 文案修复：强行退出 -> 退回主界面
             if (state.currentTime >= state.targetTime) {
                 content.innerHTML = `
                     <h3 class="text-2xl font-black text-emerald-400 mb-2">目标已达成!</h3>
@@ -470,13 +472,11 @@
                 content.innerHTML = `
                     <h3 class="text-2xl font-black text-red-400 mb-2">目标未达成</h3>
                     <p class="text-slate-300 text-sm mb-6">距离今日目标还差 ${left} 分钟。</p>
-                    
                     <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner">
                         <span class="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
                         <p class="text-xs text-gray-400 mt-2">观看短视频，立刻补充 5 分钟学习时长。</p>
                         <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-xl text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
                     </div>
-
                     <div class="space-y-3">
                         <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-xl text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
                         <button onclick="confirmExit()" class="w-full py-4 bg-gray-700/30 rounded-xl text-slate-300 font-bold text-sm active:scale-95 border border-gray-600 transition-transform">退回主界面</button>
@@ -486,17 +486,19 @@
         }
 
         function confirmExit() { 
-            // 1. 彻底清理所有的后台定时器和进程
+            // 1. 彻底清理定时器
             if(appInterval) { clearInterval(appInterval); appInterval = null; }
             if(watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
-            if(globalRec) { try { globalRec.abort(); } catch(e){} }
             
-            // 2. 状态强行复位
+            // 2. 切断麦克风
+            if (globalRecognition) { try { globalRecognition.abort(); } catch(e){} }
+            
+            // 3. 重置中间 UI 面板状态
             setAppState('READY');
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
             saveData(); 
             
-            // 3. 无缝隐藏当前 UI 并显示主菜单（不再进行导致丢失状态的 reload）
+            // 4. 无缝切回主菜单
             closeModal('exit-modal');
             hideAll(); 
             document.getElementById('step-1').classList.remove('hidden-screen'); 
