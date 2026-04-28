@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V16.1 - 退出逻辑修复版</title>
+    <title>Oasis Bridge V17 - 退出逻辑修复版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -33,7 +33,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V16.1</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V17</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
@@ -176,12 +176,14 @@
             <div class="space-y-4">
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
-                    <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-sm active:scale-95 shadow-lg">50 AED 兑换</button>
+                    <p class="text-[10px] text-gray-400 leading-relaxed mb-4 pr-16">解锁大用户标签模型(LUM)底层权限，开启后每次录音将提供精准的词级纠错标记。</p>
+                    <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-sm active:scale-95 transition-all shadow-lg">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
                 </div>
                 <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
                     <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
-                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-sm active:scale-95 shadow-lg">150 AED 抽取</button>
+                    <p class="text-[10px] text-gray-400 leading-relaxed mb-4 pr-16">源自青海河床的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
+                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-sm active:scale-95 transition-all shadow-lg">150 AED 抽取</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">🪨</div>
                 </div>
             </div>
@@ -237,15 +239,15 @@
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v16_adlim');
-        let lastRefresh = localStorage.getItem('ob_v16_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v17_adlim');
+        let lastRefresh = localStorage.getItem('ob_v17_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v16_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v16_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v16_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v16_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v17_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v17_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v17_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v17_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
@@ -262,12 +264,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v16_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v16_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v16_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v16_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v16_adlim', state.adLimit);
-            localStorage.setItem('ob_v16_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v17_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v17_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v17_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v17_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v17_adlim', state.adLimit);
+            localStorage.setItem('ob_v17_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -359,7 +361,7 @@
         if (SpeechRec) {
             globalRec = new SpeechRec(); globalRec.continuous = false; globalRec.interimResults = false;
             globalRec.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
+            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
             globalRec.onerror = () => setAppState('READY');
         }
 
@@ -448,7 +450,7 @@
         }
 
         // ==========================================
-        // 【核心修复】：看广告加5分钟 & 真·干净退出
+        // 【核心修复】：退出界面的逻辑（平滑切回 Step 1，不再刷新页面卡死）
         // ==========================================
         function promptExit() {
             if (appState === 'LISTENING') { if (globalRec) { try { globalRec.stop(); } catch(e){} } setAppState('READY'); }
@@ -469,16 +471,17 @@
             document.getElementById('exit-modal').classList.remove('hidden-screen');
         }
 
-        // 【重置清理并切回主菜单】
+        // 【无缝退出逻辑，拒绝 location.reload】
         function confirmExit() { 
-            if(appInterval) clearInterval(appInterval); 
-            appInterval = null;
-            if (globalRec) { try { globalRec.abort(); } catch(e){} }
+            // 清理后台定时器
+            if(appInterval) { clearInterval(appInterval); appInterval = null; }
+            if(watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
+            if(globalRec) { try { globalRec.abort(); } catch(e){} }
+            
             setAppState('READY');
             saveData(); 
             
-            // 完美切回选择页面，不再粗暴 reload
-            closeModal('exit-modal');
+            // 关闭模态框并平滑返回主菜单
             hideAll(); 
             document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
@@ -512,7 +515,7 @@
             setAppState('PROCESSING'); await new Promise(r => setTimeout(r, 1500)); 
 
             if (type === 'time') {
-                // 【核心修复】：只加5分钟
+                // 严格遵守：每次只加 5 分钟
                 state.currentTime += 5; 
                 if (state.currentTime >= state.targetTime) {
                     state.currentTime = state.targetTime;
