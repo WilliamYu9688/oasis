@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V15 - 24H 动态刷新版</title>
+    <title>Oasis Bridge V16 - 商业逻辑绝对尊享版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -33,7 +33,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V15</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V16</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
@@ -95,7 +95,7 @@
                 <div class="font-black text-white text-2xl">99<span class="text-xs text-amber-500 ml-1">AED</span></div>
             </div>
             <div onclick="handleStep2(2)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
-                <div><p class="font-bold text-lg text-slate-200">职场级 (L2)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">工作交接与生活办事</p></div>
+                <div><p class="font-bold text-lg text-slate-200">职场级 (L2)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">项目与跨部门协作</p></div>
                 <div class="font-black text-white text-2xl">299<span class="text-xs text-amber-500 ml-1">AED</span></div>
             </div>
             <div onclick="handleStep2(3)" class="glass-panel p-6 rounded-[32px] border-amber-500/40 flex justify-between items-center active:scale-95 transition-transform cursor-pointer relative overflow-hidden">
@@ -148,7 +148,7 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
 
-                <h2 id="target-text" class="text-2xl font-bold mb-3 min-h-[90px] flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-lg">Connecting...</h2>
+                <h2 id="target-text" class="text-2xl font-bold mb-3 min-h-[90px] flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-lg transition-all">Connecting...</h2>
                 <p id="target-zh" class="text-sm text-slate-400 mb-4 min-h-[20px]"></p>
                 <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
 
@@ -157,7 +157,7 @@
                 </div>
 
                 <div class="flex items-center justify-between px-1">
-                    <button onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75 transition-transform"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+                    <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75 transition-transform"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
                     <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(245,158,11,0.3)] border-[4px] border-amber-900/40 outline-none transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                         <div id="mic-inner-ring" class="w-20 h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-10 h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                     </button>
@@ -170,7 +170,7 @@
     <div id="store-modal" class="fixed inset-0 z-[100] modal-overlay flex flex-col justify-end p-0 hidden-screen transition-all duration-300">
         <div class="glass-panel rounded-t-[40px] p-8 pb-12 text-left shadow-2xl border-white/10 w-full h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <div><h3 class="text-3xl font-black text-emerald-400">Oasis Store</h3><p class="text-slate-400 text-xs mt-1 uppercase tracking-widest font-bold">Spend your AED</p></div>
+                <div><h3 class="text-3xl font-black text-emerald-400 drop-shadow-md">Oasis Store</h3><p class="text-slate-400 text-xs mt-1 uppercase tracking-widest font-bold">Current Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div>
                 <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div class="space-y-4">
@@ -178,11 +178,6 @@
                     <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-sm active:scale-95 shadow-lg">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
-                </div>
-                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
-                    <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
-                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-sm active:scale-95 shadow-lg">150 AED 抽取</button>
-                    <div class="absolute top-4 right-4 text-4xl opacity-20">🪨</div>
                 </div>
             </div>
         </div>
@@ -236,17 +231,16 @@
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        // 【逻辑重构点：24小时刷新逻辑】
-        let savedAdLimit = localStorage.getItem('ob_v15_adlim');
-        let lastRefresh = localStorage.getItem('ob_v15_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v16_adlim');
+        let lastRefresh = localStorage.getItem('ob_v16_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v15_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v15_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v15_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v15_att')) || {},
-            adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, // 初始改为 6
+            scores: JSON.parse(localStorage.getItem('ob_v16_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v16_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v16_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v16_att')) || {},
+            adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
         
@@ -257,20 +251,17 @@
             const now = Date.now();
             const dayMs = 24 * 60 * 60 * 1000;
             if (now - lastRefresh > dayMs) {
-                console.log("24小时已过，刷新广告次数为 6 次");
-                state.adLimit = 6;
-                lastRefresh = now;
-                saveData();
+                state.adLimit = 6; lastRefresh = now; saveData();
             }
         }
 
         function saveData() {
-            localStorage.setItem('ob_v15_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v15_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v15_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v15_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v15_adlim', state.adLimit);
-            localStorage.setItem('ob_v15_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v16_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v16_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v16_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v16_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v16_adlim', state.adLimit);
+            localStorage.setItem('ob_v16_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -278,43 +269,33 @@
             const container = document.getElementById('confirm-password-container');
             if (isRegisterMode) {
                 container.style.maxHeight = "100px"; container.style.opacity = "1";
-                document.getElementById('auth-title').innerText = "Create Account"; 
-                document.getElementById('auth-action-btn').innerText = "REGISTER & ENTER";
+                document.getElementById('auth-title').innerText = "Create Account"; document.getElementById('auth-action-btn').innerText = "REGISTER & ENTER";
             } else {
                 container.style.maxHeight = "0"; container.style.opacity = "0";
-                document.getElementById('auth-title').innerText = "System Login"; 
-                document.getElementById('auth-action-btn').innerText = "SECURE LOGIN";
+                document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "SECURE LOGIN";
             }
         }
 
         async function executeAuth() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('auth-action-btn');
             if (!email || !password) return alert("⚠️ 请填写邮箱和密码");
             btn.innerText = "PROCESSING..."; btn.disabled = true;
-
             try {
                 if (isRegisterMode) {
                     const { data, error } = await oasisCloud.auth.signUp({ email, password });
-                    if (error) throw error;
-                    currentUser = data.user;
+                    if (error) throw error; currentUser = data.user;
                 } else {
                     const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                    currentUser = data.user;
+                    if (error) throw error; currentUser = data.user;
                 }
                 const { data: prof } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', currentUser.id).maybeSingle();
                 if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
                 state.cloudBalance = prof?.wallet_balance || 0;
                 document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                checkAdRefresh();
-                hideAll(); document.getElementById('step-1').classList.remove('hidden-screen');
-            } catch (err) {
-                document.getElementById('auth-msg').innerText = "❌ " + err.message;
-            } finally {
-                btn.innerText = isRegisterMode ? "REGISTER & ENTER" : "SECURE LOGIN"; btn.disabled = false;
-            }
+                checkAdRefresh(); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen');
+            } catch (err) { document.getElementById('auth-msg').innerText = "❌ " + err.message; } 
+            finally { btn.innerText = isRegisterMode ? "REGISTER & ENTER" : "SECURE LOGIN"; btn.disabled = false; }
         }
 
         function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'rescue-modal', 'exit-modal', 'store-modal', 'history-modal'].forEach(id => { document.getElementById(id).classList.add('hidden-screen'); }); }
@@ -324,9 +305,7 @@
         
         async function handleStep2(dbLevel) {
             state.dbLevel = dbLevel; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen'); 
-            checkAdRefresh(); // 进入主屏前再刷一次
-            updateTopBar();
-            sessionHistory = []; 
+            checkAdRefresh(); updateTopBar(); sessionHistory = []; 
             if(!timeInterval) timeInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1 / 60); updateTopBar(); } }, 1000);
             fetchNewPhrase();
         }
@@ -334,16 +313,13 @@
         async function fetchNewPhrase() {
             const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
             textEl.innerText = "Loading..."; zhEl.innerText = "";
-            document.getElementById('lum-diagnosis').innerHTML = "";
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
+            document.getElementById('lum-diagnosis').innerHTML = ""; document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('READY');
 
             let pool = LOCAL_CACHE.filter(d => d.difficulty == state.dbLevel);
             try {
                 const { data, error } = await oasisCloud.from('phrases').select('*');
-                if (!error && data && data.length > 0) {
-                    pool = data.filter(d => d.difficulty == state.dbLevel);
-                }
+                if (!error && data && data.length > 0) { pool = data.filter(d => d.difficulty == state.dbLevel); }
             } catch (err) {}
             if (pool.length === 0) pool = LOCAL_CACHE; 
 
@@ -358,11 +334,9 @@
         function syncPhraseState() {
             if(!currentPhrase) return;
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const best = state.scores[t] || 0;
-            const earned = state.earnedMap[t] || 0;
+            const best = state.scores[t] || 0; const earned = state.earnedMap[t] || 0;
             const el = document.getElementById('item-best-score');
-            el.innerText = best;
-            el.className = `text-lg font-black transition-all ${best >= 80 ? 'text-emerald-400' : (best >= 60 ? 'text-amber-400' : 'text-slate-400')}`;
+            el.innerText = best; el.className = `text-lg font-black transition-all ${best >= 80 ? 'text-emerald-400' : (best >= 60 ? 'text-amber-400' : 'text-slate-400')}`;
             document.getElementById('item-earned').innerText = earned.toFixed(2);
             updateTopBar();
         }
@@ -371,7 +345,7 @@
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
             document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
             document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? "♻️ REFILL" : `🆘 ${state.adLimit}/6`;
-            document.getElementById('ad-limit-display').className = state.adLimit <= 0 ? "text-sm font-black text-amber-400 drop-shadow-md" : "text-sm font-black text-blue-400 drop-shadow-md";
+            document.getElementById('ad-limit-display').className = state.adLimit <= 0 ? "text-sm font-black text-amber-400" : "text-sm font-black text-blue-400";
         }
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -379,7 +353,7 @@
         if (SpeechRec) {
             globalRec = new SpeechRec(); globalRec.continuous = false; globalRec.interimResults = false;
             globalRec.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
+            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
             globalRec.onerror = () => setAppState('READY');
         }
 
@@ -425,14 +399,14 @@
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const score = calculateSimilarity(capturedText, targetText);
 
-                // LUM 诊断
+                // LUM
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 const aWords = targetText.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
                 const bWords = capturedText.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
                 const missed = aWords.filter(w => w && !bWords.includes(w));
                 missed.forEach(w => { const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t); });
 
-                // 算分算钱
+                // V7.6 Score Logic
                 if (score > (state.scores[targetText] || 0)) { state.scores[targetText] = score; state.attempts[targetText] = 0; } 
                 else { state.attempts[targetText] = (state.attempts[targetText] || 0) + 1; }
 
@@ -467,29 +441,37 @@
             } catch (e) { setAppState('READY'); }
         }
 
-        // --- 广告逻辑与退出 ---
+        // ==========================================
+        // 【核心修复】：看广告加5分钟 & 强行真·退出
+        // ==========================================
         function promptExit() {
+            if (appState === 'LISTENING') { if (globalRec) { try { globalRec.stop(); } catch(e){} } setAppState('READY'); }
             const content = document.getElementById('exit-content');
             if (state.currentTime >= state.targetTime) {
-                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Achieved!</h3><p class="text-slate-300 text-sm mb-6">Completed ${state.targetTime}m goal.</p>
-                    <div class="space-y-3"><button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">EXIT OASIS</button>
-                    <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl glass-btn font-bold">KEEP GOING</button></div>`;
+                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">目标已达成!</h3><p class="text-slate-300 text-sm mb-6">您已完成 ${state.targetTime} 分钟学习。</p>
+                    <div class="space-y-3"><button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">完成并退出</button>
+                    <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl glass-btn font-bold">继续学习</button></div>`;
             } else {
                 let left = Math.ceil(state.targetTime - state.currentTime);
-                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">You still have ${left}m left.</p>
+                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">目标未达成</h3><p class="text-slate-300 text-sm mb-6">距离今日目标还差 ${left} 分钟。</p>
                     <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner"><span class="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
-                    <p class="text-xs text-gray-400 mt-2">Watch a video to instantly complete your goal.</p>
-                    <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-xl text-xs font-black shadow-lg">WATCH AD & COMPLETE</button></div>
-                    <div class="space-y-3"><button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-xl text-white font-bold text-sm">CONTINUE</button>
-                    <button onclick="confirmExit()" class="w-full py-4 bg-red-900/30 rounded-xl text-red-400 font-bold text-sm">ABANDON & EXIT</button></div>`;
+                    <p class="text-xs text-gray-400 mt-2">观看短视频，立刻补充 5 分钟学习时长。</p>
+                    <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-xl text-xs font-black shadow-lg">观看资讯 (+5 分钟)</button></div>
+                    <div class="space-y-3"><button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-xl text-white font-bold text-sm">继续学习</button>
+                    <button onclick="confirmExit()" class="w-full py-4 bg-red-900/30 rounded-xl text-red-400 font-bold text-sm">强行退出</button></div>`;
             }
             document.getElementById('exit-modal').classList.remove('hidden-screen');
         }
 
-        function confirmExit() { if(appInterval) clearInterval(appInterval); saveData(); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
+        function confirmExit() { 
+            if(appInterval) clearInterval(appInterval); 
+            saveData(); 
+            // 【物理级退出】：直接重新加载页面，清除所有内存和变量残留，退回最干净的初始状态
+            location.reload(); 
+        }
 
         function requestRescue() {
-            checkAdRefresh(); // 救援前刷一次
+            checkAdRefresh();
             if (appState === 'REWARDING' || !currentPhrase) return;
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             const best = state.scores[t] || 0;
@@ -517,7 +499,15 @@
             setAppState('PROCESSING'); await new Promise(r => setTimeout(r, 1500)); 
 
             if (type === 'time') {
-                state.currentTime = state.targetTime; updateTopBar(); fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ GOAL COMPLETED</p>`;
+                // 【核心修复】：每次严格加5分钟，而非直接填满
+                state.currentTime += 5; 
+                if (state.currentTime >= state.targetTime) {
+                    state.currentTime = state.targetTime;
+                    fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ GOAL COMPLETED</p>`;
+                } else {
+                    fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ +5 MINS ADDED</p>`;
+                }
+                updateTopBar(); 
                 setTimeout(() => setAppState('READY'), 2000);
             } else if (type === 'boost' && state.adLimit > 0) {
                 state.adLimit--; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
@@ -559,7 +549,6 @@
             alert(`🎉 兑换成功！已获得：${name}`); closeModal('store-modal');
         }
         function playAudio() { const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText.replace(/"/g,"")); u.lang = state.path==='en'?'en-US':'zh-CN'; window.speechSynthesis.speak(u); }
-        async function updateLumDisplay() { try { const { count } = await oasisCloud.from('user_errors').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id); document.getElementById('lum-count').innerText = count || 0; } catch(e) {} }
     </script>
 </body>
 </html>
