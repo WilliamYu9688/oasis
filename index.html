@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V16 - 商业逻辑绝对尊享版</title>
+    <title>Oasis Bridge V16.1 - 退出逻辑修复版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -33,7 +33,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
         <div class="mb-10 text-center">
             <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V16</p>
+            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V16.1</p>
         </div>
         <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
             <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
@@ -179,6 +179,11 @@
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-sm active:scale-95 shadow-lg">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
                 </div>
+                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
+                    <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
+                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-sm active:scale-95 shadow-lg">150 AED 抽取</button>
+                    <div class="absolute top-4 right-4 text-4xl opacity-20">🪨</div>
+                </div>
             </div>
         </div>
     </div>
@@ -227,6 +232,7 @@
             { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
             { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 }
         ];
+        const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
 
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
@@ -353,7 +359,7 @@
         if (SpeechRec) {
             globalRec = new SpeechRec(); globalRec.continuous = false; globalRec.interimResults = false;
             globalRec.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
+            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
             globalRec.onerror = () => setAppState('READY');
         }
 
@@ -399,14 +405,14 @@
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const score = calculateSimilarity(capturedText, targetText);
 
-                // LUM
+                // LUM 诊断
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 const aWords = targetText.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
                 const bWords = capturedText.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
                 const missed = aWords.filter(w => w && !bWords.includes(w));
                 missed.forEach(w => { const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t); });
 
-                // V7.6 Score Logic
+                // 算分算钱
                 if (score > (state.scores[targetText] || 0)) { state.scores[targetText] = score; state.attempts[targetText] = 0; } 
                 else { state.attempts[targetText] = (state.attempts[targetText] || 0) + 1; }
 
@@ -442,7 +448,7 @@
         }
 
         // ==========================================
-        // 【核心修复】：看广告加5分钟 & 强行真·退出
+        // 【核心修复】：看广告加5分钟 & 真·干净退出
         // ==========================================
         function promptExit() {
             if (appState === 'LISTENING') { if (globalRec) { try { globalRec.stop(); } catch(e){} } setAppState('READY'); }
@@ -463,11 +469,18 @@
             document.getElementById('exit-modal').classList.remove('hidden-screen');
         }
 
+        // 【重置清理并切回主菜单】
         function confirmExit() { 
             if(appInterval) clearInterval(appInterval); 
+            appInterval = null;
+            if (globalRec) { try { globalRec.abort(); } catch(e){} }
+            setAppState('READY');
             saveData(); 
-            // 【物理级退出】：直接重新加载页面，清除所有内存和变量残留，退回最干净的初始状态
-            location.reload(); 
+            
+            // 完美切回选择页面，不再粗暴 reload
+            closeModal('exit-modal');
+            hideAll(); 
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         function requestRescue() {
@@ -499,7 +512,7 @@
             setAppState('PROCESSING'); await new Promise(r => setTimeout(r, 1500)); 
 
             if (type === 'time') {
-                // 【核心修复】：每次严格加5分钟，而非直接填满
+                // 【核心修复】：只加5分钟
                 state.currentTime += 5; 
                 if (state.currentTime >= state.targetTime) {
                     state.currentTime = state.targetTime;
@@ -507,8 +520,7 @@
                 } else {
                     fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ +5 MINS ADDED</p>`;
                 }
-                updateTopBar(); 
-                setTimeout(() => setAppState('READY'), 2000);
+                updateTopBar(); setTimeout(() => setAppState('READY'), 2000);
             } else if (type === 'boost' && state.adLimit > 0) {
                 state.adLimit--; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const best = state.scores[t] || 0;
