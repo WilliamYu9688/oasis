@@ -2,217 +2,326 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oasis Bridge V19 - 真实密钥云端直连版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Oasis Bridge V20 - Mobile Native Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
-        .app-screen { background: radial-gradient(circle at top right, #1f2937, #030712 80%); color: #f3f4f6; min-height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; overflow-y: auto; }
-        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
-        .glass-btn { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
-        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6), 0 0 20px rgba(239, 68, 68, 0.4); } 100% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0), 0 0 40px rgba(239, 68, 68, 0.2); } }
-        .money-jump { animation: jump 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
-        @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        .hidden-screen { display: none !important; }
-        .modal-overlay { background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(15px); }
-        .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); }
-        .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
+        /* --- 移动端基础重置与优化 --- */
+        * { 
+            -webkit-tap-highlight-color: transparent; /* 移除点击高亮 */
+            -webkit-touch-callout: none; /* 禁用长按菜单 */
+            -webkit-user-select: none; user-select: none; /* 禁用文本选择 */
+            touch-action: manipulation; /* 优化双击延迟 */
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; /* 核心：锁定外层滚动 */
+            background-color: #0f172a; /* Fallback */
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        input {
+            -webkit-user-select: auto; user-select: auto; /* 允许输入框选择 */
+            background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); 
+        }
         input:focus { border-color: #fbbf24; }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .lum-tag { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; animation: slideIn 0.3s ease-out; }
+
+        /* --- 屏幕容器与背景 --- */
+        .app-screen { 
+            background: radial-gradient(circle at top right, #1e293b, #020617 85%); 
+            color: #f3f4f6; 
+            width: 100vw; 
+            height: 100vh; /* 使用 100vh 作为基础 */
+            height: 100dvh; /* 现代移动端：动态视口高度，适配导航栏收放 */
+            position: fixed; top: 0; left: 0; 
+            display: flex; flex-direction: column;
+            /* 适配刘海屏安全区域 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            overflow-y: auto; /* 允许内部整体滚动 */
+            -webkit-overflow-scrolling: touch; /* iOS 丝滑滚动 */
+        }
+
+        /* --- 玻璃拟态 UI --- */
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.04); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
+        }
+        .glass-btn { 
+            background: rgba(255, 255, 255, 0.06); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        /* --- 特效与动画 --- */
+        .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6), 0 0 15px rgba(239, 68, 68, 0.3); } 100% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0), 0 0 30px rgba(239, 68, 68, 0.1); } }
+        
+        .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
+        @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        
+        .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
+        
+        /* --- 移动端原生感弹窗 (Bottom Sheet) --- */
+        .modal-overlay { 
+            background: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        /* 从底部滑出的抽屉样式 */
+        .bottom-sheet {
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 90dvh; /* 最高不超过视口 90% */
+            display: flex; flex-direction: column;
+            border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+            padding-bottom: calc(env(safe-area-inset-bottom) + 20px); /* 适配底部小黑条 */
+        }
+        .modal-overlay.active .bottom-sheet { transform: translateY(0); }
+
+        .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
+        .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; filter: grayscale(50%); }
+        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; animation: slideIn 0.3s ease-out; margin: 2px; }
         .history-item { animation: slideIn 0.3s ease-out forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 主控制台自适应调整 --- */
+        #main-app {
+            display: flex;
+            flex-direction: column;
+        }
+        /* 中间文字区域撑满剩余空间，避免按钮被挤到屏幕外 */
+        .main-content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        
+        /* 底部控制栏固定在视口底部 */
+        .bottom-controls {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+            padding-top: 10px;
+            background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent);
+            position: relative; /* 脱离文档流紧贴底部 */
+            z-index: 30;
+        }
     </style>
 </head>
-<body class="font-sans overflow-hidden bg-slate-900">
+<body>
 
-    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-8 justify-center transition-all duration-500">
-        <div class="mb-10 text-center">
-            <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V19</p>
+    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
+        <div class="mb-8 text-center mt-auto">
+            <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Mobile Edition V20</p>
         </div>
-        <div class="glass-panel p-8 rounded-[40px] shadow-2xl border-white/10 relative overflow-hidden max-w-md mx-auto w-full">
-            <h2 id="auth-title" class="text-2xl font-black text-white mb-6 tracking-tight text-center">System Login</h2>
+        <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
+            <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
             <form onsubmit="event.preventDefault(); executeAuth();" class="space-y-4 relative z-10">
-                <input id="email" type="email" placeholder="Email Address" required class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider placeholder-gray-500 transition-colors">
-                <input id="password" type="password" placeholder="Password" required class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider placeholder-gray-500 transition-colors">
-                <div id="confirm-password-container" class="overflow-hidden transition-all duration-500 max-h-0 opacity-0">
-                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-5 rounded-2xl text-sm font-bold tracking-wider placeholder-gray-500 transition-colors">
+                <input id="email" type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
+                <input id="password" type="password" placeholder="Password" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
+                <div id="confirm-password-container" class="overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
                 </div>
-                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-all shadow-[0_10px_20px_rgba(245,158,11,0.2)]">SECURE LOGIN</button>
-                <p id="auth-msg" class="text-center text-xs font-bold text-red-400 min-h-[1.5rem] mt-2 leading-relaxed"></p>
+                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-transform shadow-lg">SECURE LOGIN</button>
+                <p id="auth-msg" class="text-center text-[11px] sm:text-xs font-bold text-red-400 min-h-[1.5rem] mt-2"></p>
             </form>
-            <div class="mt-4 text-center border-t border-white/5 pt-5 relative z-10">
-                <p class="text-xs text-gray-500 font-bold tracking-widest uppercase">
+            <div class="mt-5 text-center border-t border-white/5 pt-4">
+                <p class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">
                     <span id="auth-switch-text">New to Oasis?</span> 
-                    <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 hover:text-amber-300 transition-colors ml-2 font-black underline underline-offset-4">Create Account</button>
+                    <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 ml-1 font-black underline underline-offset-4 py-2 px-2">Create Account</button>
                 </p>
             </div>
         </div>
     </div>
 
-    <div id="step-1" class="app-screen z-50 flex flex-col p-8 justify-center hidden-screen">
-        <div class="mb-14 text-center">
-            <h1 class="text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/70 mt-3 text-[10px] font-bold tracking-[0.4em] uppercase">Select Path</p>
+    <div id="step-1" class="app-screen z-50 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
+        <div class="mb-10 text-center">
+            <h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1>
         </div>
-        <div class="space-y-5">
-            <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[32px] p-8 text-left active:scale-95 transition-transform group relative overflow-hidden shadow-xl">
-                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇨🇳</div>
-                <h3 class="font-bold text-2xl tracking-tight text-white">Learn Mandarin</h3>
-                <p class="text-xs text-amber-500 mt-2 font-medium tracking-widest uppercase">Earn AED while learning</p>
+        <div class="space-y-4 max-w-sm mx-auto w-full">
+            <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div>
+                <h3 class="font-bold text-xl text-white">Learn Mandarin</h3>
+                <p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
             </button>
-            <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[32px] p-8 text-left active:scale-95 transition-transform group relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-20px] bottom-[-20px] text-8xl opacity-10">🇦🇪</div>
-                <h3 class="font-bold text-2xl text-amber-400 tracking-tight">我要学英语</h3>
-                <p class="text-xs text-slate-400 mt-2 font-medium tracking-widest uppercase">迪拜商务实战 · 全额回本</p>
+            <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div>
+                <h3 class="font-bold text-xl text-amber-400">我要学英语</h3>
+                <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
         </div>
     </div>
 
-    <div id="step-time" class="app-screen z-45 flex flex-col p-8 justify-center hidden-screen">
-        <div class="mb-12 text-center">
-            <h2 class="text-3xl font-black tracking-tight text-white drop-shadow-md">设定每日目标</h2>
-            <p class="text-xs text-amber-500/80 mt-3 font-bold tracking-widest uppercase">Target Duration</p>
+    <div id="step-time" class="app-screen z-45 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
+        <div class="mb-10 text-center">
+            <h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2>
+            <p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p>
         </div>
-        <div class="grid grid-cols-2 gap-5">
-            <button onclick="handleStepTime(15)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-all">15 Min</button>
-            <button onclick="handleStepTime(30)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-all">30 Min</button>
-            <button onclick="handleStepTime(45)" class="glass-panel py-10 rounded-[32px] font-black text-xl active:bg-amber-600 active:text-white transition-all">45 Min</button>
-            <button onclick="handleStepTime(60)" class="glass-panel py-10 rounded-[32px] font-black text-xl text-amber-400 active:bg-amber-600 active:text-white transition-all border-amber-500/30">60 Min</button>
+        <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
+            <button onclick="handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">15 Min</button>
+            <button onclick="handleStepTime(30)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">30 Min</button>
+            <button onclick="handleStepTime(45)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">45 Min</button>
+            <button onclick="handleStepTime(60)" class="glass-panel py-8 rounded-[24px] font-black text-lg text-amber-400 active:bg-amber-600 border-amber-500/30">60 Min</button>
         </div>
     </div>
 
-    <div id="step-2" class="app-screen z-40 flex flex-col p-8 justify-center hidden-screen">
-        <div class="mb-12 text-center"><h2 class="text-3xl font-black tracking-tight text-white drop-shadow-md">选择难度与奖池</h2></div>
-        <div class="space-y-5">
-            <div onclick="handleStep2(1)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
-                <div><p class="font-bold text-lg text-slate-200">入门级 (L1)</p><p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-bold">基础生活与生存</p></div>
-                <div class="font-black text-white text-2xl">99<span class="text-xs text-amber-500 ml-1">AED</span></div>
+    <div id="step-2" class="app-screen z-40 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
+        <div class="mb-10 text-center">
+            <h2 class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2>
+        </div>
+        <div class="space-y-4 max-w-sm mx-auto w-full">
+            <div onclick="handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
+                <div><p class="font-bold text-base text-slate-200">入门级 (L1)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活与生存</p></div>
+                <div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
             </div>
-            <div onclick="handleStep2(2)" class="glass-panel p-6 rounded-[32px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
-                <div><p class="font-bold text-lg text-slate-200">职场级 (L2)</p><p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-bold">项目与跨部门协作</p></div>
-                <div class="font-black text-white text-2xl">299<span class="text-xs text-amber-500 ml-1">AED</span></div>
+            <div onclick="handleStep2(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
+                <div><p class="font-bold text-base text-slate-200">职场级 (L2)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协作</p></div>
+                <div class="font-black text-white text-xl">299<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
             </div>
-            <div onclick="handleStep2(3)" class="glass-panel p-6 rounded-[32px] border-amber-500/40 flex justify-between items-center active:scale-95 transition-transform cursor-pointer relative overflow-hidden">
+            <div onclick="handleStep2(3)" class="glass-panel p-5 rounded-[24px] border-amber-500/40 flex justify-between items-center active:scale-95 transition-transform cursor-pointer relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-transparent"></div>
-                <div class="relative z-10"><p class="font-bold text-lg text-amber-400">精英级 (L3)</p><p class="text-[10px] text-amber-500/70 mt-1 uppercase tracking-widest font-bold">高级架构与战略汇报</p></div>
-                <div class="font-black text-amber-400 text-3xl relative z-10 drop-shadow-lg">500<span class="text-xs text-amber-500 ml-1">AED</span></div>
+                <div class="relative z-10"><p class="font-bold text-base text-amber-400">精英级 (L3)</p><p class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报</p></div>
+                <div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
             </div>
         </div>
     </div>
 
-    <div id="main-app" class="app-screen z-30 flex flex-col hidden-screen relative">
-        <button onclick="promptExit()" class="absolute top-6 left-5 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-90 transition-transform">⏏ Quit</button>
-        <button onclick="openHistory()" class="absolute top-6 right-5 z-50 bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-90 transition-transform">📜 LOG</button>
+    <div id="main-app" class="app-screen z-30 hidden-screen">
+        
+        <button onclick="promptExit()" class="absolute top-4 left-4 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-transform">⏏ Quit</button>
+        <button onclick="openHistory()" class="absolute top-4 right-4 z-50 bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-transform">📜 LOG</button>
 
-        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 sticky top-0 z-40 shadow-xl pt-16 pb-5">
-            <div class="grid grid-cols-3 px-5 gap-2 items-center">
-                <div class="text-center cursor-pointer group" onclick="openStore()">
-                    <div class="bg-emerald-500/10 rounded-xl p-1.5 group-active:scale-90 transition-transform border border-emerald-500/20">
-                        <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">👛 STORE</p>
-                        <h1 id="total-earned" class="text-sm font-black text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]">0.00</h1>
+        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-14 pb-4 px-2 z-40 shrink-0 shadow-lg">
+            <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
+                <div class="text-center cursor-pointer flex-1" onclick="openStore()">
+                    <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 active:scale-95 transition-transform border border-emerald-500/20">
+                        <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest">👛 Store</p>
+                        <h1 id="total-earned" class="text-sm font-black text-emerald-400">0.00</h1>
                     </div>
                 </div>
-                <div class="text-center border-x border-white/10">
-                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Time Goal</p>
-                    <h1 id="time-display" class="text-base font-black text-white drop-shadow-md">0/30m</h1>
+                <div class="text-center flex-1 border-x border-white/10 mx-1">
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Time</p>
+                    <h1 id="time-display" class="text-base font-black text-white">0/30m</h1>
                 </div>
-                <div class="text-center cursor-pointer group" onclick="requestRescue()">
-                    <div class="bg-blue-500/10 rounded-xl p-1.5 group-active:scale-90 transition-transform border border-blue-500/20">
-                        <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">Assistance</p>
-                        <h1 id="ad-limit-display" class="text-sm font-black text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]">🆘 6/6</h1>
+                <div class="text-center cursor-pointer flex-1" onclick="requestRescue()">
+                    <div class="bg-blue-500/10 rounded-xl py-1.5 mx-1 active:scale-95 transition-transform border border-blue-500/20">
+                        <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest">Help</p>
+                        <h1 id="ad-limit-display" class="text-sm font-black text-blue-400">🆘 6/6</h1>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="flex-grow flex flex-col justify-center px-5 pb-12 z-20 relative text-center">
-            <div class="glass-panel rounded-[40px] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative border-t border-l border-white/10">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="bg-black/30 px-4 py-2 rounded-2xl border border-white/5 text-left shadow-inner">
-                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Sentence Best</p>
-                        <p id="item-best-score" class="text-lg font-black text-amber-400 transition-all duration-300">0</p>
+        <div class="main-content-area px-4 sm:px-6">
+            <div class="max-w-md mx-auto w-full text-center">
+                <div class="flex justify-between items-center mb-6 max-w-xs mx-auto w-full">
+                    <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
+                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Best</p>
+                        <p id="item-best-score" class="text-base font-black text-amber-400 transition-colors">0</p>
                     </div>
-                    <div class="bg-black/30 px-4 py-2 rounded-2xl border border-white/5 text-right shadow-inner">
-                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Sentence Earned</p>
-                        <p id="item-earned" class="text-lg font-black text-emerald-400 transition-all duration-300">0.00</p>
+                    <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-right">
+                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Earned</p>
+                        <p id="item-earned" class="text-base font-black text-emerald-400 transition-colors">0.00</p>
                     </div>
                 </div>
 
-                <div id="scene-badge" class="mb-4 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
-                    <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
+                <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
+                    <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">STANDBY</span>
                 </div>
 
-                <p id="db-error-msg" class="text-[9px] text-amber-400 font-bold mb-2 uppercase tracking-wider"></p>
+                <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-md min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
+                <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
+                
+                <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
 
-                <h2 id="target-text" class="text-2xl font-bold mb-3 min-h-[90px] flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-lg transition-all">Connecting...</h2>
-                <p id="target-zh" class="text-sm text-slate-400 mb-4 min-h-[20px]"></p>
-                <div id="lum-diagnosis" class="min-h-[30px] mb-4 flex flex-wrap justify-center gap-2"></div>
-
-                <div id="score-display" class="h-24 mb-6 flex flex-col items-center justify-center">
+                <div id="score-display" class="h-20 flex flex-col items-center justify-center">
                     <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">SYSTEM READY</p>
                 </div>
+            </div>
+        </div>
 
-                <div class="flex items-center justify-between px-1">
-                    <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-75 transition-transform"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
-                    <button id="record-btn" onclick="toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(245,158,11,0.3)] border-[4px] border-amber-900/40 outline-none transition-all" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                        <div id="mic-inner-ring" class="w-20 h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-10 h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
-                    </button>
-                    <button onclick="playAudio()" class="w-14 h-14 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-lg border-white/20"><svg class="w-6 h-6 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
+        <div class="bottom-controls shrink-0">
+            <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
+                <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </button>
+                
+                <button id="record-btn" onclick="toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 outline-none transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
+                    <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg>
+                    </div>
+                </button>
+                
+                <button onclick="playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                    <svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0">
+        <div class="flex-grow w-full" onclick="closeModal('store-modal')"></div>
+        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95">
+            <div class="flex justify-between items-center mb-5">
+                <div><h3 class="text-2xl font-black text-emerald-400 drop-shadow-md">Oasis Store</h3><p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div>
+                <button onclick="closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="space-y-3 overflow-y-auto no-scrollbar flex-grow pb-4">
+                <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
+                    <h4 class="text-base font-bold text-white mb-1">LUM 错题透视</h4>
+                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁大用户标签模型(LUM)底层权限，开启精准词级纠错标记。</p>
+                    <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">50 AED 兑换</button>
+                    <div class="absolute top-4 right-4 text-3xl opacity-20">📊</div>
+                </div>
+                <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
+                    <h4 class="text-base font-bold text-amber-400 mb-1">青海河床原石</h4>
+                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">源自青海的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
+                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">150 AED 抽取</button>
+                    <div class="absolute top-4 right-4 text-3xl opacity-20">🪨</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="store-modal" class="fixed inset-0 z-[100] modal-overlay flex flex-col justify-end p-0 hidden-screen transition-all duration-300">
-        <div class="glass-panel rounded-t-[40px] p-8 pb-12 text-left shadow-2xl border-white/10 w-full h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <div><h3 class="text-3xl font-black text-emerald-400 drop-shadow-md">Oasis Store</h3><p class="text-slate-400 text-xs mt-1 uppercase tracking-widest font-bold">Current Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div>
-                <button onclick="closeModal('store-modal')" class="w-10 h-10 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
+        <div class="flex-grow w-full sm:hidden" onclick="closeModal('exit-modal')"></div>
+        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95">
             </div>
-            <div class="space-y-4">
-                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
-                    <h4 class="text-lg font-bold text-white mb-1">LUM 错题透视仪</h4>
-                    <p class="text-[10px] text-gray-400 leading-relaxed mb-4 pr-16">解锁大用户标签模型(LUM)底层权限，开启后每次录音将提供精准的词级纠错标记。</p>
-                    <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-sm active:scale-95 transition-all shadow-lg">50 AED 兑换</button>
-                    <div class="absolute top-4 right-4 text-4xl opacity-20">📊</div>
-                </div>
-                <div class="bg-gray-800/50 p-5 rounded-3xl border border-white/5 relative overflow-hidden">
-                    <h4 class="text-lg font-bold text-amber-400 mb-1">青海河床原石盲盒</h4>
-                    <p class="text-[10px] text-gray-400 leading-relaxed mb-4 pr-16">源自青海河床的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
-                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-sm active:scale-95 transition-all shadow-lg">150 AED 抽取</button>
-                    <div class="absolute top-4 right-4 text-4xl opacity-20">🪨</div>
-                </div>
-            </div>
+    </div>
+
+    <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
+        <div class="flex-grow w-full sm:hidden" onclick="closeModal('rescue-modal')"></div>
+        <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 bg-[#0f172a]/95">
+            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3>
+            <p id="rescue-desc" class="text-slate-300 text-xs mb-6 leading-relaxed">观看商业资讯，为您补齐下一阶梯奖励。</p>
+            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-3 active:scale-95 shadow-lg">获取救济</button>
+            <button onclick="closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm active:scale-95">我再靠自己试试</button>
         </div>
     </div>
 
-    <div id="exit-modal" class="fixed inset-0 z-[100] modal-overlay flex flex-col justify-center p-8 hidden-screen">
-        <div id="exit-content" class="glass-panel rounded-[40px] p-8 text-center shadow-2xl border-white/10 relative overflow-hidden">
+    <div id="history-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0">
+        <div class="flex-grow w-full" onclick="closeModal('history-modal')"></div>
+        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95 flex flex-col h-[80dvh]">
+            <div class="flex justify-between items-center mb-4 shrink-0">
+                <div><h3 class="text-2xl font-black text-blue-400 drop-shadow-md">Practice Log</h3><p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Today's Performance</p></div>
+                <button onclick="closeModal('history-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-    </div>
-
-    <div id="rescue-modal" class="fixed inset-0 z-[100] modal-overlay flex flex-col justify-center p-8 hidden-screen">
-        <div class="glass-panel rounded-[40px] p-8 text-center shadow-2xl border-white/10">
-            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-3 drop-shadow-md">专属系统助力</h3>
-            <p id="rescue-desc" class="text-slate-300 text-sm mb-8 leading-relaxed">观看商业资讯，为您补齐下一阶梯奖励。</p>
-            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-2xl text-white font-black text-sm mb-4 active:scale-95 shadow-lg">获取救济</button>
-            <button onclick="closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-2xl text-slate-300 font-bold text-sm active:scale-95">我再靠自己试试</button>
-        </div>
-    </div>
-
-    <div id="history-modal" class="fixed inset-0 z-[100] modal-overlay flex flex-col justify-end p-0 hidden-screen transition-all duration-300">
-        <div class="glass-panel rounded-t-[40px] p-8 pb-12 text-left shadow-2xl border-white/10 w-full h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center mb-6 shrink-0">
-                <div><h3 class="text-3xl font-black text-blue-400 drop-shadow-md">Practice Log</h3><p class="text-slate-400 text-xs mt-1 uppercase tracking-widest font-bold">Performance</p></div>
-                <button onclick="closeModal('history-modal')" class="w-10 h-10 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div id="history-list" class="flex-grow overflow-y-auto space-y-3 no-scrollbar pb-10"></div>
+            <div id="history-list" class="flex-grow overflow-y-auto space-y-2.5 no-scrollbar pb-4"></div>
         </div>
     </div>
 
@@ -223,37 +332,71 @@
             'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB'
         );
 
+        // 扩充的 45 条语料库 (15*3个难度)
         const LOCAL_CACHE = [
+            // L1 (15)
             { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
             { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.50 },
             { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 },
             { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
-            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
-            { id: 906, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 907, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 908, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
-            { id: 909, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
-            { id: 910, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
-            { id: 911, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 912, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
-            { id: 913, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
-            { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 }
+            { id: 905, text_en: 'How much is this item?', text_zh: '这个东西多少钱？', scenario: 'Shopping', difficulty: 1, reward_aed: 0.50 },
+            { id: 906, text_en: 'I would like to check out, please.', text_zh: '我想办理退房。', scenario: 'Hotel', difficulty: 1, reward_aed: 0.50 },
+            { id: 907, text_en: 'Where is the nearest subway station?', text_zh: '最近的地铁站在哪里？', scenario: 'Travel', difficulty: 1, reward_aed: 0.50 },
+            { id: 908, text_en: 'It is very nice to meet you.', text_zh: '很高兴认识你。', scenario: 'Social', difficulty: 1, reward_aed: 0.50 },
+            { id: 909, text_en: 'Could you bring me a menu?', text_zh: '请给我一份菜单。', scenario: 'Life', difficulty: 1, reward_aed: 0.50 },
+            { id: 910, text_en: 'Do you have a smaller size?', text_zh: '你们有更小的尺寸吗？', scenario: 'Shopping', difficulty: 1, reward_aed: 0.50 },
+            { id: 911, text_en: 'I need a taxi to the airport.', text_zh: '我需要一辆去机场的出租车。', scenario: 'Travel', difficulty: 1, reward_aed: 0.50 },
+            { id: 912, text_en: 'Let us keep in touch.', text_zh: '我们保持联系。', scenario: 'Social', difficulty: 1, reward_aed: 0.50 },
+            { id: 913, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
+            { id: 914, text_en: 'I need 2 room keys.', text_zh: '我需要两张房卡。', scenario: 'Hotel', difficulty: 1, reward_aed: 0.50 },
+            { id: 915, text_en: 'I will be back in 5 minutes.', text_zh: '我会在五分钟后回来。', scenario: 'Life', difficulty: 1, reward_aed: 0.50 },
+            // L2 (15)
+            { id: 916, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
+            { id: 917, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
+            { id: 918, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
+            { id: 919, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
+            { id: 920, text_en: 'Let us schedule a brief meeting.', text_zh: '我们安排一个简短的会议吧。', scenario: 'Business', difficulty: 2, reward_aed: 0.50 },
+            { id: 921, text_en: 'The air conditioning is not working properly.', text_zh: '空调不能正常工作。', scenario: 'Hotel', difficulty: 2, reward_aed: 0.50 },
+            { id: 922, text_en: 'Does this train go directly to the city center?', text_zh: '这趟列车直达市中心吗？', scenario: 'Travel', difficulty: 2, reward_aed: 0.50 },
+            { id: 923, text_en: 'We should grab coffee sometime.', text_zh: '我们应该找个时间喝杯咖啡。', scenario: 'Social', difficulty: 2, reward_aed: 0.50 },
+            { id: 924, text_en: 'Can you issue a tax refund receipt?', text_zh: '您能开一张退税收据吗？', scenario: 'Shopping', difficulty: 2, reward_aed: 0.50 },
+            { id: 925, text_en: 'Please review the attached contract draft.', text_zh: '请审查附件中的合同草案。', scenario: 'Business', difficulty: 2, reward_aed: 0.50 },
+            { id: 926, text_en: 'Could you recommend a good local restaurant?', text_zh: '您能推荐一家当地的好餐厅吗？', scenario: 'Life', difficulty: 2, reward_aed: 0.50 },
+            { id: 927, text_en: 'My luggage was lost during the transfer.', text_zh: '我的行李在转机时丢失了。', scenario: 'Travel', difficulty: 2, reward_aed: 0.50 },
+            { id: 928, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
+            { id: 929, text_en: 'The presentation will take 3 hours.', text_zh: '演示将需要三个小时。', scenario: 'Business', difficulty: 2, reward_aed: 0.50 },
+            { id: 930, text_en: 'I would like to order 4 pairs.', text_zh: '我想订购四双。', scenario: 'Shopping', difficulty: 2, reward_aed: 0.50 },
+            // L3 (15)
+            { id: 931, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 932, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
+            { id: 933, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 934, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
+            { id: 935, text_en: 'Our objective is to maximize shareholder value.', text_zh: '我们的目标是股东价值最大化。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
+            { id: 936, text_en: 'Building a strong network is crucial for success.', text_zh: '建立强大的人脉网络对成功至关重要。', scenario: 'Social', difficulty: 3, reward_aed: 0.50 },
+            { id: 937, text_en: 'The board requires a comprehensive risk assessment.', text_zh: '董事会需要一份全面的风险评估。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
+            { id: 938, text_en: 'Arrange a premium transfer for our VIP clients.', text_zh: '为我们的贵宾安排高级接送服务。', scenario: 'Travel', difficulty: 3, reward_aed: 0.50 },
+            { id: 939, text_en: 'We are negotiating an exclusive distribution agreement.', text_zh: '我们正在谈判一项独家分销协议。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
+            { id: 940, text_en: 'Innovation drives our competitive advantage.', text_zh: '创新驱动着我们的竞争优势。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 941, text_en: 'I look forward to exploring future collaborations.', text_zh: '我期待着探索未来的合作机会。', scenario: 'Social', difficulty: 3, reward_aed: 0.50 },
+            { id: 942, text_en: 'Ensure the presidential suite is fully prepared.', text_zh: '确保总统套房已完全准备就绪。', scenario: 'Hotel', difficulty: 3, reward_aed: 0.50 },
+            { id: 943, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 },
+            { id: 944, text_en: 'We need to finalize the 8 core metrics.', text_zh: '我们需要敲定八项核心指标。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
+            { id: 945, text_en: 'The delegation consists of 10 senior executives.', text_zh: '代表团由十名高管组成。', scenario: 'Travel', difficulty: 3, reward_aed: 0.50 }
         ];
         const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
 
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v19_adlim');
-        let lastRefresh = localStorage.getItem('ob_v19_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v18_adlim');
+        let lastRefresh = localStorage.getItem('ob_v18_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v19_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v19_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v19_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v19_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v18_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v18_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v18_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v18_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
@@ -270,12 +413,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v19_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v19_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v19_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v19_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v19_adlim', state.adLimit);
-            localStorage.setItem('ob_v19_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v18_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v18_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v18_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v18_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v18_adlim', state.adLimit);
+            localStorage.setItem('ob_v18_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -312,8 +455,31 @@
             finally { btn.innerText = isRegisterMode ? "REGISTER & ENTER" : "SECURE LOGIN"; btn.disabled = false; }
         }
 
-        function hideAll() { ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app', 'rescue-modal', 'exit-modal', 'store-modal', 'history-modal'].forEach(id => { document.getElementById(id).classList.add('hidden-screen'); }); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
+        function hideAll() { 
+            // 移除 mobile 底部的激活状态
+            document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+            ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app'].forEach(id => { document.getElementById(id).classList.add('hidden-screen'); }); 
+        }
+        
+        function closeModal(id) { 
+            const el = document.getElementById(id);
+            el.classList.remove('active');
+            // 等待 CSS 动画完成后再彻底隐藏
+            setTimeout(() => {
+                if(!el.classList.contains('active')) {
+                    // bottom sheet 不需要 hidden-screen，只需靠 z-index 和 opacity
+                }
+            }, 300);
+        }
+
+        function openModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden-screen'); // 如果有的话
+            // 触发回流以保证 transition 生效
+            void el.offsetWidth;
+            el.classList.add('active');
+        }
+
         function handleStep1(p) { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         function handleStepTime(t) { state.targetTime = t; state.currentTime = 0; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         
@@ -325,34 +491,23 @@
             fetchNewPhrase();
         }
 
-        // ==========================================
-        // 【核心】：云端优先，完全直连数据库
-        // ==========================================
         async function fetchNewPhrase() {
             const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
             textEl.innerText = "Loading data..."; zhEl.innerText = "";
-            document.getElementById('lum-diagnosis').innerHTML = ""; document.getElementById('db-error-msg').innerText = "";
+            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            document.getElementById('db-error-msg').innerText = "";
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('READY');
 
             let pool = [];
             try {
-                // 强制优先拉取真实数据库的数据
                 const { data, error } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
-                
-                if (error) {
-                    document.getElementById('db-error-msg').innerText = "⚠️ DB Err: " + error.message;
-                    pool = state.path === 'cn' ? LOCAL_CACHE_CN : LOCAL_CACHE;
-                    pool = pool.filter(d => d.difficulty == state.dbLevel);
-                } else if (!data || data.length === 0) {
-                    document.getElementById('db-error-msg').innerText = "⚠️ 数据库中尚未录入该难度级别的语料，启用本地缓存。";
-                    pool = state.path === 'cn' ? LOCAL_CACHE_CN : LOCAL_CACHE;
-                    pool = pool.filter(d => d.difficulty == state.dbLevel);
-                } else {
-                    pool = data;
-                }
+                if (error) throw error;
+                if (!data || data.length === 0) throw new Error("Empty db");
+                pool = data;
             } catch (err) {
-                document.getElementById('db-error-msg').innerText = "⚠️ Network Err: Local Cache Active";
+                // 如果数据库连不上，用本地 45 条语料进行兜底，确保流程不中断
+                // document.getElementById('db-error-msg').innerText = "⚠️ Offline Cache";
                 pool = state.path === 'cn' ? LOCAL_CACHE_CN : LOCAL_CACHE;
                 pool = pool.filter(d => d.difficulty == state.dbLevel);
             }
@@ -374,7 +529,7 @@
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             const best = state.scores[t] || 0; const earned = state.earnedMap[t] || 0;
             const el = document.getElementById('item-best-score');
-            el.innerText = best; el.className = `text-lg font-black transition-all ${best >= 80 ? 'text-emerald-400' : (best >= 60 ? 'text-amber-400' : 'text-slate-400')}`;
+            el.innerText = best; el.className = `text-base font-black transition-all ${best >= 80 ? 'text-emerald-400' : (best >= 60 ? 'text-amber-400' : 'text-slate-400')}`;
             document.getElementById('item-earned').innerText = earned.toFixed(2);
             updateTopBar();
         }
@@ -387,24 +542,24 @@
         }
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let globalRec = null; let capturedText = "";
+        let globalRecognition = null; let capturedText = "";
         if (SpeechRec) {
-            globalRec = new SpeechRec(); globalRec.continuous = false; globalRec.interimResults = false;
-            globalRec.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            globalRec.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
-            globalRec.onerror = () => setAppState('READY');
+            globalRecognition = new SpeechRec(); globalRecognition.continuous = false; globalRecognition.interimResults = false;
+            globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
+            globalRecognition.onend = () => { if (appState === 'LISTENING' || appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else { document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase text-[10px]">未能识别</p>`; setTimeout(() => setAppState('READY'), 1500); } } };
+            globalRecognition.onerror = () => setAppState('READY');
         }
 
         window.toggleRecord = function() {
-            if (!globalRec || appState === 'REWARDING' || !currentPhrase) return;
+            if (!globalRecognition || appState === 'REWARDING' || !currentPhrase) return;
             if (appState === 'LISTENING') { 
-                setAppState('PROCESSING'); try { globalRec.stop(); } catch(e) {} 
+                setAppState('PROCESSING'); try { globalRecognition.stop(); } catch(e) {} 
                 setTimeout(() => { if (appState === 'PROCESSING') { if (capturedText) evaluateLogic(); else setAppState('READY'); } }, 1500);
                 return; 
             }
             capturedText = ""; setAppState('LISTENING');
-            globalRec.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            try { globalRec.start(); } catch(e) { setAppState('READY'); }
+            globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            try { globalRecognition.start(); } catch(e) { setAppState('READY'); }
         };
 
         function setAppState(s) {
@@ -471,7 +626,7 @@
                 }
 
                 const colorClass = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
-                document.getElementById('score-display').innerHTML = `<span class="text-5xl font-black ${colorClass}">${score}</span><br>${fbHtml}`;
+                document.getElementById('score-display').innerHTML = `<span class="text-4xl sm:text-5xl font-black ${colorClass}">${score}</span><br>${fbHtml}`;
                 
                 saveData(); syncPhraseState();
                 clearTimeout(watchdogTimer);
@@ -483,35 +638,37 @@
         // 【核心修复】：退出界面的文案与无缝切回主菜单
         // ==========================================
         function promptExit() {
-            if (appState === 'LISTENING') { if (globalRec) { try { globalRec.stop(); } catch(e){} } setAppState('READY'); }
+            if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
             const content = document.getElementById('exit-content');
             
             if (state.currentTime >= state.targetTime) {
                 content.innerHTML = `
-                    <h3 class="text-2xl font-black text-emerald-400 mb-2">目标已达成!</h3>
-                    <p class="text-slate-300 text-sm mb-6">您已完成 ${state.targetTime} 分钟学习。</p>
-                    <div class="space-y-3">
-                        <button onclick="confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black active:scale-95 transition-transform">退回主界面</button>
-                        <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-xl glass-btn font-bold active:scale-95 transition-transform">继续学习</button>
+                    <div class="absolute inset-0 bg-gradient-to-b from-emerald-900/20 to-transparent"></div>
+                    <h3 class="text-2xl font-black text-emerald-400 mb-2 relative z-10">目标已达成!</h3>
+                    <p class="text-slate-300 text-sm mb-6 relative z-10">您已完成 ${state.targetTime} 分钟学习。</p>
+                    <div class="space-y-3 relative z-10">
+                        <button onclick="confirmExit()" class="w-full py-4 rounded-[16px] bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black active:scale-95 transition-transform shadow-lg">退回主界面</button>
+                        <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-[16px] glass-btn font-bold active:scale-95 transition-transform">继续学习</button>
                     </div>`;
             } else {
                 let left = Math.ceil(state.targetTime - state.currentTime);
                 content.innerHTML = `
-                    <h3 class="text-2xl font-black text-red-400 mb-2">目标未达成</h3>
-                    <p class="text-slate-300 text-sm mb-6">距离今日目标还差 ${left} 分钟。</p>
+                    <div class="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent"></div>
+                    <h3 class="text-2xl font-black text-red-400 mb-2 relative z-10">目标未达成</h3>
+                    <p class="text-slate-300 text-sm mb-6 relative z-10">距离今日目标还差 ${left} 分钟。</p>
                     
-                    <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner">
-                        <span class="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
-                        <p class="text-xs text-gray-400 mt-2">观看短视频，立刻补充 5 分钟学习时长。</p>
-                        <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-xl text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
+                    <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner relative z-10">
+                        <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
+                        <p class="text-xs text-gray-400 mt-1">观看短视频，立刻补充 5 分钟学习时长。</p>
+                        <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-[12px] text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
                     </div>
 
-                    <div class="space-y-3">
-                        <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-xl text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
-                        <button onclick="confirmExit()" class="w-full py-4 bg-gray-700/30 rounded-xl text-slate-300 font-bold text-sm active:scale-95 border border-gray-600 transition-transform">退回主界面</button>
+                    <div class="space-y-3 relative z-10">
+                        <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-[16px] text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
+                        <button onclick="confirmExit()" class="w-full py-4 bg-gray-800/50 rounded-[16px] text-slate-400 font-bold text-sm active:scale-95 border border-gray-700 transition-transform">退回主界面</button>
                     </div>`;
             }
-            document.getElementById('exit-modal').classList.remove('hidden-screen');
+            openModal('exit-modal');
         }
 
         function confirmExit() { 
@@ -520,7 +677,7 @@
             if(watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
             
             // 2. 切断麦克风
-            if (globalRec) { try { globalRec.abort(); } catch(e){} }
+            if (globalRecognition) { try { globalRecognition.abort(); } catch(e){} }
             
             // 3. 重置中间 UI 面板状态
             setAppState('READY');
@@ -546,14 +703,14 @@
                 document.getElementById('rescue-title').innerText = "救济已耗尽";
                 document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>回满 6 次额度</span>！";
                 document.getElementById('rescue-action-btn').onclick = () => watchAd('refill');
-                document.getElementById('rescue-modal').classList.remove('hidden-screen'); return;
+                openModal('rescue-modal'); return;
             }
             const nextVal = Math.round((rewardStages[finalTier + 1] - (state.earnedMap[t] || 0)) * 100) / 100;
             document.getElementById('rescue-title').innerText = "系统助力";
             document.getElementById('rescue-desc').innerHTML = `为您补齐奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`;
             document.getElementById('rescue-action-btn').innerText = `获取救济 (剩余 ${state.adLimit} 次)`;
             document.getElementById('rescue-action-btn').onclick = () => watchAd('boost');
-            document.getElementById('rescue-modal').classList.remove('hidden-screen');
+            openModal('rescue-modal');
         }
 
         async function watchAd(type) {
@@ -594,14 +751,14 @@
             if (sessionHistory.length === 0) list.innerHTML = `<p class="text-center text-slate-500 mt-10 font-bold text-xs">NO RECORDS YET.</p>`;
             else sessionHistory.forEach(log => {
                 const color = log.score >= 80 ? 'text-emerald-400' : (log.score >= 60 ? 'text-amber-400' : 'text-slate-400');
-                list.innerHTML += `<div class="glass-panel p-4 rounded-2xl flex justify-between items-center history-item border border-white/5">
-                    <div class="w-2/3 pr-4"><p class="text-white text-sm font-bold truncate">${log.text}</p><p class="text-[10px] text-slate-500 mt-1">${log.time}</p></div>
-                    <div class="text-right"><p class="text-xl font-black ${color}">${log.score}</p><p class="text-[10px] text-amber-500 font-bold">+${log.aed.toFixed(2)} AED</p></div></div>`;
+                list.innerHTML += `<div class="bg-gray-800/40 p-3 rounded-[16px] flex justify-between items-center history-item border border-white/5">
+                    <div class="w-2/3 pr-3"><p class="text-white text-xs font-bold truncate">${log.text}</p><p class="text-[9px] text-slate-500 mt-1">${log.time}</p></div>
+                    <div class="text-right"><p class="text-lg font-black ${color}">${log.score}</p><p class="text-[9px] text-amber-500 font-bold">+${log.aed.toFixed(2)} AED</p></div></div>`;
             });
-            document.getElementById('history-modal').classList.remove('hidden-screen');
+            openModal('history-modal');
         }
 
-        function openStore() { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); document.getElementById('store-modal').classList.remove('hidden-screen'); }
+        function openStore() { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); openModal('store-modal'); }
         async function buyItem(price, name) {
             if (state.cloudBalance < price) return alert(`余额不足！`);
             if (!confirm(`确定花费 ${price} AED 兑换 [${name}] 吗？`)) return;
@@ -609,7 +766,6 @@
             oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).catch(()=>{});
             alert(`🎉 兑换成功！已获得：${name}`); closeModal('store-modal');
         }
-        function playAudio() { const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText.replace(/"/g,"")); u.lang = state.path==='en'?'en-US':'zh-CN'; window.speechSynthesis.speak(u); }
     </script>
 </body>
 </html>
