@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V27 - 算法绝对统一版</title>
+    <title>Oasis Bridge V28 - 算分引擎重铸版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -40,7 +40,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V27</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V28</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -63,28 +63,19 @@
     </div>
 
     <div id="step-1" class="app-screen z-50 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center">
-            <h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1>
-        </div>
+        <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div>
-                <h3 class="font-bold text-xl text-white">Learn Mandarin</h3>
-                <p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
             </button>
             <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div>
-                <h3 class="font-bold text-xl text-amber-400">我要学英语</h3>
-                <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
         </div>
     </div>
 
     <div id="step-time" class="app-screen z-45 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center">
-            <h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2>
-            <p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p>
-        </div>
+        <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2><p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p></div>
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
             <button onclick="handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">15 Min</button>
             <button onclick="handleStepTime(30)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">30 Min</button>
@@ -155,6 +146,7 @@
 
                 <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-md min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                 <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
+                
                 <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
 
                 <div id="score-display" class="h-20 flex flex-col items-center justify-center">
@@ -200,8 +192,7 @@
 
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
         <div class="flex-grow w-full sm:hidden" onclick="closeModal('exit-modal')"></div>
-        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95">
-        </div>
+        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95"></div>
     </div>
 
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
@@ -209,7 +200,7 @@
         <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 bg-[#0f172a]/95">
             <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3>
             <p id="rescue-desc" class="text-slate-300 text-xs mb-6 leading-relaxed">观看商业资讯，为您补齐下一阶梯奖励。</p>
-            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 active:scale-95 shadow-lg">获取救济</button>
+            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-3 active:scale-95 shadow-lg">获取救济</button>
             <button onclick="closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm active:scale-95">我再靠自己试试</button>
         </div>
     </div>
@@ -237,38 +228,30 @@
             { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.50 },
             { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 },
             { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
-            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
-            { id: 906, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 907, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 908, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
-            { id: 909, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
-            { id: 910, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
-            { id: 911, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 912, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
-            { id: 913, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
-            { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 }
+            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 }
         ];
         const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
 
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v27_adlim');
-        let lastRefresh = localStorage.getItem('ob_v27_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v28_adlim');
+        let lastRefresh = localStorage.getItem('ob_v28_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v27_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v27_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v27_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v27_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v28_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v28_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v28_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v28_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
         
         let currentPhrase = null; let appInterval = null; let appState = 'READY';
         let sessionHistory = []; let watchdogTimer = null;
+        
+        // 核心防并发锁
         let isEvaluating = false; 
 
         function checkAdRefresh() {
@@ -279,12 +262,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v27_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v27_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v27_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v27_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v27_adlim', state.adLimit);
-            localStorage.setItem('ob_v27_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v28_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v28_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v28_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v28_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v28_adlim', state.adLimit);
+            localStorage.setItem('ob_v28_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -401,38 +384,54 @@
         }
 
         // ==========================================
-        // 【绝对核心】：唯一的 NLP 清洗器引擎
+        // 【核心大重铸】：1D 数学算分法，坚不可摧
         // ==========================================
         function cleanText(text, lang) {
             if (!text) return "";
             let s = text.toLowerCase();
             if (lang === 'cn') {
-                // 中文数字还原，加入“两”的映射以增加容错
                 const map = {'一':'1','二':'2','两':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
                 for (let k in map) s = s.replace(new RegExp(k, 'g'), map[k]);
-                // 中文：彻底去除所有标点与空格，防止分词器干扰
-                s = s.replace(/[^\w\u4e00-\u9fa50-9]/g, "");
+                s = s.replace(/[^\w\u4e00-\u9fa50-9]/g, ""); // 中文彻底去空格，防止断句干扰
             } else {
-                // 英文：去除标点，保留空格用于分词
                 s = s.replace(/[^\w\s0-9]/g, "");
                 s = s.replace(/\s+/g, " ").trim();
             }
             return s;
         }
 
-        // 只通过已经清洗过的纯净字符串进行比对
-        function calcEditScore(s1, s2) {
-            if (s1 === s2 && s1.length > 0) return 100; 
-            if (!s1 || !s2) return 0;
-            const matrix = Array(s2.length+1).fill(null).map(()=>Array(s1.length+1).fill(null));
-            for(let i=0;i<=s1.length;i++) matrix[0][i]=i; 
-            for(let j=0;j<=s2.length;j++) matrix[j][0]=j;
-            for(let j=1;j<=s2.length;j++) {
-                for(let i=1;i<=s1.length;i++) {
-                    matrix[j][i]=Math.min(matrix[j][i-1]+1, matrix[j-1][i]+1, matrix[j-1][i-1]+(s1[i-1]===s2[j-1]?0:1));
+        function calcEditScore(str1, str2) {
+            try {
+                const s1 = cleanText(str1, state.path); 
+                const s2 = cleanText(str2, state.path);
+                
+                // 极速拦截
+                if (!s1 && !s2) return 100;
+                if (!s1 || !s2) return 0;
+                if (s1 === s2) return 100;
+                
+                // 1D 动态规划（绝不内存溢出）
+                let dp = Array(s2.length + 1).fill(0).map((_, idx) => idx);
+                for (let i = 1; i <= s1.length; i++) {
+                    let prev = dp[0];
+                    dp[0] = i;
+                    for (let j = 1; j <= s2.length; j++) {
+                        let temp = dp[j];
+                        if (s1[i - 1] === s2[j - 1]) {
+                            dp[j] = prev;
+                        } else {
+                            dp[j] = Math.min(dp[j - 1], dp[j], prev) + 1;
+                        }
+                        prev = temp;
+                    }
                 }
+                const dist = dp[s2.length];
+                const maxLen = Math.max(s1.length, s2.length);
+                return Math.max(0, Math.round((1 - dist / maxLen) * 100));
+            } catch(err) {
+                console.error("Score Engine Fallback:", err);
+                return 0; // 绝对保底
             }
-            return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -496,34 +495,40 @@
             try {
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 
-                // 【核心统一】：LUM 和 总分 100% 使用同一个清洗器，绝不矛盾
-                const cleanTarget = cleanText(targetText, state.path);
-                const cleanCaptured = cleanText(capturedText, state.path);
-                const score = calcEditScore(cleanTarget, cleanCaptured);
+                // 【核心统一】：算分与查错全部使用同样的清洗机制
+                const score = calcEditScore(targetText, capturedText);
 
-                const diag = document.getElementById('lum-diagnosis'); 
-                if(diag) diag.innerHTML = "";
-                
-                let aWords = [], bWords = [];
-                if (state.path === 'en') {
-                    aWords = cleanTarget.split(" ");
-                    bWords = cleanCaptured.split(" ");
-                } else {
-                    aWords = cleanTarget.split(""); 
-                    bWords = cleanCaptured.split("");
-                }
-                
-                const missed = aWords.filter(w => w && w.trim() !== "" && !bWords.includes(w));
-                const uniqueMissed = [...new Set(missed)]; 
-                
-                if(uniqueMissed.length > 0) {
-                    const errs = uniqueMissed.map(w => {
-                        if(diag) {
-                            const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t);
-                        }
-                        return { user_id: currentUser?.id || 'anonymous', phrase_id: currentPhrase.id || 999, wrong_word: w, error_tag: 'Missed' };
-                    });
-                    if(currentPhrase.id && currentUser?.id) oasisCloud.from('user_errors').insert(errs).catch(e=>{});
+                // LUM 沙盒：即便这里报错，也绝不影响分数结算
+                try {
+                    const diag = document.getElementById('lum-diagnosis'); 
+                    if(diag) diag.innerHTML = "";
+                    
+                    const cleanTarget = cleanText(targetText, state.path);
+                    const cleanCaptured = cleanText(capturedText, state.path);
+                    
+                    let aWords = [], bWords = [];
+                    if (state.path === 'en') {
+                        aWords = cleanTarget.split(" ");
+                        bWords = cleanCaptured.split(" ");
+                    } else {
+                        aWords = cleanTarget.split(""); // 中文彻底按单字精确切分
+                        bWords = cleanCaptured.split("");
+                    }
+                    
+                    const missed = aWords.filter(w => w && w.trim() !== "" && !bWords.includes(w));
+                    const uniqueMissed = [...new Set(missed)]; 
+                    
+                    if(uniqueMissed.length > 0) {
+                        const errs = uniqueMissed.map(w => {
+                            if(diag) {
+                                const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t);
+                            }
+                            return { user_id: currentUser?.id || 'anonymous', phrase_id: currentPhrase.id || 999, wrong_word: w, error_tag: 'Missed' };
+                        });
+                        if(currentPhrase.id && currentUser?.id) oasisCloud.from('user_errors').insert(errs).catch(e=>{});
+                    }
+                } catch(lumError) {
+                    console.error("LUM Skipped:", lumError);
                 }
 
                 // 算分算钱
@@ -563,7 +568,7 @@
                     fbHtml += `<p class="text-[10px] text-blue-400 mt-2 font-bold animate-pulse cursor-pointer py-1 px-3 bg-blue-900/30 rounded-full inline-block border border-blue-500/30" onclick="requestRescue()">💡 Need Help? Tap SOS 🆘</p>`;
                 }
 
-                // UI 渲染
+                // UI 渲染：即使分数是 0，也坚定地印在屏幕上
                 const colorClass = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl sm:text-5xl font-black ${colorClass}">${score}</span><br>${fbHtml}`;
                 
@@ -578,7 +583,7 @@
 
             } catch (error) {
                 console.error("Critical Eval Error:", error);
-                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">评测异常</p>`;
+                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">无法完成算分(底层熔断)</p>`;
                 clearTimeout(watchdogTimer);
                 setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 2000);
             }
