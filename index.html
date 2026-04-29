@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V24 - 并发绝缘版</title>
+    <title>Oasis Bridge V25 - 精准打分适配版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -40,7 +40,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V24</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V25</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -175,9 +175,15 @@
             <div class="space-y-3 overflow-y-auto no-scrollbar flex-grow pb-4">
                 <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
                     <h4 class="text-base font-bold text-white mb-1">LUM 错题透视</h4>
-                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁大用户标签模型底层权限，开启精准词汇标记。</p>
+                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁大用户标签模型(LUM)底层权限，开启精准词汇标记。</p>
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-3xl opacity-20">📊</div>
+                </div>
+                <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
+                    <h4 class="text-base font-bold text-amber-400 mb-1">青海河床原石</h4>
+                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">源自青海的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
+                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">150 AED 抽取</button>
+                    <div class="absolute top-4 right-4 text-3xl opacity-20">🪨</div>
                 </div>
             </div>
         </div>
@@ -185,8 +191,7 @@
 
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
         <div class="flex-grow w-full sm:hidden" onclick="closeModal('exit-modal')"></div>
-        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95">
-            </div>
+        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95"></div>
     </div>
 
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
@@ -211,7 +216,6 @@
     </div>
 
     <script>
-        // 【正式配置】
         const oasisCloud = window.supabase.createClient(
             'https://tpawabhfakqpjmepruzx.supabase.co', 
             'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB'
@@ -229,24 +233,23 @@
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v24_adlim');
-        let lastRefresh = localStorage.getItem('ob_v24_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v25_adlim');
+        let lastRefresh = localStorage.getItem('ob_v25_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v24_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v24_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v24_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v24_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v25_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v25_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v25_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v25_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
         
         let currentPhrase = null; let appInterval = null; let appState = 'READY';
-        let sessionHistory = []; 
-        let watchdogTimer = null;
+        let sessionHistory = []; let watchdogTimer = null;
         
-        // 【核心绝缘锁】：彻底切断双重打分触发
+        // 【防并发锁】
         let isEvaluating = false; 
 
         function checkAdRefresh() {
@@ -257,12 +260,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v24_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v24_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v24_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v24_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v24_adlim', state.adLimit);
-            localStorage.setItem('ob_v24_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v25_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v25_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v25_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v25_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v25_adlim', state.adLimit);
+            localStorage.setItem('ob_v25_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -381,12 +384,11 @@
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         let globalRecognition = null; let capturedText = "";
-        
         if (SpeechRec) {
             globalRecognition = new SpeechRec(); globalRecognition.continuous = false; globalRecognition.interimResults = false;
             globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
             
-            // 【核心绝缘锁】：消除双重打分
+            // 【并发挥泪斩】：彻底根治 Analyzing 卡死
             globalRecognition.onend = () => { 
                 if ((appState === 'LISTENING' || appState === 'PROCESSING') && !isEvaluating) { 
                     if (capturedText && capturedText.trim() !== "") {
@@ -411,14 +413,14 @@
                 setAppState('PROCESSING'); 
                 try { globalRecognition.stop(); } catch(e) {} 
                 
-                // 放宽到 8 秒保底，绝不卡死
+                // 保底安全绳：8 秒超时
                 setTimeout(() => { 
                     if (appState === 'PROCESSING' && !isEvaluating) { 
                         if (capturedText && capturedText.trim() !== "") {
                             evaluateLogic(); 
                         } else { 
                             setAppState('READY'); 
-                            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]'>SYSTEM READY</p>";
+                            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]'>语音识别超时</p>";
                         } 
                     } 
                 }, 8000);
@@ -431,39 +433,37 @@
         };
 
         function setAppState(s) {
-            appState = s; 
-            const fb = document.getElementById('score-display'); 
-            const btn = document.getElementById('record-btn'); 
-            const rfBtn = document.getElementById('refresh-btn');
-            
+            appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn'); const rfBtn = document.getElementById('refresh-btn');
             switch(s) {
-                case 'FETCHING': 
-                    btn.classList.remove('recording-active'); btn.disabled = true; rfBtn.disabled = true; 
-                    break;
-                case 'READY': 
-                    btn.classList.remove('recording-active'); btn.disabled = false; rfBtn.disabled = false; 
-                    if (fb.innerHTML.includes('ANALYZING') || fb.innerHTML.includes('LISTENING') || fb.innerHTML.includes('FETCHING')) {
-                        fb.innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]'>SYSTEM READY</p>";
-                    }
-                    break;
-                case 'LISTENING': 
-                    fb.innerHTML = `<p class="text-amber-400 animate-pulse font-bold tracking-widest text-[10px] uppercase">🎙️ LISTENING...</p>`; 
-                    btn.classList.add('recording-active'); btn.disabled = false; rfBtn.disabled = false; 
-                    break;
-                case 'PROCESSING': 
-                    fb.innerHTML = `<p class="text-blue-400 animate-pulse font-bold tracking-widest text-[10px] uppercase">🔄 ANALYZING...</p>`; 
-                    btn.classList.remove('recording-active'); btn.disabled = true; rfBtn.disabled = true; 
-                    break;
-                case 'REWARDING': 
-                    btn.classList.remove('recording-active'); btn.disabled = true; rfBtn.disabled = true; 
-                    break;
+                case 'FETCHING': btn.classList.remove('recording-active'); btn.disabled = true; rfBtn.disabled = true; break;
+                case 'READY': btn.classList.remove('recording-active'); btn.disabled = false; rfBtn.disabled = false; break;
+                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 animate-pulse font-bold tracking-widest text-[10px] uppercase">🎙️ LISTENING...</p>`; btn.classList.add('recording-active'); btn.disabled = false; rfBtn.disabled = false; break;
+                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 animate-pulse font-bold tracking-widest text-[10px] uppercase">🔄 ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; rfBtn.disabled = true; break;
+                case 'REWARDING': btn.classList.remove('recording-active'); btn.disabled = true; rfBtn.disabled = true; break;
             }
         }
 
+        // ==========================================
+        // 【核心大手术】：完美的中英文字符清洗与打分引擎
+        // ==========================================
+        function normalize(s, lang) {
+            if(!s) return "";
+            let res = s.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
+            if(lang === 'cn') {
+                // 中文数字还原映射
+                const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
+                for(let k in map) res = res.replace(new RegExp(k, 'g'), map[k]);
+                // 【核心修复】：中文彻底去除所有空格，防止引擎随意断句影响计算
+                res = res.replace(/\s+/g, "");
+            } else {
+                res = res.replace(/\s+/g, " ");
+            }
+            return res;
+        }
+
         function calculateSimilarity(str1, str2) {
-            const regex = /[^\w\s\u4e00-\u9fa50-9]/g;
-            const normalize = (s) => (s || "").toLowerCase().replace(regex, "").trim().replace(/\s+/g, " ");
-            const s1 = normalize(str1); const s2 = normalize(str2);
+            const s1 = normalize(str1, state.path); 
+            const s2 = normalize(str2, state.path);
             if (s1 === s2 && s1.length > 0) return 100; if (!s1 || !s2) return 0;
             const matrix = Array(s2.length+1).fill(null).map(()=>Array(s1.length+1).fill(null));
             for(let i=0;i<=s1.length;i++) matrix[0][i]=i; for(let j=0;j<=s2.length;j++) matrix[j][0]=j;
@@ -471,11 +471,8 @@
             return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
         }
 
-        // ==========================================
-        // 【核心大圆满】：彻底解除防并发锁与云端写入限制
-        // ==========================================
         async function evaluateLogic() {
-            if (isEvaluating) return; 
+            if (isEvaluating) return; // 绝对防并发！
             isEvaluating = true;
             setAppState('PROCESSING');
             
@@ -486,16 +483,28 @@
 
             try {
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                const score = calculateSimilarity(capturedText || "", targetText || "");
+                const score = calculateSimilarity(capturedText, targetText);
 
-                // 【核心修复】：支持中文和英文的 LUM 诊断
+                // 【LUM 切词分治】：中英文双轨切词算法
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-                const aWords = (targetText || "").toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g,"").split(/\s+/);
-                const bWords = (capturedText || "").toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g,"").split(/\s+/);
-                const missed = aWords.filter(w => w && w.trim() !== "" && !bWords.includes(w));
+                const normTarget = normalize(targetText, state.path);
+                const normCaptured = normalize(capturedText, state.path);
                 
-                if(missed.length > 0) {
-                    const errs = missed.map(w => {
+                let aWords = [], bWords = [];
+                if (state.path === 'en') {
+                    aWords = normTarget.split(/\s+/);
+                    bWords = normCaptured.split(/\s+/);
+                } else {
+                    // 中文单字切分，实现最精准标红
+                    aWords = normTarget.split('');
+                    bWords = normCaptured.split('');
+                }
+                
+                const missed = aWords.filter(w => w && w.trim() !== "" && !bWords.includes(w));
+                const uniqueMissed = [...new Set(missed)]; // 去重，避免重复标红
+                
+                if(uniqueMissed.length > 0) {
+                    const errs = uniqueMissed.map(w => {
                         const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t);
                         return { user_id: currentUser?.id || 'anonymous', phrase_id: currentPhrase.id || 999, wrong_word: w, error_tag: 'Missed' };
                     });
@@ -504,7 +513,7 @@
                     }
                 }
 
-                // 阶梯计分
+                // 算分算钱
                 if (score > (state.scores[targetText] || 0)) { state.scores[targetText] = score; state.attempts[targetText] = 0; } 
                 else { state.attempts[targetText] = (state.attempts[targetText] || 0) + 1; }
 
@@ -560,14 +569,14 @@
 
             } catch (error) {
                 console.error("Critical Eval Error:", error);
-                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">评测异常</p>`;
+                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">评测错误</p>`;
                 clearTimeout(watchdogTimer);
                 setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 2000);
             }
         }
 
         // ==========================================
-        // UI 弹窗控制
+        // 退出拦截补时与无缝切回状态机
         // ==========================================
         function promptExit() {
             if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
@@ -588,11 +597,13 @@
                     <div class="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent"></div>
                     <h3 class="text-2xl font-black text-red-400 mb-2 relative z-10">目标未达成</h3>
                     <p class="text-slate-300 text-sm mb-6 relative z-10">距离今日目标还差 ${left} 分钟。</p>
+                    
                     <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner relative z-10">
                         <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
                         <p class="text-xs text-gray-400 mt-1">观看短视频，立刻补充 5 分钟学习时长。</p>
                         <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-[12px] text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
                     </div>
+
                     <div class="space-y-3 relative z-10">
                         <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-[16px] text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
                         <button onclick="confirmExit()" class="w-full py-4 bg-gray-800/50 rounded-[16px] text-slate-400 font-bold text-sm active:scale-95 border border-gray-700 transition-transform">退回主界面</button>
@@ -611,9 +622,7 @@
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
             saveData(); 
             
-            closeModal('exit-modal');
-            hideAll(); 
-            document.getElementById('step-1').classList.remove('hidden-screen'); 
+            closeModal('exit-modal'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         function requestRescue() {
