@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V25 - 精准打分适配版</title>
+    <title>Oasis Bridge V26 - 算分引擎破釜沉舟版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -40,7 +40,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V25</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V26</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -191,15 +191,16 @@
 
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
         <div class="flex-grow w-full sm:hidden" onclick="closeModal('exit-modal')"></div>
-        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95"></div>
+        <div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 relative overflow-hidden bg-[#0f172a]/95">
+        </div>
     </div>
 
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8">
         <div class="flex-grow w-full sm:hidden" onclick="closeModal('rescue-modal')"></div>
         <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 sm:p-8 text-center shadow-2xl border-white/10 bg-[#0f172a]/95">
-            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3>
+            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-3 drop-shadow-md">专属系统助力</h3>
             <p id="rescue-desc" class="text-slate-300 text-xs mb-6 leading-relaxed">观看商业资讯，为您补齐下一阶梯奖励。</p>
-            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-3 active:scale-95 shadow-lg">获取救济</button>
+            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 active:scale-95 shadow-lg">获取救济</button>
             <button onclick="closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm active:scale-95">我再靠自己试试</button>
         </div>
     </div>
@@ -233,24 +234,22 @@
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v25_adlim');
-        let lastRefresh = localStorage.getItem('ob_v25_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v26_adlim');
+        let lastRefresh = localStorage.getItem('ob_v26_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v25_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v25_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v25_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v25_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v26_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v26_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v26_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v26_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
         
         let currentPhrase = null; let appInterval = null; let appState = 'READY';
         let sessionHistory = []; let watchdogTimer = null;
-        
-        // 【防并发锁】
-        let isEvaluating = false; 
+        let isEvaluating = false; // 绝缘锁
 
         function checkAdRefresh() {
             const now = Date.now();
@@ -260,12 +259,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v25_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v25_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v25_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v25_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v25_adlim', state.adLimit);
-            localStorage.setItem('ob_v25_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v26_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v26_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v26_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v26_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v26_adlim', state.adLimit);
+            localStorage.setItem('ob_v26_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -382,43 +381,69 @@
             document.getElementById('ad-limit-display').className = state.adLimit <= 0 ? "text-sm font-black text-amber-400" : "text-sm font-black text-blue-400";
         }
 
+        // ==========================================
+        // 【绝对核心】：彻底修复的多语言字符串清洗器
+        // ==========================================
+        function normalizeText(text, lang) {
+            if (!text) return "";
+            let s = text.toLowerCase();
+            if (lang === 'cn') {
+                // 中文数字还原
+                const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
+                for (let k in map) s = s.replace(new RegExp(k, 'g'), map[k]);
+                // 仅保留中文字符、数字和英文字母，彻底去除标点和空格！
+                s = s.replace(/[^\w\u4e00-\u9fa50-9]/g, "");
+                return s;
+            } else {
+                // 英文：保留空格用于分词，去除其余标点
+                s = s.replace(/[^\w\s0-9]/g, "");
+                s = s.replace(/\s+/g, " ").trim();
+                return s;
+            }
+        }
+
+        function calculateSimilarity(str1, str2) {
+            const s1 = normalizeText(str1, state.path); 
+            const s2 = normalizeText(str2, state.path);
+            if (s1 === s2 && s1.length > 0) return 100; 
+            if (!s1 || !s2) return 0;
+            const matrix = Array(s2.length+1).fill(null).map(()=>Array(s1.length+1).fill(null));
+            for(let i=0;i<=s1.length;i++) matrix[0][i]=i; 
+            for(let j=0;j<=s2.length;j++) matrix[j][0]=j;
+            for(let j=1;j<=s2.length;j++) {
+                for(let i=1;i<=s1.length;i++) {
+                    matrix[j][i]=Math.min(matrix[j][i-1]+1, matrix[j-1][i]+1, matrix[j-1][i-1]+(s1[i-1]===s2[j-1]?0:1));
+                }
+            }
+            return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
+        }
+
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         let globalRecognition = null; let capturedText = "";
+        
         if (SpeechRec) {
             globalRecognition = new SpeechRec(); globalRecognition.continuous = false; globalRecognition.interimResults = false;
             globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
-            
-            // 【并发挥泪斩】：彻底根治 Analyzing 卡死
             globalRecognition.onend = () => { 
                 if ((appState === 'LISTENING' || appState === 'PROCESSING') && !isEvaluating) { 
-                    if (capturedText && capturedText.trim() !== "") {
-                        evaluateLogic(); 
-                    } else { 
+                    if (capturedText && capturedText.trim() !== "") evaluateLogic(); 
+                    else { 
                         setAppState('READY');
                         document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase tracking-widest text-[10px]">未能识别到语音</p>`; 
-                        setTimeout(() => { if(!isEvaluating) setAppState('READY'); }, 1500); 
                     } 
                 } 
             };
-            
-            globalRecognition.onerror = (e) => { 
-                if(!isEvaluating) setAppState('READY');
-            };
+            globalRecognition.onerror = () => { if(!isEvaluating) setAppState('READY'); };
         }
 
         window.toggleRecord = function() {
             if (!globalRecognition || appState === 'REWARDING' || !currentPhrase || isEvaluating) return;
-            
             if (appState === 'LISTENING') { 
-                setAppState('PROCESSING'); 
-                try { globalRecognition.stop(); } catch(e) {} 
-                
-                // 保底安全绳：8 秒超时
+                setAppState('PROCESSING'); try { globalRecognition.stop(); } catch(e) {} 
                 setTimeout(() => { 
                     if (appState === 'PROCESSING' && !isEvaluating) { 
-                        if (capturedText && capturedText.trim() !== "") {
-                            evaluateLogic(); 
-                        } else { 
+                        if (capturedText && capturedText.trim() !== "") evaluateLogic(); 
+                        else { 
                             setAppState('READY'); 
                             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]'>语音识别超时</p>";
                         } 
@@ -426,7 +451,6 @@
                 }, 8000);
                 return; 
             }
-            
             capturedText = ""; setAppState('LISTENING');
             globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
             try { globalRecognition.start(); } catch(e) { setAppState('READY'); }
@@ -444,35 +468,10 @@
         }
 
         // ==========================================
-        // 【核心大手术】：完美的中英文字符清洗与打分引擎
+        // 核心评分分发引擎
         // ==========================================
-        function normalize(s, lang) {
-            if(!s) return "";
-            let res = s.toLowerCase().replace(/[^\w\s\u4e00-\u9fa50-9]/g, "").trim();
-            if(lang === 'cn') {
-                // 中文数字还原映射
-                const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
-                for(let k in map) res = res.replace(new RegExp(k, 'g'), map[k]);
-                // 【核心修复】：中文彻底去除所有空格，防止引擎随意断句影响计算
-                res = res.replace(/\s+/g, "");
-            } else {
-                res = res.replace(/\s+/g, " ");
-            }
-            return res;
-        }
-
-        function calculateSimilarity(str1, str2) {
-            const s1 = normalize(str1, state.path); 
-            const s2 = normalize(str2, state.path);
-            if (s1 === s2 && s1.length > 0) return 100; if (!s1 || !s2) return 0;
-            const matrix = Array(s2.length+1).fill(null).map(()=>Array(s1.length+1).fill(null));
-            for(let i=0;i<=s1.length;i++) matrix[0][i]=i; for(let j=0;j<=s2.length;j++) matrix[j][0]=j;
-            for(let j=1;j<=s2.length;j++) for(let i=1;i<=s1.length;i++) matrix[j][i]=Math.min(matrix[j][i-1]+1,matrix[j-1][i]+1,matrix[j-1][i-1]+(s1[i-1]===s2[j-1]?0:1));
-            return Math.round((1 - matrix[s2.length][s1.length] / Math.max(s1.length, s2.length)) * 100);
-        }
-
         async function evaluateLogic() {
-            if (isEvaluating) return; // 绝对防并发！
+            if (isEvaluating) return; 
             isEvaluating = true;
             setAppState('PROCESSING');
             
@@ -483,34 +482,35 @@
 
             try {
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                const score = calculateSimilarity(capturedText, targetText);
+                const score = calculateSimilarity(capturedText || "", targetText || "");
 
-                // 【LUM 切词分治】：中英文双轨切词算法
-                const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-                const normTarget = normalize(targetText, state.path);
-                const normCaptured = normalize(capturedText, state.path);
+                // 【绝版修复】：中英双轨 LUM 切词标红
+                const diag = document.getElementById('lum-diagnosis'); 
+                if(diag) diag.innerHTML = "";
+                
+                const normTarget = normalizeText(targetText, state.path);
+                const normCaptured = normalizeText(capturedText, state.path);
                 
                 let aWords = [], bWords = [];
                 if (state.path === 'en') {
-                    aWords = normTarget.split(/\s+/);
-                    bWords = normCaptured.split(/\s+/);
+                    aWords = normTarget.split(" ");
+                    bWords = normCaptured.split(" ");
                 } else {
-                    // 中文单字切分，实现最精准标红
-                    aWords = normTarget.split('');
-                    bWords = normCaptured.split('');
+                    aWords = normTarget.split(""); // 中文彻底按单字字符拆分，无死角标红
+                    bWords = normCaptured.split("");
                 }
                 
                 const missed = aWords.filter(w => w && w.trim() !== "" && !bWords.includes(w));
-                const uniqueMissed = [...new Set(missed)]; // 去重，避免重复标红
+                const uniqueMissed = [...new Set(missed)]; // 去重
                 
                 if(uniqueMissed.length > 0) {
                     const errs = uniqueMissed.map(w => {
-                        const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t);
+                        if(diag) {
+                            const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t);
+                        }
                         return { user_id: currentUser?.id || 'anonymous', phrase_id: currentPhrase.id || 999, wrong_word: w, error_tag: 'Missed' };
                     });
-                    if(currentPhrase.id && currentUser?.id) {
-                        oasisCloud.from('user_errors').insert(errs).catch(e=>{});
-                    }
+                    if(currentPhrase.id && currentUser?.id) oasisCloud.from('user_errors').insert(errs).catch(e=>{});
                 }
 
                 // 算分算钱
@@ -519,7 +519,7 @@
 
                 let scoreTier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
                 const finalTier = Math.max(scoreTier, state.adBoostMap[targetText] || 0);
-                const targetReward = rewardStages[finalTier]; 
+                const targetReward = rewardStages[finalTier] || 0; 
                 const currentEarned = state.earnedMap[targetText] || 0;
                 const diff = Math.round((targetReward - currentEarned) * 100) / 100;
 
@@ -533,32 +533,28 @@
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     fbHtml += `<span class="text-[11px] text-emerald-400 font-bold block mt-1">+${diff.toFixed(2)} AED Earned</span>`;
                     
-                    if (currentUser?.id) {
-                        oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).catch(e=>{});
-                    }
+                    if (currentUser?.id) oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).catch(e=>{});
                 } else {
                     if (currentEarned >= 0.50) fbHtml += `<span class="text-[10px] text-blue-400 mt-1 font-bold uppercase tracking-widest block">🎉 Fully Rewarded (0.50 AED)</span>`;
                     else if (currentEarned >= targetReward) fbHtml += `<span class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest block">No New Tier Reached</span>`;
                 }
 
-                // 【历史记录全量穿透写入】
+                // 历史记录写入
                 if (currentPhrase.id) {
                     sessionHistory.unshift({ text: targetText, score: score, aed: diff > 0 ? diff : 0, time: new Date().toLocaleTimeString() });
-                    if (currentUser?.id) {
-                        oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff > 0 ? diff : 0 }]).catch(e=>{});
-                    }
+                    if (currentUser?.id) oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff > 0 ? diff : 0 }]).catch(e=>{});
                 }
 
+                // SOS
                 if (finalTier < 5 && ((finalTier === 0 && state.attempts[targetText] >= 3) || (finalTier > 0 && state.attempts[targetText] >= 2)) && state.adLimit > 0) {
                     fbHtml += `<p class="text-[10px] text-blue-400 mt-2 font-bold animate-pulse cursor-pointer py-1 px-3 bg-blue-900/30 rounded-full inline-block border border-blue-500/30" onclick="requestRescue()">💡 Need Help? Tap SOS 🆘</p>`;
                 }
 
+                // UI 渲染
                 const colorClass = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl sm:text-5xl font-black ${colorClass}">${score}</span><br>${fbHtml}`;
                 
-                saveData(); 
-                syncPhraseState();
-                
+                saveData(); syncPhraseState();
                 setAppState('REWARDING');
                 clearTimeout(watchdogTimer);
                 
@@ -569,14 +565,14 @@
 
             } catch (error) {
                 console.error("Critical Eval Error:", error);
-                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">评测错误</p>`;
+                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">评测异常</p>`;
                 clearTimeout(watchdogTimer);
                 setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 2000);
             }
         }
 
         // ==========================================
-        // 退出拦截补时与无缝切回状态机
+        // 退出拦截补时与无缝切回主菜单
         // ==========================================
         function promptExit() {
             if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
@@ -597,13 +593,11 @@
                     <div class="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent"></div>
                     <h3 class="text-2xl font-black text-red-400 mb-2 relative z-10">目标未达成</h3>
                     <p class="text-slate-300 text-sm mb-6 relative z-10">距离今日目标还差 ${left} 分钟。</p>
-                    
                     <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner relative z-10">
                         <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
                         <p class="text-xs text-gray-400 mt-1">观看短视频，立刻补充 5 分钟学习时长。</p>
                         <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-[12px] text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
                     </div>
-
                     <div class="space-y-3 relative z-10">
                         <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-[16px] text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
                         <button onclick="confirmExit()" class="w-full py-4 bg-gray-800/50 rounded-[16px] text-slate-400 font-bold text-sm active:scale-95 border border-gray-700 transition-transform">退回主界面</button>
@@ -622,7 +616,9 @@
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
             saveData(); 
             
-            closeModal('exit-modal'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); 
+            closeModal('exit-modal');
+            hideAll(); 
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         function requestRescue() {
