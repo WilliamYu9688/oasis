@@ -3,32 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V21 - 网络极速熔断版</title>
+    <title>Oasis Bridge V22 - X光透视排错版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { 
-            -webkit-tap-highlight-color: transparent; 
-            -webkit-touch-callout: none; 
-            -webkit-user-select: none; user-select: none; 
-            touch-action: manipulation; 
-            box-sizing: border-box;
-        }
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
-            background-color: #0f172a; 
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         input { -webkit-user-select: auto; user-select: auto; background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
         input:focus { border-color: #fbbf24; }
-        .app-screen { 
-            background: radial-gradient(circle at top right, #1e293b, #020617 85%); color: #f3f4f6; 
-            width: 100vw; height: 100vh; height: 100dvh; 
-            position: fixed; top: 0; left: 0; display: flex; flex-direction: column;
-            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
-            overflow-y: auto; -webkit-overflow-scrolling: touch; 
-        }
+        .app-screen { background: radial-gradient(circle at top right, #1e293b, #020617 85%); color: #f3f4f6; width: 100vw; height: 100vh; height: 100dvh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .glass-panel { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
         .glass-btn { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -57,7 +40,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V21</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V22</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -141,7 +124,7 @@
 
         <div class="main-content-area px-4 sm:px-6">
             <div class="max-w-md mx-auto w-full text-center">
-                <div class="flex justify-between items-center mb-6 max-w-xs mx-auto w-full">
+                <div class="flex justify-between items-center mb-5 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
                         <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Best</p><p id="item-best-score" class="text-base font-black text-amber-400 transition-colors">0</p>
                     </div>
@@ -154,7 +137,7 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">STANDBY</span>
                 </div>
 
-                <p id="db-error-msg" class="text-[9px] text-amber-400 font-bold mb-2 tracking-wider"></p>
+                <p id="db-error-msg" class="text-[9px] font-bold mb-2 tracking-wider uppercase transition-colors"></p>
 
                 <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-md min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                 <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
@@ -168,17 +151,11 @@
 
         <div class="bottom-controls shrink-0">
             <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
-                <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform">
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                </button>
+                <button id="refresh-btn" onclick="fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
                 <button id="record-btn" onclick="toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 outline-none transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                    <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);">
-                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg>
-                    </div>
+                    <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
-                <button onclick="playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform">
-                    <svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                </button>
+                <button onclick="playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform"><svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
             </div>
         </div>
     </div>
@@ -193,12 +170,13 @@
             <div class="space-y-3 overflow-y-auto no-scrollbar flex-grow pb-4">
                 <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
                     <h4 class="text-base font-bold text-white mb-1">LUM 错题透视</h4>
-                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁大用户标签模型底层权限，开启精准词汇标记。</p>
+                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁大用户标签模型(LUM)底层权限，开启精准词级纠错标记。</p>
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-3xl opacity-20">📊</div>
                 </div>
                 <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
                     <h4 class="text-base font-bold text-amber-400 mb-1">青海河床原石</h4>
+                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">源自青海的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
                     <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">150 AED 抽取</button>
                     <div class="absolute top-4 right-4 text-3xl opacity-20">🪨</div>
                 </div>
@@ -234,69 +212,43 @@
     </div>
 
     <script>
-        const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
+        // 【关键】：写入您的真实 Supabase 配置
+        const oasisCloud = window.supabase.createClient(
+            'https://tpawabhfakqpjmepruzx.supabase.co', 
+            'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB'
+        );
 
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
             { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.50 },
             { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 },
             { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
-            { id: 905, text_en: 'How much is this item?', text_zh: '这个东西多少钱？', scenario: 'Shopping', difficulty: 1, reward_aed: 0.50 },
-            { id: 906, text_en: 'I would like to check out, please.', text_zh: '我想办理退房。', scenario: 'Hotel', difficulty: 1, reward_aed: 0.50 },
-            { id: 907, text_en: 'Where is the nearest subway station?', text_zh: '最近的地铁站在哪里？', scenario: 'Travel', difficulty: 1, reward_aed: 0.50 },
-            { id: 908, text_en: 'It is very nice to meet you.', text_zh: '很高兴认识你。', scenario: 'Social', difficulty: 1, reward_aed: 0.50 },
-            { id: 909, text_en: 'Could you bring me a menu?', text_zh: '请给我一份菜单。', scenario: 'Life', difficulty: 1, reward_aed: 0.50 },
-            { id: 910, text_en: 'Do you have a smaller size?', text_zh: '你们有更小的尺寸吗？', scenario: 'Shopping', difficulty: 1, reward_aed: 0.50 },
-            { id: 911, text_en: 'I need a taxi to the airport.', text_zh: '我需要一辆去机场的出租车。', scenario: 'Travel', difficulty: 1, reward_aed: 0.50 },
-            { id: 912, text_en: 'Let us keep in touch.', text_zh: '我们保持联系。', scenario: 'Social', difficulty: 1, reward_aed: 0.50 },
-            { id: 913, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
-            { id: 914, text_en: 'I need 2 room keys.', text_zh: '我需要两张房卡。', scenario: 'Hotel', difficulty: 1, reward_aed: 0.50 },
-            { id: 915, text_en: 'I will be back in 5 minutes.', text_zh: '我会在五分钟后回来。', scenario: 'Life', difficulty: 1, reward_aed: 0.50 },
-            { id: 916, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 917, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
-            { id: 918, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
-            { id: 919, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
-            { id: 920, text_en: 'Let us schedule a brief meeting.', text_zh: '我们安排一个简短的会议吧。', scenario: 'Business', difficulty: 2, reward_aed: 0.50 },
-            { id: 921, text_en: 'The air conditioning is not working properly.', text_zh: '空调不能正常工作。', scenario: 'Hotel', difficulty: 2, reward_aed: 0.50 },
-            { id: 922, text_en: 'Does this train go directly to the city center?', text_zh: '这趟列车直达市中心吗？', scenario: 'Travel', difficulty: 2, reward_aed: 0.50 },
-            { id: 923, text_en: 'We should grab coffee sometime.', text_zh: '我们应该找个时间喝杯咖啡。', scenario: 'Social', difficulty: 2, reward_aed: 0.50 },
-            { id: 924, text_en: 'Can you issue a tax refund receipt?', text_zh: '您能开一张退税收据吗？', scenario: 'Shopping', difficulty: 2, reward_aed: 0.50 },
-            { id: 925, text_en: 'Please review the attached contract draft.', text_zh: '请审查附件中的合同草案。', scenario: 'Business', difficulty: 2, reward_aed: 0.50 },
-            { id: 926, text_en: 'Could you recommend a good local restaurant?', text_zh: '您能推荐一家当地的好餐厅吗？', scenario: 'Life', difficulty: 2, reward_aed: 0.50 },
-            { id: 927, text_en: 'My luggage was lost during the transfer.', text_zh: '我的行李在转机时丢失了。', scenario: 'Travel', difficulty: 2, reward_aed: 0.50 },
-            { id: 928, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
-            { id: 929, text_en: 'The presentation will take 3 hours.', text_zh: '演示将需要三个小时。', scenario: 'Business', difficulty: 2, reward_aed: 0.50 },
-            { id: 930, text_en: 'I would like to order 4 pairs.', text_zh: '我想订购四双。', scenario: 'Shopping', difficulty: 2, reward_aed: 0.50 },
-            { id: 931, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 932, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
-            { id: 933, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 934, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
-            { id: 935, text_en: 'Our objective is to maximize shareholder value.', text_zh: '我们的目标是股东价值最大化。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
-            { id: 936, text_en: 'Building a strong network is crucial for success.', text_zh: '建立强大的人脉网络对成功至关重要。', scenario: 'Social', difficulty: 3, reward_aed: 0.50 },
-            { id: 937, text_en: 'The board requires a comprehensive risk assessment.', text_zh: '董事会需要一份全面的风险评估。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
-            { id: 938, text_en: 'Arrange a premium transfer for our VIP clients.', text_zh: '为我们的贵宾安排高级接送服务。', scenario: 'Travel', difficulty: 3, reward_aed: 0.50 },
-            { id: 939, text_en: 'We are negotiating an exclusive distribution agreement.', text_zh: '我们正在谈判一项独家分销协议。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
-            { id: 940, text_en: 'Innovation drives our competitive advantage.', text_zh: '创新驱动着我们的竞争优势。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
-            { id: 941, text_en: 'I look forward to exploring future collaborations.', text_zh: '我期待着探索未来的合作机会。', scenario: 'Social', difficulty: 3, reward_aed: 0.50 },
-            { id: 942, text_en: 'Ensure the presidential suite is fully prepared.', text_zh: '确保总统套房已完全准备就绪。', scenario: 'Hotel', difficulty: 3, reward_aed: 0.50 },
-            { id: 943, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 },
-            { id: 944, text_en: 'We need to finalize the 8 core metrics.', text_zh: '我们需要敲定八项核心指标。', scenario: 'Business', difficulty: 3, reward_aed: 0.50 },
-            { id: 945, text_en: 'The delegation consists of 10 senior executives.', text_zh: '代表团由十名高管组成。', scenario: 'Travel', difficulty: 3, reward_aed: 0.50 }
+            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 },
+            { id: 906, text_en: 'We need to hand over the smart home prototype.', text_zh: '我们需要把智能家居原型机进行交接。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
+            { id: 907, text_en: 'Please ensure all backend API endpoints are documented.', text_zh: '请确保所有后端 API 接口都已记录。', scenario: 'Tech', difficulty: 2, reward_aed: 0.50 },
+            { id: 908, text_en: 'The project deadline is extended.', text_zh: '项目截止日期延长了。', scenario: 'Management', difficulty: 2, reward_aed: 0.50 },
+            { id: 909, text_en: 'HR needs to step up to find senior devs.', text_zh: 'HR 部门需要加把劲找到高级开发。', scenario: 'HR', difficulty: 2, reward_aed: 0.50 },
+            { id: 910, text_en: 'The vehicle inspection takes 5 days.', text_zh: '车辆检查需要五天。', scenario: 'Admin', difficulty: 2, reward_aed: 0.50 },
+            { id: 911, text_en: 'The Large User-label Model is optimized for the market.', text_zh: '大用户标签模型是针对市场进行优化的。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 912, text_en: 'The B/O fusion is a headquarters-driven initiative.', text_zh: '业网融合是一项由总部驱动的倡议。', scenario: 'Management', difficulty: 3, reward_aed: 0.50 },
+            { id: 913, text_en: 'The CEO approved the acquisition.', text_zh: 'CEO 批准了这项收购。', scenario: 'Strategy', difficulty: 3, reward_aed: 0.50 },
+            { id: 914, text_en: 'This merger is a game-changer for our goals.', text_zh: '这笔并购买卖彻底改变了我们的局势。', scenario: 'Idiom', difficulty: 3, reward_aed: 0.50 },
+            { id: 915, text_en: 'The AI engine handles 10 concurrent tasks.', text_zh: 'AI 引擎处理十个并发任务。', scenario: 'Tech', difficulty: 3, reward_aed: 0.50 }
         ];
         const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
 
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v21_adlim');
-        let lastRefresh = localStorage.getItem('ob_v21_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v22_adlim');
+        let lastRefresh = localStorage.getItem('ob_v22_refreshtime') || 0;
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v21_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v21_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v21_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v21_att')) || {},
+            scores: JSON.parse(localStorage.getItem('ob_v22_scores')) || {},
+            earnedMap: JSON.parse(localStorage.getItem('ob_v22_emap')) || {},
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v22_boost')) || {},
+            attempts: JSON.parse(localStorage.getItem('ob_v22_att')) || {},
             adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
             dbLevel: 1, cloudBalance: 0.00 
         };
@@ -312,12 +264,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('ob_v21_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v21_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v21_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v21_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v21_adlim', state.adLimit);
-            localStorage.setItem('ob_v21_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v22_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v22_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v22_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v22_att', JSON.stringify(state.attempts));
+            localStorage.setItem('ob_v22_adlim', state.adLimit);
+            localStorage.setItem('ob_v22_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -373,30 +325,42 @@
         }
 
         // ==========================================
-        // 【核心修复】：工业级异步超时熔断
+        // 【核心排错器】：实时反馈数据库 RLS 状态
         // ==========================================
         async function fetchNewPhrase() {
             const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
+            const msgEl = document.getElementById('db-error-msg');
+            
             textEl.innerText = "Connecting..."; zhEl.innerText = "";
-            document.getElementById('lum-diagnosis').innerHTML = ""; document.getElementById('db-error-msg').innerText = "";
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>FETCHING DATA...</p>";
+            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            msgEl.innerText = "Syncing with Cloud..."; 
+            msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-blue-400 animate-pulse";
+            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('FETCHING');
 
             let pool = [];
             try {
-                // 强制优先拉取真实数据库的数据，并加入 2.5s 极限熔断
-                const fetchPromise = oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2500));
+                const { data, error } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
                 
-                const response = await Promise.race([fetchPromise, timeoutPromise]);
-                
-                if (response.error) throw new Error(response.error.message);
-                if (!response.data || response.data.length === 0) throw new Error("Empty DB");
-                
-                pool = response.data;
+                if (error) {
+                    msgEl.innerText = "⚠️ DB Error: " + error.message;
+                    msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-red-400";
+                } else if (!data || data.length === 0) {
+                    // 如果连接成功但返回空数组，100% 是被 RLS 拦截了，或者表里没数据
+                    msgEl.innerText = "⚠️ 云端表为空或被 RLS 拦截 (使用本地缓存)";
+                    msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-amber-400";
+                } else {
+                    pool = data;
+                    msgEl.innerText = `✅ 云端同步成功 (题库量: ${data.length})`;
+                    msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-emerald-400";
+                }
             } catch (err) {
-                // 触发熔断或报错，静默切换本地高可用缓存
-                document.getElementById('db-error-msg').innerText = "⚠️ Cloud Sync Failed. Local Cache Active.";
+                msgEl.innerText = "⚠️ 网络异常: " + err.message;
+                msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-red-400";
+            }
+
+            // 如果云端没拿到，自动使用本地 45 条语料兜底，绝不让用户卡死
+            if (pool.length === 0) {
                 pool = state.path === 'cn' ? LOCAL_CACHE_CN : LOCAL_CACHE;
                 pool = pool.filter(d => d.difficulty == state.dbLevel);
             }
@@ -412,7 +376,6 @@
             
             syncPhraseState();
             setAppState('READY');
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
         }
 
         function syncPhraseState() {
@@ -491,7 +454,7 @@
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 const score = calculateSimilarity(capturedText, targetText);
 
-                // LUM
+                // LUM 诊断
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 const aWords = targetText.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
                 const bWords = capturedText.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
