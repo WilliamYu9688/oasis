@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V28 - 算分引擎重铸版</title>
+    <title>Oasis Bridge V29 - 终极防御版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -40,7 +40,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V28</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V29</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -63,19 +63,28 @@
     </div>
 
     <div id="step-1" class="app-screen z-50 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
+        <div class="mb-10 text-center">
+            <h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1>
+        </div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <button onclick="handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div>
+                <h3 class="font-bold text-xl text-white">Learn Mandarin</h3>
+                <p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
             </button>
             <button onclick="handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div>
+                <h3 class="font-bold text-xl text-amber-400">我要学英语</h3>
+                <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
         </div>
     </div>
 
     <div id="step-time" class="app-screen z-45 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2><p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p></div>
+        <div class="mb-10 text-center">
+            <h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2>
+            <p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p>
+        </div>
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
             <button onclick="handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">15 Min</button>
             <button onclick="handleStepTime(30)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 active:text-white transition-all">30 Min</button>
@@ -146,10 +155,9 @@
 
                 <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-md min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                 <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
-                
                 <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
 
-                <div id="score-display" class="h-20 flex flex-col items-center justify-center">
+                <div id="score-display" class="h-24 flex flex-col items-center justify-center">
                     <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">SYSTEM READY</p>
                 </div>
             </div>
@@ -179,12 +187,6 @@
                     <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁大用户标签模型(LUM)底层权限，开启精准词汇标记。</p>
                     <button onclick="buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">50 AED 兑换</button>
                     <div class="absolute top-4 right-4 text-3xl opacity-20">📊</div>
-                </div>
-                <div class="bg-gray-800/60 p-4 rounded-[20px] border border-white/5 relative">
-                    <h4 class="text-base font-bold text-amber-400 mb-1">青海河床原石</h4>
-                    <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">源自青海的虚拟稀有玉石碎片，集齐可合成数字勋章。</p>
-                    <button onclick="buyItem(150, '原石盲盒')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">150 AED 抽取</button>
-                    <div class="absolute top-4 right-4 text-3xl opacity-20">🪨</div>
                 </div>
             </div>
         </div>
@@ -217,57 +219,34 @@
     </div>
 
     <script>
-        // 【正式配置】
-        const oasisCloud = window.supabase.createClient(
-            'https://tpawabhfakqpjmepruzx.supabase.co', 
-            'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB'
-        );
+        const oasisCloud = window.supabase.createClient('https://tpawabhfakqpjmepruzx.supabase.co', 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB');
 
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
             { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1, reward_aed: 0.50 },
-            { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 },
-            { id: 904, text_en: 'The office closes on Friday evening.', text_zh: '办公室周五晚上关门。', scenario: 'Office', difficulty: 1, reward_aed: 0.50 },
-            { id: 905, text_en: 'The logistics company will arrive at 3 PM.', text_zh: '物流公司将在下午三点到达。', scenario: 'Logistics', difficulty: 1, reward_aed: 0.50 }
+            { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1, reward_aed: 0.50 }
         ];
         const LOCAL_CACHE_CN = LOCAL_CACHE.map(item => ({ ...item, lang: 'cn' }));
 
         let currentUser = null; let isRegisterMode = false;
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
         
-        let savedAdLimit = localStorage.getItem('ob_v28_adlim');
-        let lastRefresh = localStorage.getItem('ob_v28_refreshtime') || 0;
+        let savedAdLimit = localStorage.getItem('ob_v29_adlim');
+        let lastRefresh = localStorage.getItem('ob_v29_refreshtime') || 0;
         
-        let state = {
-            path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v28_scores')) || {},
-            earnedMap: JSON.parse(localStorage.getItem('ob_v28_emap')) || {},
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v28_boost')) || {},
-            attempts: JSON.parse(localStorage.getItem('ob_v28_att')) || {},
-            adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, 
-            dbLevel: 1, cloudBalance: 0.00 
-        };
+        let state = { path: 'en', targetTime: 0, currentTime: 0, scores: JSON.parse(localStorage.getItem('ob_v29_scores')) || {}, earnedMap: JSON.parse(localStorage.getItem('ob_v29_emap')) || {}, adBoostMap: JSON.parse(localStorage.getItem('ob_v29_boost')) || {}, attempts: JSON.parse(localStorage.getItem('ob_v29_att')) || {}, adLimit: savedAdLimit !== null ? parseInt(savedAdLimit) : 6, dbLevel: 1, cloudBalance: 0.00 };
         
         let currentPhrase = null; let appInterval = null; let appState = 'READY';
         let sessionHistory = []; let watchdogTimer = null;
-        
-        // 核心防并发锁
         let isEvaluating = false; 
 
         function checkAdRefresh() {
             const now = Date.now();
-            if (now - lastRefresh > 24 * 60 * 60 * 1000) {
-                state.adLimit = 6; lastRefresh = now; saveData();
-            }
+            if (now - lastRefresh > 24 * 60 * 60 * 1000) { state.adLimit = 6; lastRefresh = now; saveData(); }
         }
 
         function saveData() {
-            localStorage.setItem('ob_v28_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v28_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v28_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v28_att', JSON.stringify(state.attempts));
-            localStorage.setItem('ob_v28_adlim', state.adLimit);
-            localStorage.setItem('ob_v28_refreshtime', lastRefresh);
+            localStorage.setItem('ob_v29_scores', JSON.stringify(state.scores)); localStorage.setItem('ob_v29_emap', JSON.stringify(state.earnedMap)); localStorage.setItem('ob_v29_boost', JSON.stringify(state.adBoostMap)); localStorage.setItem('ob_v29_att', JSON.stringify(state.attempts)); localStorage.setItem('ob_v29_adlim', state.adLimit); localStorage.setItem('ob_v29_refreshtime', lastRefresh);
         }
 
         function toggleAuthMode() {
@@ -304,10 +283,7 @@
             finally { btn.innerText = isRegisterMode ? "REGISTER & ENTER" : "SECURE LOGIN"; btn.disabled = false; }
         }
 
-        function hideAll() { 
-            document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
-            ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app'].forEach(id => { document.getElementById(id).classList.add('hidden-screen'); }); 
-        }
+        function hideAll() { document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active')); ['auth-screen', 'step-1', 'step-time', 'step-2', 'main-app'].forEach(id => { document.getElementById(id).classList.add('hidden-screen'); }); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
         function openModal(id) { const el = document.getElementById(id); el.classList.remove('hidden-screen'); void el.offsetWidth; el.classList.add('active'); }
 
@@ -323,11 +299,8 @@
         }
 
         async function fetchNewPhrase() {
-            const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
-            const msgEl = document.getElementById('db-error-msg');
-            
-            textEl.innerText = "Connecting..."; zhEl.innerText = "";
-            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            const textEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh'); const msgEl = document.getElementById('db-error-msg');
+            textEl.innerText = "Connecting..."; zhEl.innerText = ""; document.getElementById('lum-diagnosis').innerHTML = ""; 
             msgEl.innerText = "Syncing with Cloud..."; msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-blue-400 animate-pulse";
             document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-widest text-[10px]'>SYSTEM READY</p>";
             setAppState('FETCHING');
@@ -346,14 +319,9 @@
                     pool = response.data;
                     msgEl.innerText = `✅ 云端同步成功 (题库量: ${pool.length})`; msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-emerald-400";
                 }
-            } catch (err) {
-                msgEl.innerText = "⚠️ 网络异常: " + err.message; msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-red-400";
-            }
+            } catch (err) { msgEl.innerText = "⚠️ 网络异常: " + err.message; msgEl.className = "text-[9px] font-bold mb-2 uppercase tracking-wider text-red-400"; }
 
-            if (pool.length === 0) {
-                pool = state.path === 'cn' ? LOCAL_CACHE_CN : LOCAL_CACHE;
-                pool = pool.filter(d => d.difficulty == state.dbLevel);
-            }
+            if (pool.length === 0) { pool = state.path === 'cn' ? LOCAL_CACHE_CN : LOCAL_CACHE; pool = pool.filter(d => d.difficulty == state.dbLevel); }
             if (pool.length === 0) pool = LOCAL_CACHE; 
 
             currentPhrase = pool[Math.floor(Math.random() * pool.length)];
@@ -384,20 +352,24 @@
         }
 
         // ==========================================
-        // 【核心大重铸】：1D 数学算分法，坚不可摧
+        // 【终极防御核心】：全方位拦截 Null，抛出精准报错
         // ==========================================
         function cleanText(text, lang) {
-            if (!text) return "";
-            let s = text.toLowerCase();
-            if (lang === 'cn') {
-                const map = {'一':'1','二':'2','两':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
-                for (let k in map) s = s.replace(new RegExp(k, 'g'), map[k]);
-                s = s.replace(/[^\w\u4e00-\u9fa50-9]/g, ""); // 中文彻底去空格，防止断句干扰
-            } else {
-                s = s.replace(/[^\w\s0-9]/g, "");
-                s = s.replace(/\s+/g, " ").trim();
+            try {
+                if (!text) return "";
+                let s = String(text).toLowerCase(); // 强制 String，防 null 崩溃
+                if (lang === 'cn') {
+                    const map = {'一':'1','二':'2','两':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
+                    for (let k in map) s = s.replace(new RegExp(k, 'g'), map[k]);
+                    s = s.replace(/[^\w\u4e00-\u9fa50-9]/g, ""); 
+                } else {
+                    s = s.replace(/[^\w\s0-9]/g, "");
+                    s = s.replace(/\s+/g, " ").trim();
+                }
+                return s;
+            } catch (err) {
+                console.error("CleanText Fail:", err); return "";
             }
-            return s;
         }
 
         function calcEditScore(str1, str2) {
@@ -405,67 +377,69 @@
                 const s1 = cleanText(str1, state.path); 
                 const s2 = cleanText(str2, state.path);
                 
-                // 极速拦截
                 if (!s1 && !s2) return 100;
                 if (!s1 || !s2) return 0;
                 if (s1 === s2) return 100;
                 
-                // 1D 动态规划（绝不内存溢出）
                 let dp = Array(s2.length + 1).fill(0).map((_, idx) => idx);
                 for (let i = 1; i <= s1.length; i++) {
                     let prev = dp[0];
                     dp[0] = i;
                     for (let j = 1; j <= s2.length; j++) {
                         let temp = dp[j];
-                        if (s1[i - 1] === s2[j - 1]) {
-                            dp[j] = prev;
-                        } else {
-                            dp[j] = Math.min(dp[j - 1], dp[j], prev) + 1;
-                        }
+                        if (s1[i - 1] === s2[j - 1]) dp[j] = prev;
+                        else dp[j] = Math.min(dp[j - 1], dp[j], prev) + 1;
                         prev = temp;
                     }
                 }
                 const dist = dp[s2.length];
                 const maxLen = Math.max(s1.length, s2.length);
                 return Math.max(0, Math.round((1 - dist / maxLen) * 100));
-            } catch(err) {
-                console.error("Score Engine Fallback:", err);
-                return 0; // 绝对保底
-            }
+            } catch(err) { throw new Error(`算分引擎故障: ${err.message}`); }
         }
 
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         let globalRecognition = null; let capturedText = "";
+        
         if (SpeechRec) {
             globalRecognition = new SpeechRec(); globalRecognition.continuous = false; globalRecognition.interimResults = false;
-            globalRecognition.onresult = (e) => { capturedText = Array.from(e.results).map(r => r[0].transcript).join(''); };
+            globalRecognition.onresult = (e) => { 
+                capturedText = e.results ? Array.from(e.results).map(r => r[0].transcript).join('') : ""; 
+            };
+            
             globalRecognition.onend = () => { 
                 if ((appState === 'LISTENING' || appState === 'PROCESSING') && !isEvaluating) { 
-                    if (capturedText && capturedText.trim() !== "") evaluateLogic(); 
-                    else { 
+                    if (capturedText && String(capturedText).trim() !== "") {
+                        evaluateLogic(); 
+                    } else { 
                         setAppState('READY');
                         document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold uppercase tracking-widest text-[10px]">未能识别到语音</p>`; 
                     } 
                 } 
             };
-            globalRecognition.onerror = () => { if(!isEvaluating) setAppState('READY'); };
+            globalRecognition.onerror = (e) => { if(!isEvaluating) setAppState('READY'); };
         }
 
         window.toggleRecord = function() {
-            if (!globalRecognition || appState === 'REWARDING' || !currentPhrase || isEvaluating) return;
+            if (!globalRecognition || appState === 'REWARDING' || isEvaluating) return;
+            
             if (appState === 'LISTENING') { 
-                setAppState('PROCESSING'); try { globalRecognition.stop(); } catch(e) {} 
+                setAppState('PROCESSING'); 
+                try { globalRecognition.stop(); } catch(e) {} 
+                
+                // 保底安全绳：8 秒超时强制重置
                 setTimeout(() => { 
                     if (appState === 'PROCESSING' && !isEvaluating) { 
-                        if (capturedText && capturedText.trim() !== "") evaluateLogic(); 
+                        if (capturedText && String(capturedText).trim() !== "") evaluateLogic(); 
                         else { 
                             setAppState('READY'); 
-                            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]'>语音识别超时</p>";
+                            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]'>引擎无响应, 已重置</p>";
                         } 
                     } 
                 }, 8000);
                 return; 
             }
+            
             capturedText = ""; setAppState('LISTENING');
             globalRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
             try { globalRecognition.start(); } catch(e) { setAppState('READY'); }
@@ -493,12 +467,14 @@
             }, 6000);
 
             try {
+                // 【终极防御】：先检查核心变量
+                if (!currentPhrase) throw new Error("缺少当前例句目标");
                 const targetText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                if (!targetText) throw new Error("例句内容为空");
                 
-                // 【核心统一】：算分与查错全部使用同样的清洗机制
                 const score = calcEditScore(targetText, capturedText);
 
-                // LUM 沙盒：即便这里报错，也绝不影响分数结算
+                // LUM 沙盒
                 try {
                     const diag = document.getElementById('lum-diagnosis'); 
                     if(diag) diag.innerHTML = "";
@@ -506,30 +482,20 @@
                     const cleanTarget = cleanText(targetText, state.path);
                     const cleanCaptured = cleanText(capturedText, state.path);
                     
-                    let aWords = [], bWords = [];
-                    if (state.path === 'en') {
-                        aWords = cleanTarget.split(" ");
-                        bWords = cleanCaptured.split(" ");
-                    } else {
-                        aWords = cleanTarget.split(""); // 中文彻底按单字精确切分
-                        bWords = cleanCaptured.split("");
-                    }
+                    let aWords = state.path === 'en' ? cleanTarget.split(" ") : cleanTarget.split("");
+                    let bWords = state.path === 'en' ? cleanCaptured.split(" ") : cleanCaptured.split("");
                     
-                    const missed = aWords.filter(w => w && w.trim() !== "" && !bWords.includes(w));
+                    const missed = aWords.filter(w => w && String(w).trim() !== "" && !bWords.includes(w));
                     const uniqueMissed = [...new Set(missed)]; 
                     
                     if(uniqueMissed.length > 0) {
                         const errs = uniqueMissed.map(w => {
-                            if(diag) {
-                                const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t);
-                            }
+                            if(diag) { const t = document.createElement('span'); t.className='lum-tag'; t.innerText=w.toUpperCase(); diag.appendChild(t); }
                             return { user_id: currentUser?.id || 'anonymous', phrase_id: currentPhrase.id || 999, wrong_word: w, error_tag: 'Missed' };
                         });
                         if(currentPhrase.id && currentUser?.id) oasisCloud.from('user_errors').insert(errs).catch(e=>{});
                     }
-                } catch(lumError) {
-                    console.error("LUM Skipped:", lumError);
-                }
+                } catch(lumError) { console.error("LUM Fault:", lumError); }
 
                 // 算分算钱
                 if (score > (state.scores[targetText] || 0)) { state.scores[targetText] = score; state.attempts[targetText] = 0; } 
@@ -541,7 +507,7 @@
                 const currentEarned = state.earnedMap[targetText] || 0;
                 const diff = Math.round((targetReward - currentEarned) * 100) / 100;
 
-                let fbHtml = `<span class="text-[9px] text-gray-500 font-bold mt-2 block">HEARD: "${capturedText}"</span>`;
+                let fbHtml = `<span class="text-[9px] text-gray-500 font-bold mt-2 block w-full truncate px-4">HEARD: "${capturedText}"</span>`;
                 
                 if (diff > 0) {
                     setAppState('REWARDING');
@@ -563,12 +529,10 @@
                     if (currentUser?.id) oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff > 0 ? diff : 0 }]).catch(e=>{});
                 }
 
-                // SOS
                 if (finalTier < 5 && ((finalTier === 0 && state.attempts[targetText] >= 3) || (finalTier > 0 && state.attempts[targetText] >= 2)) && state.adLimit > 0) {
                     fbHtml += `<p class="text-[10px] text-blue-400 mt-2 font-bold animate-pulse cursor-pointer py-1 px-3 bg-blue-900/30 rounded-full inline-block border border-blue-500/30" onclick="requestRescue()">💡 Need Help? Tap SOS 🆘</p>`;
                 }
 
-                // UI 渲染：即使分数是 0，也坚定地印在屏幕上
                 const colorClass = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl sm:text-5xl font-black ${colorClass}">${score}</span><br>${fbHtml}`;
                 
@@ -582,10 +546,11 @@
                 }, diff > 0 ? 2200 : 1800);
 
             } catch (error) {
+                // 【核心追踪】：将具体错误抛到屏幕上
                 console.error("Critical Eval Error:", error);
-                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold uppercase tracking-[0.2em] text-[10px]">无法完成算分(底层熔断)</p>`;
+                document.getElementById('score-display').innerHTML = `<p class="text-red-400 font-bold tracking-widest text-[9px]">引擎熔断: ${error.message}</p>`;
                 clearTimeout(watchdogTimer);
-                setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 2000);
+                setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 3000);
             }
         }
 
@@ -595,31 +560,11 @@
         function promptExit() {
             if (appState === 'LISTENING') { if (globalRecognition) { try { globalRecognition.stop(); } catch(e){} } setAppState('READY'); }
             const content = document.getElementById('exit-content');
-            
             if (state.currentTime >= state.targetTime) {
-                content.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-b from-emerald-900/20 to-transparent"></div>
-                    <h3 class="text-2xl font-black text-emerald-400 mb-2 relative z-10">目标已达成!</h3>
-                    <p class="text-slate-300 text-sm mb-6 relative z-10">您已完成 ${state.targetTime} 分钟学习。</p>
-                    <div class="space-y-3 relative z-10">
-                        <button onclick="confirmExit()" class="w-full py-4 rounded-[16px] bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black active:scale-95 transition-transform shadow-lg">退回主界面</button>
-                        <button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-[16px] glass-btn font-bold active:scale-95 transition-transform">继续学习</button>
-                    </div>`;
+                content.innerHTML = `<div class="absolute inset-0 bg-gradient-to-b from-emerald-900/20 to-transparent"></div><h3 class="text-2xl font-black text-emerald-400 mb-2 relative z-10">目标已达成!</h3><p class="text-slate-300 text-sm mb-6 relative z-10">您已完成 ${state.targetTime} 分钟学习。</p><div class="space-y-3 relative z-10"><button onclick="confirmExit()" class="w-full py-4 rounded-[16px] bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black active:scale-95 transition-transform shadow-lg">退回主界面</button><button onclick="closeModal('exit-modal')" class="w-full py-4 rounded-[16px] glass-btn font-bold active:scale-95 transition-transform">继续学习</button></div>`;
             } else {
                 let left = Math.ceil(state.targetTime - state.currentTime);
-                content.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent"></div>
-                    <h3 class="text-2xl font-black text-red-400 mb-2 relative z-10">目标未达成</h3>
-                    <p class="text-slate-300 text-sm mb-6 relative z-10">距离今日目标还差 ${left} 分钟。</p>
-                    <div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner relative z-10">
-                        <span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span>
-                        <p class="text-xs text-gray-400 mt-1">观看短视频，立刻补充 5 分钟学习时长。</p>
-                        <button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-[12px] text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button>
-                    </div>
-                    <div class="space-y-3 relative z-10">
-                        <button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-[16px] text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button>
-                        <button onclick="confirmExit()" class="w-full py-4 bg-gray-800/50 rounded-[16px] text-slate-400 font-bold text-sm active:scale-95 border border-gray-700 transition-transform">退回主界面</button>
-                    </div>`;
+                content.innerHTML = `<div class="absolute inset-0 bg-gradient-to-b from-red-900/20 to-transparent"></div><h3 class="text-2xl font-black text-red-400 mb-2 relative z-10">目标未达成</h3><p class="text-slate-300 text-sm mb-6 relative z-10">距离今日目标还差 ${left} 分钟。</p><div class="bg-gray-800/80 rounded-2xl p-4 mb-6 border border-white/5 shadow-inner relative z-10"><span class="absolute top-2 right-2 bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-sm">AD</span><p class="text-xs text-gray-400 mt-1">观看短视频，立刻补充 5 分钟学习时长。</p><button onclick="watchAd('time')" class="w-full mt-3 py-3 ad-btn-bg text-white rounded-[12px] text-xs font-black shadow-lg active:scale-95 transition-transform">观看资讯 (+5 分钟)</button></div><div class="space-y-3 relative z-10"><button onclick="closeModal('exit-modal')" class="w-full py-4 bg-gray-700/50 rounded-[16px] text-white font-bold text-sm active:scale-95 transition-transform">继续学习</button><button onclick="confirmExit()" class="w-full py-4 bg-gray-800/50 rounded-[16px] text-slate-400 font-bold text-sm active:scale-95 border border-gray-700 transition-transform">退回主界面</button></div>`;
             }
             openModal('exit-modal');
         }
@@ -628,13 +573,8 @@
             if(appInterval) { clearInterval(appInterval); appInterval = null; }
             if(watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
             if(globalRecognition) { try { globalRecognition.abort(); } catch(e){} }
-            
-            isEvaluating = false;
-            setAppState('READY');
-            document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
-            saveData(); 
-            
-            closeModal('exit-modal'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); 
+            isEvaluating = false; setAppState('READY'); document.getElementById('score-display').innerHTML = "<p class='text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]'>SYSTEM READY</p>";
+            saveData(); closeModal('exit-modal'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         function requestRescue() {
@@ -647,17 +587,10 @@
 
             if (finalTier >= 5) return alert("已拿满最高奖励！");
             if (state.adLimit <= 0) {
-                document.getElementById('rescue-title').innerText = "救济已耗尽";
-                document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>回满 6 次额度</span>！";
-                document.getElementById('rescue-action-btn').onclick = () => watchAd('refill');
-                openModal('rescue-modal'); return;
+                document.getElementById('rescue-title').innerText = "救济已耗尽"; document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>回满 6 次额度</span>！"; document.getElementById('rescue-action-btn').onclick = () => watchAd('refill'); openModal('rescue-modal'); return;
             }
             const nextVal = Math.round((rewardStages[finalTier + 1] - (state.earnedMap[t] || 0)) * 100) / 100;
-            document.getElementById('rescue-title').innerText = "系统助力";
-            document.getElementById('rescue-desc').innerHTML = `为您补齐奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`;
-            document.getElementById('rescue-action-btn').innerText = `获取救济 (剩余 ${state.adLimit} 次)`;
-            document.getElementById('rescue-action-btn').onclick = () => watchAd('boost');
-            openModal('rescue-modal');
+            document.getElementById('rescue-title').innerText = "系统助力"; document.getElementById('rescue-desc').innerHTML = `为您补齐奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`; document.getElementById('rescue-action-btn').innerText = `获取救济 (剩余 ${state.adLimit} 次)`; document.getElementById('rescue-action-btn').onclick = () => watchAd('boost'); openModal('rescue-modal');
         }
 
         async function watchAd(type) {
@@ -667,12 +600,8 @@
 
             if (type === 'time') {
                 state.currentTime += 5; 
-                if (state.currentTime >= state.targetTime) {
-                    state.currentTime = state.targetTime;
-                    fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ GOAL COMPLETED</p>`;
-                } else {
-                    fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ +5 MINS ADDED</p>`;
-                }
+                if (state.currentTime >= state.targetTime) { state.currentTime = state.targetTime; fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ GOAL COMPLETED</p>`; } 
+                else { fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">⏱️ +5 MINS ADDED</p>`; }
                 updateTopBar(); setTimeout(() => setAppState('READY'), 2000);
             } else if (type === 'boost' && state.adLimit > 0) {
                 state.adLimit--; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
@@ -687,9 +616,7 @@
                     fb.innerHTML = `<p class="text-emerald-400 text-[11px] font-bold">🛡️ +${diff.toFixed(2)} AED BOOSTED</p>`;
                 }
                 state.attempts[t] = 0; setTimeout(() => fetchNewPhrase(), 2000);
-            } else if (type === 'refill') {
-                state.adLimit = 6; fb.innerHTML = '<p class="text-blue-400 text-[10px] font-bold">📺 REFILLED TO 6</p>'; setTimeout(() => setAppState('READY'), 2000);
-            }
+            } else if (type === 'refill') { state.adLimit = 6; fb.innerHTML = '<p class="text-blue-400 text-[10px] font-bold">📺 REFILLED TO 6</p>'; setTimeout(() => setAppState('READY'), 2000); }
             saveData(); syncPhraseState();
         }
 
@@ -698,9 +625,7 @@
             if (sessionHistory.length === 0) list.innerHTML = `<p class="text-center text-slate-500 mt-10 font-bold text-xs">NO RECORDS YET.</p>`;
             else sessionHistory.forEach(log => {
                 const color = log.score >= 80 ? 'text-emerald-400' : (log.score >= 60 ? 'text-amber-400' : 'text-slate-400');
-                list.innerHTML += `<div class="bg-gray-800/40 p-3 rounded-[16px] flex justify-between items-center history-item border border-white/5">
-                    <div class="w-2/3 pr-3"><p class="text-white text-xs font-bold truncate">${log.text}</p><p class="text-[9px] text-slate-500 mt-1">${log.time}</p></div>
-                    <div class="text-right"><p class="text-lg font-black ${color}">${log.score}</p><p class="text-[9px] text-amber-500 font-bold">+${log.aed.toFixed(2)} AED</p></div></div>`;
+                list.innerHTML += `<div class="bg-gray-800/40 p-3 rounded-[16px] flex justify-between items-center history-item border border-white/5"><div class="w-2/3 pr-3"><p class="text-white text-xs font-bold truncate">${log.text}</p><p class="text-[9px] text-slate-500 mt-1">${log.time}</p></div><div class="text-right"><p class="text-lg font-black ${color}">${log.score}</p><p class="text-[9px] text-amber-500 font-bold">+${log.aed.toFixed(2)} AED</p></div></div>`;
             });
             openModal('history-modal');
         }
