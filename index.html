@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V37 - 商业闭环全功能版</title>
+    <title>Oasis Bridge V39 - 体验升维重构版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -35,7 +35,6 @@
         #main-app { display: flex; flex-direction: column; }
         .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
-        .progress-bar-fill { transition: width 0.3s ease-in-out; }
     </style>
 </head>
 <body>
@@ -43,7 +42,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V37</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V39</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -65,7 +64,7 @@
         </div>
     </div>
 
-    <div id="step-1" class="app-screen z-50 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
+    <div id="step-1" class="app-screen z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen bg-[#0f172a]">
         <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
@@ -77,7 +76,7 @@
         </div>
     </div>
 
-    <div id="step-time" class="app-screen z-45 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
+    <div id="step-time" class="app-screen z-[57] flex flex-col p-6 sm:p-8 justify-center hidden-screen bg-[#0f172a]">
         <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2><p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p></div>
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
             <button onclick="window.handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600 transition-all">15 Min</button>
@@ -87,7 +86,7 @@
         </div>
     </div>
 
-    <div id="step-2" class="app-screen z-40 flex flex-col p-6 sm:p-8 justify-center hidden-screen">
+    <div id="step-2" class="app-screen z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen bg-[#0f172a]">
         <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 transition-transform cursor-pointer">
@@ -101,6 +100,26 @@
                 <div class="relative z-10"><p class="font-bold text-base text-amber-400">精英级 (L3)</p><p class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报</p></div><div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
             </div>
         </div>
+    </div>
+
+    <div id="loading-screen" class="app-screen z-[55] flex flex-col justify-center items-center hidden-screen bg-[#020617]">
+        <div class="w-full max-w-xs text-center px-6 relative z-10">
+            <div class="mb-8">
+                <svg class="w-16 h-16 mx-auto text-amber-500 animate-pulse drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <h2 class="text-2xl font-black text-white mt-4 tracking-wider">OASIS ENGINE</h2>
+                <p id="loading-status-text" class="text-xs text-blue-400 font-bold mt-2 uppercase tracking-widest">Waking up AI Core...</p>
+            </div>
+            
+            <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden border border-white/10 relative">
+                <div id="loading-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-blue-400 w-0 transition-all duration-300"></div>
+            </div>
+            <p id="loading-percent" class="text-right text-[10px] text-gray-400 font-bold mt-1">0%</p>
+            
+            <button id="loading-retry-btn" onclick="window.initWhisper()" class="mt-8 px-6 py-2 border border-red-500/30 bg-red-500/10 text-red-400 rounded-full text-[10px] font-bold uppercase tracking-widest hidden active:scale-95 transition-transform">网络超时，点击重试</button>
+        </div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent opacity-50"></div>
     </div>
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
@@ -120,7 +139,7 @@
                     <h1 id="time-display" class="text-base font-black text-white">0/30m</h1>
                 </div>
                 <div class="text-center cursor-pointer flex-1" onclick="window.requestRescue()">
-                    <div class="bg-blue-500/10 rounded-xl py-1.5 mx-1 active:scale-95 transition-transform border border-blue-500/20">
+                    <div class="bg-blue-500/10 rounded-xl py-1.5 mx-1 active:scale-95 transition-transform border border-blue-500/20 relative z-50 pointer-events-auto">
                         <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">Help</p>
                         <h1 id="ad-limit-display" class="text-sm font-black text-blue-400">🆘 6/6</h1>
                     </div>
@@ -152,12 +171,12 @@
                 <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
 
                 <div id="score-display" class="h-24 flex flex-col items-center justify-center">
-                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">INITIALIZING...</p>
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">WAITING...</p>
                 </div>
             </div>
         </div>
 
-        <div class="bottom-controls shrink-0">
+        <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
                 <button id="refresh-btn" onclick="window.fetchNewPhrase()" disabled class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-transform"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
                 <button id="record-btn" onclick="window.toggleRecord()" disabled class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 outline-none transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
@@ -168,95 +187,36 @@
         </div>
     </div>
 
-    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0">
-        <div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div>
-        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95 h-[85dvh] flex flex-col">
-            <div class="flex justify-between items-center mb-5 shrink-0">
-                <div>
-                    <h3 class="text-2xl font-black text-emerald-400 drop-shadow-md">Financial Center</h3>
-                    <p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p>
-                </div>
-                <button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            
-            <div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6">
-                <div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20 relative shadow-inner">
-                    <h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4>
-                    <p class="text-[10px] text-gray-400 leading-tight mb-4">Payout to Payoneer or UAE Local Bank. 3-5 days.</p>
-                    <div class="space-y-3">
-                        <select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white outline-none">
-                            <option value="Payoneer">Payoneer Account</option>
-                            <option value="Bank">UAE Local Bank</option>
-                        </select>
-                        <input id="payout-account" type="text" placeholder="Account ID / IBAN" class="w-full p-3 rounded-xl text-xs font-bold">
-                        <div class="flex gap-2">
-                            <input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50">
-                            <button onclick="window.submitWithdrawal()" id="withdraw-btn" class="px-6 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md flex-shrink-0 transition-colors uppercase">Cash Out</button>
-                        </div>
-                        <p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p>
-                    </div>
-                </div>
-
-                <hr class="border-white/5">
-
-                <div class="space-y-3">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Virtual Upgrades</h4>
-                    <div class="bg-gray-800/40 p-4 rounded-[20px] border border-white/5 relative">
-                        <h4 class="text-base font-bold text-white mb-1">LUM 错题透视仪</h4>
-                        <p class="text-[10px] text-gray-400 leading-tight mb-3 pr-12">解锁底层词汇比对权重，开启精准词标记。</p>
-                        <button onclick="window.buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs active:scale-95 shadow-md">50 AED Unlock</button>
-                        <div class="absolute top-4 right-4 text-3xl opacity-20">📊</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
-    <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 active:scale-95 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
-    <div id="history-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0"><div class="flex-grow w-full" onclick="window.closeModal('history-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[80dvh]"><div class="flex justify-between items-center mb-4 shrink-0"><div><h3 class="text-2xl font-black text-blue-400 drop-shadow-md">Practice Log</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Session History</p></div><button onclick="window.closeModal('history-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div id="history-list" class="flex-grow overflow-y-auto space-y-2.5 no-scrollbar pb-4"></div></div></div>
+    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400 drop-shadow-md">Financial Center</h3><p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20 relative shadow-inner"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white outline-none"><option value="Payoneer">Payoneer Account</option><option value="Bank">UAE Local Bank</option></select><input id="payout-account" type="text" placeholder="Account ID / IBAN" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" id="withdraw-btn" class="px-6 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-xl text-white font-black text-xs active:scale-95">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div><hr class="border-white/5"><div class="space-y-3"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Virtual Upgrades</h4><div class="bg-gray-800/40 p-4 rounded-[20px] border border-white/5 relative"><h4 class="text-base font-bold text-white mb-1">LUM 错题透视仪</h4><button onclick="window.buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs mt-2">50 AED Unlock</button></div></div></div></div></div>
+    <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
+    <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 active:scale-95 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
+    <div id="history-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('history-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[80dvh]"><div class="flex justify-between items-center mb-4 shrink-0"><div><h3 class="text-2xl font-black text-blue-400 drop-shadow-md">Practice Log</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Session History</p></div><button onclick="window.closeModal('history-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div id="history-list" class="flex-grow overflow-y-auto space-y-2.5 no-scrollbar pb-4"></div></div></div>
 
     <script>
         window.AdManager = {
-            // 已填入您的真实生产 ID
             adUnitId: 'ca-app-pub-5083945196856634/5740020253',
-            isNativeAdMob: false,
-            isAdLoaded: false,
-
+            isNativeAdMob: false, isAdLoaded: false,
             init: async function() {
                 if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
                     this.isNativeAdMob = true;
-                    const { AdMob } = window.Capacitor.Plugins;
-                    try {
-                        await AdMob.initialize({ requestTrackingAuthorization: true });
-                        this.loadAd();
-                    } catch (e) { console.error("AdMob Init Err:", e); }
+                    try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
                 }
             },
-
             loadAd: async function() {
                 if (!this.isNativeAdMob) return;
-                const { AdMob } = window.Capacitor.Plugins;
-                try {
-                    await AdMob.prepareRewardVideoAd({ adId: this.adUnitId });
-                    this.isAdLoaded = true;
-                } catch (e) { this.isAdLoaded = false; }
+                try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
             },
-
             showAd: async function(onSuccess, onCancel) {
                 if (this.isNativeAdMob) {
-                    if (!this.isAdLoaded) { alert("广告正在极速准备中..."); this.loadAd(); onCancel(); return; }
+                    if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
                     const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
                     AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
                     AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
                     await AdMob.showRewardVideoAd();
                 } else {
-                    const fb = document.getElementById('score-display');
-                    const old = fb.innerHTML;
-                    fb.innerHTML = '<p class="text-amber-400 text-[10px] font-bold animate-pulse">📺 [Web测试] 将调起生产 AdMob 视频...</p>';
-                    await new Promise(r => setTimeout(r, 2000));
-                    fb.innerHTML = old;
-                    onSuccess();
+                    const fb = document.getElementById('score-display'); const old = fb.innerHTML;
+                    fb.innerHTML = '<p class="text-amber-400 text-[10px] font-bold animate-pulse">📺 [Web测试] 将调起 AdMob 视频...</p>';
+                    await new Promise(r => setTimeout(r, 1500)); fb.innerHTML = old; onSuccess();
                 }
             }
         };
@@ -264,7 +224,7 @@
     </script>
 
     <script>
-        // 【关键配置区】：请替换为您真实的 Supabase 地址与秘钥
+        // ⚠️【请务必替换为您自己的 Supabase 钥匙】
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         const oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -280,22 +240,27 @@
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v37_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v37_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v37_boost') || '{}'),
-            attempts: JSON.parse(localStorage.getItem('ob_v37_att') || '{}'),
-            adLimit: localStorage.getItem('ob_v37_adlim') !== null ? parseInt(localStorage.getItem('ob_v37_adlim')) : 6,
+            scores: JSON.parse(localStorage.getItem('ob_v39_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v39_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v39_boost') || '{}'),
+            attempts: JSON.parse(localStorage.getItem('ob_v39_att') || '{}'),
+            adLimit: localStorage.getItem('ob_v39_adlim') !== null ? parseInt(localStorage.getItem('ob_v39_adlim')) : 6,
             dbLevel: 1, cloudBalance: 0.00
         };
 
-        let currentPhrase = null; let appInterval = null; let appState = 'MODEL_LOADING';
+        let currentPhrase = null; let appInterval = null; let appState = 'READY';
         let sessionHistory = []; let watchdogTimer = null; let isEvaluating = false;
 
+        function checkAdRefresh() {
+            const now = Date.now(); const last = localStorage.getItem('ob_v39_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v39_refreshtime', now); saveData(); }
+        }
+
         function saveData() {
-            localStorage.setItem('ob_v37_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v37_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v37_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v37_adlim', state.adLimit);
+            localStorage.setItem('ob_v39_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v39_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v39_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v39_adlim', state.adLimit);
         }
 
         window.toggleAuthMode = function() {
@@ -322,7 +287,10 @@
                 if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
                 state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
                 document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                hideAll(); document.getElementById('step-1').classList.remove('hidden-screen');
+                checkAdRefresh();
+                
+                document.getElementById('auth-screen').classList.add('hidden-screen'); 
+                document.getElementById('step-1').classList.remove('hidden-screen');
             } catch (err) { document.getElementById('auth-msg').innerText = "❌ " + err.message; }
             finally { btn.disabled = false; btn.innerText = isRegisterMode ? "Register & Enter" : "Secure Access"; }
         }
@@ -334,11 +302,28 @@
         window.handleStep1 = (p) => { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         window.handleStepTime = (t) => { state.targetTime = t; state.currentTime = 0; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         window.handleStep2 = async (lv) => {
-            state.dbLevel = lv; hideAll(); document.getElementById('main-app').classList.remove('hidden-screen');
+            state.dbLevel = lv; 
+            hideAll();
+            
+            // AI 引擎大厅拦截
+            if (!window.whisperPipeline) {
+                document.getElementById('loading-screen').classList.remove('hidden-screen');
+                window.initWhisper();
+            } else {
+                document.getElementById('main-app').classList.remove('hidden-screen');
+                window.fetchNewPhrase();
+                if(appInterval) clearInterval(appInterval);
+                appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
+            }
+        }
+
+        // 供引擎加载完毕后调用
+        window.enterMainApp = function() {
+            document.getElementById('loading-screen').classList.add('hidden-screen');
+            document.getElementById('main-app').classList.remove('hidden-screen');
+            window.fetchNewPhrase();
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
-            window.fetchNewPhrase();
-            if (!window.whisperPipeline && !window.isWhisperLoading) window.initWhisper();
         }
 
         window.fetchNewPhrase = async function() {
@@ -354,7 +339,12 @@
             tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
             zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
+            
             syncPhraseState();
+            
+            // 【痛点修复2】：强制释放并发锁，恢复按钮
+            isEvaluating = false; 
+            setAppState('READY');
         }
 
         function syncPhraseState() {
@@ -374,10 +364,9 @@
         function setAppState(s) {
             appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
             switch(s) {
-                case 'MODEL_LOADING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse">⏳ INITIALIZING AI...</p>`; btn.disabled = true; break;
-                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase">SYSTEM READY</p>`; btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
-                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); break;
-                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase">🔄 WHISPER ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
+                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
+                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); break;
+                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🔄 ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
                 case 'REWARDING': btn.disabled = true; break;
             }
         }
@@ -404,7 +393,10 @@
                     prev = temp;
                 }
             }
-            return Math.max(0, Math.round((1 - dp[s2.length] / Math.max(s1.length, s2.length)) * 100));
+            // 【痛点修复1】：识别宽容度，准确率 >= 85% 即给 100 分满分
+            let finalScore = Math.max(0, Math.round((1 - dp[s2.length] / Math.max(s1.length, s2.length)) * 100));
+            if (finalScore >= 85) finalScore = 100;
+            return finalScore;
         }
 
         window.processAndScore = async function(txt) {
@@ -415,7 +407,6 @@
                 const finalT = formatSentence(rawT, state.path);
                 const score = calcEditScore(finalT, finalC);
 
-                // LUM
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
                 let aW = state.path === 'en' ? finalT.split(" ") : finalT.split("");
                 let bW = state.path === 'en' ? finalC.split(" ") : finalC.split("");
@@ -442,7 +433,12 @@
                 const color = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${color}">${score}</span><br>${fb}`;
                 saveData(); syncPhraseState();
-                setTimeout(() => { isEvaluating = false; if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); }, 2200);
+                
+                // 【修复】：算分展示完毕后强制解锁重置
+                setTimeout(() => { 
+                    isEvaluating = false; 
+                    if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); 
+                }, 2200);
             } catch (e) { console.error(e); setAppState('READY'); isEvaluating = false; }
         }
 
@@ -462,29 +458,64 @@
         }
 
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
+        
+        // 【痛点修复3】：确保广告触发函数挂载且Z-index无遮挡
+        window.requestRescue = function() {
+            checkAdRefresh();
+            if (appState === 'REWARDING' || !currentPhrase) return;
+            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            const best = state.scores[t] || 0;
+            const finalTier = Math.max((best >= 100 ? 5 : (best >= 90 ? 4 : (best >= 80 ? 3 : (best >= 70 ? 2 : (best >= 60 ? 1 : 0))))), state.adBoostMap[t] || 0);
+
+            if (finalTier >= 5) return alert("已拿满最高奖励！");
+            if (state.adLimit <= 0) {
+                document.getElementById('rescue-title').innerText = "救济已耗尽"; document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>回满 6 次额度</span>！"; 
+                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
+                window.openModal('rescue-modal'); return;
+            }
+            const nextVal = Math.round((rewardStages[finalTier + 1] - (state.earnedMap[t] || 0)) * 100) / 100;
+            document.getElementById('rescue-title').innerText = "系统助力"; document.getElementById('rescue-desc').innerHTML = `为您补齐奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`; 
+            document.getElementById('rescue-action-btn').innerText = `Watch Ad (${state.adLimit} left)`; 
+            document.getElementById('rescue-action-btn').onclick = () => window.watchAd('boost'); 
+            window.openModal('rescue-modal');
+        }
+
         window.watchAd = (type) => {
             window.closeModal('rescue-modal'); window.closeModal('exit-modal');
             window.AdManager.showAd(() => {
                 if (type === 'time') { state.currentTime += 5; updateTopBar(); }
                 else if (type === 'boost') {
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                    const curT = state.adBoostMap[t] || 0;
-                    state.adBoostMap[t] = Math.min(5, curT + 1);
-                    window.processAndScore(""); // 触发重新算钱
+                    state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
+                    window.processAndScore(""); 
+                } else if (type === 'refill') {
+                    state.adLimit = 6; updateTopBar();
                 }
                 saveData();
             }, () => setAppState('READY'));
         }
 
+        // 【痛点修复4 & 5】：退出拦截与返回主菜单逻辑重构
         window.promptExit = () => {
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
             if (left <= 0) {
-                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Reached!</h3><p class="text-slate-300 text-sm mb-6">Daily goal complete.</p><button onclick="location.reload()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">Quit Session</button>`;
+                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Reached!</h3><p class="text-slate-300 text-sm mb-6">Daily goal complete.</p><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black uppercase">Back to Main Menu</button>`;
             } else {
-                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3">Watch Ad (+5 Mins)</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">Continue</button>`;
+                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl font-black mb-3 uppercase">Back to Main Menu</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">Continue Study</button>`;
             }
             window.openModal('exit-modal');
+        }
+
+        window.confirmExit = () => {
+            if(appInterval) { clearInterval(appInterval); appInterval = null; }
+            if(appState === 'LISTENING' && window.mediaRecorder) window.mediaRecorder.stop();
+            isEvaluating = false; setAppState('READY');
+            state.currentTime = 0; // 重置今日时间
+            window.closeModal('exit-modal');
+            hideAll();
+            // 完美退回主菜单
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         window.openHistory = async () => {
@@ -505,18 +536,40 @@
 
         window.initWhisper = async function() {
             if (window.whisperPipeline || window.isWhisperLoading) return;
-            window.isWhisperLoading = true; setAppState('MODEL_LOADING');
+            window.isWhisperLoading = true; 
+            
+            const retryBtn = document.getElementById('loading-retry-btn');
+            const statusTxt = document.getElementById('loading-status-text');
+            const bar = document.getElementById('loading-progress-bar');
+            const pct = document.getElementById('loading-percent');
+            
+            retryBtn.classList.add('hidden');
+            statusTxt.innerText = "DOWNLOADING OFFLINE AI...";
+            statusTxt.className = "text-xs text-amber-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
+            
             try {
                 window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
                     progress_callback: (d) => {
                         if (d.status === 'downloading') {
                             const p = Math.round((d.loaded / d.total) * 100) || 0;
-                            document.getElementById('score-display').innerHTML = `<div class="w-40 bg-gray-800 rounded-full h-1.5 mb-2 overflow-hidden"><div class="bg-blue-500 h-full progress-bar-fill" style="width:${p}%"></div></div><p class="text-blue-400 font-bold text-[9px]">LOADING AI: ${p}%</p>`;
+                            bar.style.width = p + '%';
+                            pct.innerText = p + '%';
+                            if (p > 99) {
+                                statusTxt.innerText = "MOUNTING CORE...";
+                                statusTxt.className = "text-xs text-emerald-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
+                            }
                         }
                     }
                 });
-                setAppState('READY');
-            } catch (e) { console.error(e); } finally { window.isWhisperLoading = false; }
+                
+                setTimeout(() => { window.enterMainApp(); }, 500);
+
+            } catch (e) { 
+                console.error(e);
+                statusTxt.innerText = "CONNECTION FAILED";
+                statusTxt.className = "text-xs text-red-400 font-bold mt-2 uppercase tracking-widest";
+                retryBtn.classList.remove('hidden');
+            } finally { window.isWhisperLoading = false; }
         }
 
         window.toggleRecord = async function() {
@@ -537,7 +590,7 @@
                     window.processAndScore(result.text || "");
                 };
                 window.mediaRecorder.start(); setAppState('LISTENING');
-            } catch (e) { alert("Mic error"); setAppState('READY'); }
+            } catch (e) { alert("Mic permission denied"); setAppState('READY'); }
         }
     </script>
 </body>
