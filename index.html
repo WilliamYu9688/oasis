@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V39 - 体验升维重构版</title>
+    <title>Oasis Bridge V40 - 商业封漏版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -42,7 +42,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V39</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V40</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -111,12 +111,10 @@
                 <h2 class="text-2xl font-black text-white mt-4 tracking-wider">OASIS ENGINE</h2>
                 <p id="loading-status-text" class="text-xs text-blue-400 font-bold mt-2 uppercase tracking-widest">Waking up AI Core...</p>
             </div>
-            
             <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden border border-white/10 relative">
                 <div id="loading-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-blue-400 w-0 transition-all duration-300"></div>
             </div>
             <p id="loading-percent" class="text-right text-[10px] text-gray-400 font-bold mt-1">0%</p>
-            
             <button id="loading-retry-btn" onclick="window.initWhisper()" class="mt-8 px-6 py-2 border border-red-500/30 bg-red-500/10 text-red-400 rounded-full text-[10px] font-bold uppercase tracking-widest hidden active:scale-95 transition-transform">网络超时，点击重试</button>
         </div>
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent opacity-50"></div>
@@ -225,8 +223,8 @@
 
     <script>
         // ⚠️【请务必替换为您自己的 Supabase 钥匙】
-        const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         const oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const LOCAL_CACHE = [
@@ -240,11 +238,11 @@
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v39_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v39_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v39_boost') || '{}'),
-            attempts: JSON.parse(localStorage.getItem('ob_v39_att') || '{}'),
-            adLimit: localStorage.getItem('ob_v39_adlim') !== null ? parseInt(localStorage.getItem('ob_v39_adlim')) : 6,
+            scores: JSON.parse(localStorage.getItem('ob_v40_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v40_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v40_boost') || '{}'),
+            attempts: JSON.parse(localStorage.getItem('ob_v40_att') || '{}'),
+            adLimit: localStorage.getItem('ob_v40_adlim') !== null ? parseInt(localStorage.getItem('ob_v40_adlim')) : 6,
             dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -252,15 +250,15 @@
         let sessionHistory = []; let watchdogTimer = null; let isEvaluating = false;
 
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v39_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v39_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v40_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v40_refreshtime', now); saveData(); }
         }
 
         function saveData() {
-            localStorage.setItem('ob_v39_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v39_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v39_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v39_adlim', state.adLimit);
+            localStorage.setItem('ob_v40_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v40_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v40_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v40_adlim', state.adLimit);
         }
 
         window.toggleAuthMode = function() {
@@ -302,25 +300,13 @@
         window.handleStep1 = (p) => { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         window.handleStepTime = (t) => { state.targetTime = t; state.currentTime = 0; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
         window.handleStep2 = async (lv) => {
-            state.dbLevel = lv; 
-            hideAll();
-            
-            // AI 引擎大厅拦截
-            if (!window.whisperPipeline) {
-                document.getElementById('loading-screen').classList.remove('hidden-screen');
-                window.initWhisper();
-            } else {
-                document.getElementById('main-app').classList.remove('hidden-screen');
-                window.fetchNewPhrase();
-                if(appInterval) clearInterval(appInterval);
-                appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
-            }
+            state.dbLevel = lv; hideAll();
+            if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } 
+            else { window.enterMainApp(); }
         }
 
-        // 供引擎加载完毕后调用
         window.enterMainApp = function() {
-            document.getElementById('loading-screen').classList.add('hidden-screen');
-            document.getElementById('main-app').classList.remove('hidden-screen');
+            document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             window.fetchNewPhrase();
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
@@ -340,16 +326,11 @@
             zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
             
-            syncPhraseState();
-            
-            // 【痛点修复2】：强制释放并发锁，恢复按钮
-            isEvaluating = false; 
-            setAppState('READY');
+            syncPhraseState(); isEvaluating = false; setAppState('READY');
         }
 
         function syncPhraseState() {
-            if(!currentPhrase) return;
-            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            if(!currentPhrase) return; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             document.getElementById('item-best-score').innerText = state.scores[t] || 0;
             document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2);
             updateTopBar();
@@ -371,7 +352,6 @@
             }
         }
 
-        // NLP 工具
         function formatSentence(text, lang) {
             if (!text) return ""; let s = String(text).toLowerCase();
             if (lang === 'cn') {
@@ -393,9 +373,8 @@
                     prev = temp;
                 }
             }
-            // 【痛点修复1】：识别宽容度，准确率 >= 85% 即给 100 分满分
             let finalScore = Math.max(0, Math.round((1 - dp[s2.length] / Math.max(s1.length, s2.length)) * 100));
-            if (finalScore >= 85) finalScore = 100;
+            if (finalScore >= 85) finalScore = 100; // 宽容度补齐
             return finalScore;
         }
 
@@ -403,16 +382,12 @@
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
                 const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                const finalC = formatSentence(txt, state.path);
-                const finalT = formatSentence(rawT, state.path);
+                const finalC = formatSentence(txt, state.path); const finalT = formatSentence(rawT, state.path);
                 const score = calcEditScore(finalT, finalC);
 
                 const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-                let aW = state.path === 'en' ? finalT.split(" ") : finalT.split("");
-                let bW = state.path === 'en' ? finalC.split(" ") : finalC.split("");
-                aW.filter(w => w && !bW.includes(w)).forEach(w => {
-                    const span = document.createElement('span'); span.className='lum-tag'; span.innerText=w.toUpperCase(); diag.appendChild(span);
-                });
+                let aW = state.path === 'en' ? finalT.split(" ") : finalT.split(""); let bW = state.path === 'en' ? finalC.split(" ") : finalC.split("");
+                aW.filter(w => w && !bW.includes(w)).forEach(w => { const span = document.createElement('span'); span.className='lum-tag'; span.innerText=w.toUpperCase(); diag.appendChild(span); });
 
                 if (score > (state.scores[rawT] || 0)) { state.scores[rawT] = score; }
                 let tier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
@@ -421,48 +396,31 @@
 
                 let fb = `<span class="text-[10px] text-gray-400 mt-2 block truncate px-4">HEARD: "${finalC || "..."}"</span>`;
                 if (diff > 0) {
-                    setAppState('REWARDING');
-                    state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
+                    setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     fb += `<span class="text-[11px] text-emerald-400 font-bold block">+${diff.toFixed(2)} AED Earned</span>`;
-                    if (currentUser?.id) {
-                        oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).then();
-                        oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff }]).then();
-                    }
+                    if (currentUser?.id) { oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).then(); oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff }]).then(); }
                 }
                 const color = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${color}">${score}</span><br>${fb}`;
                 saveData(); syncPhraseState();
-                
-                // 【修复】：算分展示完毕后强制解锁重置
-                setTimeout(() => { 
-                    isEvaluating = false; 
-                    if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); 
-                }, 2200);
+                setTimeout(() => { isEvaluating = false; if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); }, 2200);
             } catch (e) { console.error(e); setAppState('READY'); isEvaluating = false; }
         }
 
         window.submitWithdrawal = async function() {
-            const amt = parseFloat(document.getElementById('payout-amount').value);
-            const acc = document.getElementById('payout-account').value.trim();
-            const msg = document.getElementById('withdraw-msg');
+            const amt = parseFloat(document.getElementById('payout-amount').value); const acc = document.getElementById('payout-account').value.trim(); const msg = document.getElementById('withdraw-msg');
             if (isNaN(amt) || amt < 50 || amt > state.cloudBalance || !acc) { msg.innerText = "Invalid amount or account."; return; }
-            msg.innerText = "PROCESSING...";
-            state.cloudBalance -= amt;
-            if (currentUser?.id) {
-                await oasisCloud.from('withdrawals').insert([{ user_id: currentUser.id, amount: amt, payout_method: document.getElementById('payout-method').value, account_details: acc }]);
-                await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id);
-            }
+            msg.innerText = "PROCESSING..."; state.cloudBalance -= amt;
+            if (currentUser?.id) { await oasisCloud.from('withdrawals').insert([{ user_id: currentUser.id, amount: amt, payout_method: document.getElementById('payout-method').value, account_details: acc }]); await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id); }
             updateTopBar(); document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2);
             msg.className = "text-[9px] font-bold text-emerald-400 h-3 text-center"; msg.innerText = "Success! Processing in 3-5 days.";
         }
 
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
         
-        // 【痛点修复3】：确保广告触发函数挂载且Z-index无遮挡
         window.requestRescue = function() {
-            checkAdRefresh();
-            if (appState === 'REWARDING' || !currentPhrase) return;
+            checkAdRefresh(); if (appState === 'REWARDING' || !currentPhrase) return;
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             const best = state.scores[t] || 0;
             const finalTier = Math.max((best >= 100 ? 5 : (best >= 90 ? 4 : (best >= 80 ? 3 : (best >= 70 ? 2 : (best >= 60 ? 1 : 0))))), state.adBoostMap[t] || 0);
@@ -470,24 +428,27 @@
             if (finalTier >= 5) return alert("已拿满最高奖励！");
             if (state.adLimit <= 0) {
                 document.getElementById('rescue-title').innerText = "救济已耗尽"; document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>回满 6 次额度</span>！"; 
-                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
-                window.openModal('rescue-modal'); return;
+                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); window.openModal('rescue-modal'); return;
             }
             const nextVal = Math.round((rewardStages[finalTier + 1] - (state.earnedMap[t] || 0)) * 100) / 100;
             document.getElementById('rescue-title').innerText = "系统助力"; document.getElementById('rescue-desc').innerHTML = `为您补齐奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`; 
-            document.getElementById('rescue-action-btn').innerText = `Watch Ad (${state.adLimit} left)`; 
-            document.getElementById('rescue-action-btn').onclick = () => window.watchAd('boost'); 
-            window.openModal('rescue-modal');
+            document.getElementById('rescue-action-btn').innerText = `Watch Ad (${state.adLimit} left)`; document.getElementById('rescue-action-btn').onclick = () => window.watchAd('boost'); window.openModal('rescue-modal');
         }
 
+        // 【修复代码：严格控制次数削减】
         window.watchAd = (type) => {
             window.closeModal('rescue-modal'); window.closeModal('exit-modal');
             window.AdManager.showAd(() => {
-                if (type === 'time') { state.currentTime += 5; updateTopBar(); }
+                if (type === 'time') { 
+                    state.currentTime += 5; updateTopBar(); 
+                }
                 else if (type === 'boost') {
-                    const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                    state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
-                    window.processAndScore(""); 
+                    if (state.adLimit > 0) {
+                        state.adLimit--; // 【修复】：成功扣除次数
+                        const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                        state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
+                        window.processAndScore(""); 
+                    }
                 } else if (type === 'refill') {
                     state.adLimit = 6; updateTopBar();
                 }
@@ -495,27 +456,17 @@
             }, () => setAppState('READY'));
         }
 
-        // 【痛点修复4 & 5】：退出拦截与返回主菜单逻辑重构
         window.promptExit = () => {
-            const left = Math.ceil(state.targetTime - state.currentTime);
-            const content = document.getElementById('exit-content');
-            if (left <= 0) {
-                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Reached!</h3><p class="text-slate-300 text-sm mb-6">Daily goal complete.</p><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black uppercase">Back to Main Menu</button>`;
-            } else {
-                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl font-black mb-3 uppercase">Back to Main Menu</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">Continue Study</button>`;
-            }
+            const left = Math.ceil(state.targetTime - state.currentTime); const content = document.getElementById('exit-content');
+            if (left <= 0) { content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Reached!</h3><p class="text-slate-300 text-sm mb-6">Daily goal complete.</p><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black uppercase">Back to Main Menu</button>`; } 
+            else { content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl font-black mb-3 uppercase">Back to Main Menu</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">Continue Study</button>`; }
             window.openModal('exit-modal');
         }
 
         window.confirmExit = () => {
             if(appInterval) { clearInterval(appInterval); appInterval = null; }
             if(appState === 'LISTENING' && window.mediaRecorder) window.mediaRecorder.stop();
-            isEvaluating = false; setAppState('READY');
-            state.currentTime = 0; // 重置今日时间
-            window.closeModal('exit-modal');
-            hideAll();
-            // 完美退回主菜单
-            document.getElementById('step-1').classList.remove('hidden-screen'); 
+            isEvaluating = false; setAppState('READY'); state.currentTime = 0; window.closeModal('exit-modal'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); 
         }
 
         window.openHistory = async () => {
@@ -531,44 +482,24 @@
 
     <script type="module">
         import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
-        env.allowLocalModels = false;
-        window.whisperPipeline = null; window.isWhisperLoading = false; window.mediaRecorder = null; let audioChunks = [];
+        env.allowLocalModels = false; window.whisperPipeline = null; window.isWhisperLoading = false; window.mediaRecorder = null; let audioChunks = [];
 
         window.initWhisper = async function() {
-            if (window.whisperPipeline || window.isWhisperLoading) return;
-            window.isWhisperLoading = true; 
-            
-            const retryBtn = document.getElementById('loading-retry-btn');
-            const statusTxt = document.getElementById('loading-status-text');
-            const bar = document.getElementById('loading-progress-bar');
-            const pct = document.getElementById('loading-percent');
-            
-            retryBtn.classList.add('hidden');
-            statusTxt.innerText = "DOWNLOADING OFFLINE AI...";
-            statusTxt.className = "text-xs text-amber-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
-            
+            if (window.whisperPipeline || window.isWhisperLoading) return; window.isWhisperLoading = true; 
+            const retryBtn = document.getElementById('loading-retry-btn'); const statusTxt = document.getElementById('loading-status-text'); const bar = document.getElementById('loading-progress-bar'); const pct = document.getElementById('loading-percent');
+            retryBtn.classList.add('hidden'); statusTxt.innerText = "DOWNLOADING OFFLINE AI..."; statusTxt.className = "text-xs text-amber-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
             try {
                 window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
                     progress_callback: (d) => {
                         if (d.status === 'downloading') {
-                            const p = Math.round((d.loaded / d.total) * 100) || 0;
-                            bar.style.width = p + '%';
-                            pct.innerText = p + '%';
-                            if (p > 99) {
-                                statusTxt.innerText = "MOUNTING CORE...";
-                                statusTxt.className = "text-xs text-emerald-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
-                            }
+                            const p = Math.round((d.loaded / d.total) * 100) || 0; bar.style.width = p + '%'; pct.innerText = p + '%';
+                            if (p > 99) { statusTxt.innerText = "MOUNTING CORE..."; statusTxt.className = "text-xs text-emerald-400 font-bold mt-2 uppercase tracking-widest animate-pulse"; }
                         }
                     }
                 });
-                
                 setTimeout(() => { window.enterMainApp(); }, 500);
-
             } catch (e) { 
-                console.error(e);
-                statusTxt.innerText = "CONNECTION FAILED";
-                statusTxt.className = "text-xs text-red-400 font-bold mt-2 uppercase tracking-widest";
-                retryBtn.classList.remove('hidden');
+                console.error(e); statusTxt.innerText = "CONNECTION FAILED"; statusTxt.className = "text-xs text-red-400 font-bold mt-2 uppercase tracking-widest"; retryBtn.classList.remove('hidden');
             } finally { window.isWhisperLoading = false; }
         }
 
@@ -580,10 +511,8 @@
                 window.mediaRecorder = new MediaRecorder(stream); audioChunks = [];
                 window.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
                 window.mediaRecorder.onstop = async () => {
-                    stream.getTracks().forEach(t => t.stop());
-                    setAppState('PROCESSING');
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const arrayBuf = await blob.arrayBuffer();
+                    stream.getTracks().forEach(t => t.stop()); setAppState('PROCESSING');
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' }); const arrayBuf = await blob.arrayBuffer();
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
                     const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
                     const result = await window.whisperPipeline(audioBuf.getChannelData(0), { language: state.path === 'en' ? 'english' : 'chinese', task: 'transcribe' });
