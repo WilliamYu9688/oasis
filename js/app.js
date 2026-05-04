@@ -244,3 +244,68 @@ window.watchAd = (type) => {
 window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
 window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
 window.submitWithdrawal = async function() { alert("Processing Withdrawal (3-5 Days)"); }
+
+// ==========================================
+// 📺 广告点击触发器 & 收益发放
+// ==========================================
+window.triggerAd = function() {
+    window.playSfx('click');
+    // 初始化广告次数（默认6次）
+    if (state.adChances === undefined) state.adChances = 6; 
+    
+    if (state.adChances <= 0) {
+        alert("今日广告增收次数已用完，请明天再来！");
+        return;
+    }
+
+    // 调用我们在模块里写好的广告管理器
+    window.AdManager.showAd(
+        () => {
+            // 看完广告的奖励逻辑
+            state.adChances -= 1;
+            state.cloudBalance += 2.0; // 给2块钱奖励，加速凑齐 10 AED
+            document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+            document.getElementById('total-earned').classList.add('money-jump');
+            saveData();
+            
+            // 如果界面上有 ID 为 ad-chances-display 的元素，顺便更新它的数字
+            const adCounter = document.getElementById('ad-chances-display');
+            if (adCounter) adCounter.innerText = state.adChances;
+            
+            alert(`✅ 增效奖励已发放！今日还剩 ${state.adChances} 次提现加速机会。`);
+        },
+        () => {
+            console.log("用户取消了广告或加载失败");
+        }
+    );
+};
+
+// ==========================================
+// 👁️ LUM 仪表盘逻辑 (10 AED 降价版)
+// ==========================================
+window.unlockLUM = function() {
+    window.playSfx('click');
+    if (state.cloudBalance >= 10) {  // 门槛从 50 降维打击到 10
+        state.cloudBalance -= 10;
+        document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+        saveData();
+        
+        // 隐藏毛玻璃锁死层
+        const lockOverlay = document.getElementById('lum-lock-overlay');
+        if(lockOverlay) lockOverlay.style.display = 'none';
+        
+        // 触发雷达图渲染 (如果该函数存在)
+        if (window.renderLUMChart) window.renderLUMChart();
+    } else {
+        alert(`⚠️ 余额不足，还差 ${(10 - state.cloudBalance).toFixed(2)} AED 解锁靶向治疗！\n（建议点击左上角看广告快速赚钱）`);
+    }
+};
+
+window.closeLUM = function() {
+    window.playSfx('click');
+    // 找到 LUM 的主容器并隐藏
+    const lumScreen = document.getElementById('lum-screen');
+    if (lumScreen) {
+        lumScreen.classList.add('hidden-screen');
+    }
+};
