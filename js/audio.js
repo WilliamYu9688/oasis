@@ -2,7 +2,9 @@
 // 🎵 原生 Web Audio 音效引擎
 // ==========================================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSfx(type) {
+
+// 强制绑定到全局，确保 app.js 绝对能调到它
+window.playSfx = function(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -22,13 +24,13 @@ function playSfx(type) {
         gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
         osc.start(now); osc.stop(now + 0.2);
     }
-}
+};
 
 // ==========================================
-// 🎙️ TTS 引擎 (Netlify直连探针版)
+// 🎙️ TTS 引擎 (Netlify 直连探针版)
 // ==========================================
 window.playAudio = async () => {
-    playSfx('click');
+    window.playSfx('click');
     const text = document.getElementById('target-text').innerText.replace(/"/g, "");
     const isEn = state.path === 'en';
     if (!text || text === "Connecting...") return;
@@ -60,16 +62,16 @@ window.playAudio = async () => {
         audio.play();
 
     } catch (err) {
-        alert("发音诊断报告:\n\n" + err.message + "\n\n(提示：请确保已上传 _redirects 文件并在 Netlify 线上环境测试)");
+        alert("发音诊断报告:\n\n" + err.message + "\n\n(提示：请确保已上传 netlify.toml 并在线上环境测试)");
         btn.innerHTML = originalContent; btn.disabled = false;
         const u = new SpeechSynthesisUtterance(text); u.lang = isEn ? 'en-US' : 'zh-CN'; 
         u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
         window.speechSynthesis.speak(u);
     }
-}
+};
 
 // ==========================================
-// 🤖 Whisper 离线识别引擎与靶向打分
+// 🎯 LUM 靶向打分算法
 // ==========================================
 function analyzeMistakes(target, captured) {
     const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
@@ -106,45 +108,55 @@ window.processAndScore = async function(txt) {
         if (diff > 0) {
             setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
             document.getElementById('total-earned').classList.add('money-jump');
-            playSfx('success');
-            if (oasisCloud.auth.user()) {
-                oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', oasisCloud.auth.user().id).then();
+            window.playSfx('success');
+            if (currentUser && currentUser.id) {
+                oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).then();
             }
         }
         document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">HEARD: "${fmtC}"</span>`;
         saveData(); syncPhraseState();
         setTimeout(() => { isEvaluating = false; if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); }, 2200);
     } catch (e) { setAppState('READY'); isEvaluating = false; }
-}
+};
 
-import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
-env.allowLocalModels = false; window.whisperPipeline = null;
-window.initWhisper = async function() {
-    const bar = document.getElementById('loading-progress-bar');
-    try {
-        window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
-            progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } }
-        });
-        window.enterMainApp();
-    } catch (e) { alert("AI Load Error"); }
-}
+// ==========================================
+// 🧠 动态导入 AI 模块 (完美避开浏览器语法冲突)
+// ==========================================
+window.whisperPipeline = null;
 
-window.toggleRecord = async function() {
-    if (appState === 'LISTENING') { if (window.mediaRecorder) window.mediaRecorder.stop(); return; }
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        playSfx('record');
-        window.mediaRecorder = new MediaRecorder(stream); let chunks = [];
-        window.mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-        window.mediaRecorder.onstop = async () => {
-            setAppState('PROCESSING');
-            const blob = new Blob(chunks, { type: 'audio/webm' });
-            const buf = await blob.arrayBuffer();
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-            const decoded = await audioCtx.decodeAudioData(buf);
-            const result = await window.whisperPipeline(decoded.getChannelData(0), { language: state.path==='en'?'english':'chinese', task: 'transcribe' });
-            window.processAndScore(result.text || "");
-        };
-        window.mediaRecorder.start(); setAppState('LISTENING');
-    } catch (e) { setAppState('READY'); }
-}
+// 使用动态 import()，不需要修改 HTML 里的 <script> 标签！
+import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1').then(({ pipeline, env }) => {
+    env.allowLocalModels = false;
+    
+    window.initWhisper = async function() {
+        const bar = document.getElementById('loading-progress-bar');
+        try {
+            window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
+                progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } }
+            });
+            window.enterMainApp();
+        } catch (e) { alert("AI 引擎唤醒失败"); }
+    }
+
+    window.toggleRecord = async function() {
+        if (appState === 'LISTENING') { if (window.mediaRecorder) window.mediaRecorder.stop(); return; }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            window.playSfx('record');
+            window.mediaRecorder = new MediaRecorder(stream); let chunks = [];
+            window.mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            window.mediaRecorder.onstop = async () => {
+                setAppState('PROCESSING');
+                const blob = new Blob(chunks, { type: 'audio/webm' });
+                const buf = await blob.arrayBuffer();
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                const decoded = await audioCtx.decodeAudioData(buf);
+                const result = await window.whisperPipeline(decoded.getChannelData(0), { language: state.path==='en'?'english':'chinese', task: 'transcribe' });
+                window.processAndScore(result.text || "");
+            };
+            window.mediaRecorder.start(); setAppState('LISTENING');
+        } catch (e) { setAppState('READY'); }
+    }
+}).catch(err => {
+    console.error("AI 下载被网络拦截:", err);
+});
