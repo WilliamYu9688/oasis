@@ -34,7 +34,7 @@ function generateUUID() {
 }
 
 // ==========================================
-// 🎙️ TTS 引擎 (Vercel 直连 + 严格参数校验版)
+// 🎙️ TTS 引擎 (完美对接火山引擎真实音色版)
 // ==========================================
 window.playAudio = async () => {
     window.playSfx('click');
@@ -48,7 +48,6 @@ window.playAudio = async () => {
     btn.disabled = true;
 
     try {
-        // 关键点：Bearer; 后面绝不能有空格，APPID 必须转为字符串
         const response = await fetch("/api/tts", {
             method: "POST",
             headers: { 
@@ -58,9 +57,9 @@ window.playAudio = async () => {
             body: JSON.stringify({
                 app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
                 user: { uid: currentUser?.id || "oasis_tester" },
-                // 采用最通用的基础音色，确保 3001 报错不再出现
+                // 🚨 核心修复：填入您后台真实的音色代号！
                 audio: { 
-                    voice_type: isEn ? 'en_male_narration' : 'zh_male_xiaoming', 
+                    voice_type: isEn ? 'BV001_streaming' : 'BV002_streaming', 
                     encoding: "mp3", 
                     speed_ratio: 0.9 
                 },
