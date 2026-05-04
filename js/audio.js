@@ -2,8 +2,6 @@
 // 🎵 原生 Web Audio 音效引擎
 // ==========================================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-// 强制绑定到全局，确保 app.js 绝对能调到它
 window.playSfx = function(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
@@ -26,8 +24,16 @@ window.playSfx = function(type) {
     }
 };
 
+// 生成严谨的 UUID (满足火山引擎格式强校验)
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 // ==========================================
-// 🎙️ TTS 引擎 (Netlify 直连探针版)
+// 🎙️ TTS 引擎 (Vercel 直连合规版)
 // ==========================================
 window.playAudio = async () => {
     window.playSfx('click');
@@ -43,16 +49,22 @@ window.playAudio = async () => {
     try {
         const response = await fetch("/api/tts", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer;${VOLC_TOKEN}` },
+            headers: { 
+                "Content-Type": "application/json", 
+                // 火山引擎官方规范：Bearer; 后面必须加一个空格
+                "Authorization": `Bearer; ${VOLC_TOKEN}` 
+            },
             body: JSON.stringify({
                 app: { appid: VOLC_APPID, token: VOLC_TOKEN, cluster: "volcano_tts" },
                 user: { uid: currentUser?.id || "oasis_tester" },
                 audio: { voice_type: isEn ? 'en_male_adam' : 'zh_male_sunfeiyu', encoding: "mp3", speed_ratio: 0.9 },
-                request: { reqid: "req_" + Date.now(), text: text, text_type: "plain", operation: "query" }
+                // 恢复标准的 UUID，满足 400 参数校验
+                request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
             })
         });
         
-        if (!response.ok) throw new Error(`Netlify代理层断联 (状态码: ${response.status})`);
+        if (!response.ok) throw new Error(`Vercel 代理层报错 (状态码: ${response.status})`);
+        
         const result = await response.json();
         if (result.code !== 3000) throw new Error(`火山引擎拒绝访问: ${result.message}`);
         
@@ -62,7 +74,7 @@ window.playAudio = async () => {
         audio.play();
 
     } catch (err) {
-        alert("发音诊断报告:\n\n" + err.message + "\n\n(提示：请确保已上传 netlify.toml 并在线上环境测试)");
+        alert("系统诊断报告:\n\n" + err.message);
         btn.innerHTML = originalContent; btn.disabled = false;
         const u = new SpeechSynthesisUtterance(text); u.lang = isEn ? 'en-US' : 'zh-CN'; 
         u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
@@ -120,11 +132,10 @@ window.processAndScore = async function(txt) {
 };
 
 // ==========================================
-// 🧠 动态导入 AI 模块 (完美避开浏览器语法冲突)
+// 🧠 动态导入 AI 模块
 // ==========================================
 window.whisperPipeline = null;
 
-// 使用动态 import()，不需要修改 HTML 里的 <script> 标签！
 import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1').then(({ pipeline, env }) => {
     env.allowLocalModels = false;
     
