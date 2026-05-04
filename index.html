@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V43 - 终极体验归位版</title>
+    <title>Oasis Bridge V44 - 终极无损体验版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -41,7 +41,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V43</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V44</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -218,7 +218,7 @@
     </script>
 
     <script>
-        // 【已硬编码：您的真实 Supabase 秘钥】
+        // 【已完全锁定：真实 Supabase 秘钥】
         let oasisCloud = null;
         try {
             const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
@@ -236,25 +236,25 @@
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v43_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v43_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v43_boost') || '{}'),
-            adLimit: localStorage.getItem('ob_v43_adlim') !== null ? parseInt(localStorage.getItem('ob_v43_adlim')) : 6,
+            scores: JSON.parse(localStorage.getItem('ob_v44_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v44_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v44_boost') || '{}'),
+            adLimit: localStorage.getItem('ob_v44_adlim') !== null ? parseInt(localStorage.getItem('ob_v44_adlim')) : 6,
             dbLevel: 1, cloudBalance: 0.00
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false;
 
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v43_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v43_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v44_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v44_refreshtime', now); saveData(); }
         }
 
         function saveData() {
-            localStorage.setItem('ob_v43_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v43_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v43_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v43_adlim', state.adLimit);
+            localStorage.setItem('ob_v44_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v44_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v44_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v44_adlim', state.adLimit);
         }
 
         window.toggleAuthMode = function() {
@@ -346,10 +346,9 @@
         }
 
         // ==========================================
-        // 🎙️ TTS 引擎：火山大模型 (首选) + 猎犬隐藏音色 (完美备胎)
+        // 🎙️ TTS 引擎：已锁定真实秘钥 + 豆包大模型逼真人声
         // ==========================================
         window.playAudio = async () => {
-            // 【已硬编码：您的真实火山引擎秘钥】
             const VOLC_APPID = '1093118246'; 
             const VOLC_TOKEN = 'RbveOFk3QKz41ne4lK6pltCm80cPp-NU'; 
             
@@ -370,22 +369,18 @@
                         app: { 
                             appid: VOLC_APPID, 
                             token: VOLC_TOKEN, 
-                            // 【升级】：强制调用 volcano_tts_large 大模型，逼真人声
-                            cluster: "volcano_tts_large" 
+                            cluster: "volcano_tts_large" // 强制调用大模型
                         },
                         user: { uid: currentUser?.id || "oasis_tester" },
                         audio: { 
-                            // 【升级】：使用具有情绪起伏的口语化发音人
-                            voice_type: isEn ? 'en_male_conversation' : 'zh_male_xiaoming', 
+                            voice_type: isEn ? 'en_male_conversation' : 'zh_male_xiaoming', // 自然口语发音人
                             encoding: "mp3", 
-                            // 【升级】：语速降至 0.9，告别机械感，适合听力
-                            speed_ratio: 0.9 
+                            speed_ratio: 0.9 // 语速调优
                         },
                         request: { reqid: crypto.randomUUID(), text: text, text_type: "plain", operation: "query" }
                     })
                 });
                 const result = await response.json();
-                // 只要不是 3000，立刻抛出错误，触发完美备胎
                 if (result.code !== 3000) throw new Error(result.message);
                 
                 const audio = new Audio("data:audio/mp3;base64," + result.data);
@@ -395,20 +390,14 @@
 
             } catch (err) {
                 console.warn("大模型发音波动，切换隐藏高级音色...", err);
-                
-                // 【完美备胎】：如果火山引擎失败，绝不用廉价机器音，自动翻找手机里的高级语音包
                 const u = new SpeechSynthesisUtterance(text); 
-                u.lang = isEn ? 'en-US' : 'zh-CN';
-                u.rate = 0.9;
-                
+                u.lang = isEn ? 'en-US' : 'zh-CN'; u.rate = 0.9;
                 const voices = window.speechSynthesis.getVoices();
                 if (voices.length > 0) {
-                    let bestVoice = voices.find(v => v.lang.includes(u.lang) && 
-                        (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
+                    let bestVoice = voices.find(v => v.lang.includes(u.lang) && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
                     if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(u.lang)); 
                     if (bestVoice) u.voice = bestVoice;
                 }
-                
                 u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
                 u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
                 window.speechSynthesis.speak(u);
@@ -464,7 +453,11 @@
             window.watchAd('boost');
         }
 
+        // 【已彻底修复：点击广告后立刻关闭所有遮挡弹窗】
         window.watchAd = (type) => {
+            window.closeModal('rescue-modal'); 
+            window.closeModal('exit-modal');
+            
             window.AdManager.showAd(() => {
                 if (type === 'time') { 
                     state.currentTime += 5; updateTopBar(); 
@@ -478,7 +471,7 @@
             }, () => setAppState('READY'));
         }
 
-        // 【已修复：完美还原您设计的补时长广告逻辑】
+        // 【已完全锁定：保留退出时的看广告加时长逻辑】
         window.promptExit = () => {
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
