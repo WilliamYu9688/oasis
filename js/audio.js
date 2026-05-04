@@ -33,7 +33,7 @@ function generateUUID() {
 }
 
 // ==========================================
-// 🎙️ TTS 引擎 (完美读取 config.js 全局真秘钥)
+// 🎙️ TTS 引擎 (Vercel 直连·严谨参数版)
 // ==========================================
 window.playAudio = async () => {
     window.playSfx('click');
@@ -47,15 +47,19 @@ window.playAudio = async () => {
     btn.disabled = true;
 
     try {
-        // 注意：这里已经删除了写死的常量，直接调用 config.js 里的 VOLC_APPID 和 VOLC_TOKEN
+        // 🚨 核心修复 1：彻底干掉空格，严格贴合火山网关标准
+        const authHeader = `Bearer;${VOLC_TOKEN}`;
+        // 🚨 核心修复 2：强制将 APPID 转换为字符串，防止纯数字引发类型拦截
+        const appIdStr = String(VOLC_APPID);
+        
         const response = await fetch("/api/tts", {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json", 
-                "Authorization": `Bearer;${VOLC_TOKEN}` 
+                "Authorization": authHeader 
             },
             body: JSON.stringify({
-                app: { appid: VOLC_APPID, token: VOLC_TOKEN, cluster: "volcano_tts" },
+                app: { appid: appIdStr, token: VOLC_TOKEN, cluster: "volcano_tts" },
                 user: { uid: currentUser?.id || "oasis_tester" },
                 audio: { voice_type: isEn ? 'en_male_adam' : 'zh_male_sunfeiyu', encoding: "mp3", speed_ratio: 0.9 },
                 request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
@@ -63,7 +67,9 @@ window.playAudio = async () => {
         });
         
         if (!response.ok) {
-            throw new Error(`请求被拦截 (状态码: ${response.status})。请检查 js/config.js 里的火山引擎秘钥是否正确或欠费！`);
+            // 🚨 核心修复 3：如果再报 403，直接把火山引擎底层的原始嫌弃理由打印出来，不再猜哑谜
+            const errText = await response.text();
+            throw new Error(`代理层拦截 (状态码: ${response.status})。\n底层反馈: ${errText}`);
         }
         
         const result = await response.json();
