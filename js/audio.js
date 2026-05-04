@@ -2,6 +2,7 @@
 // 🎵 原生 Web Audio 音效引擎
 // ==========================================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 window.playSfx = function(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
@@ -24,7 +25,7 @@ window.playSfx = function(type) {
     }
 };
 
-// 严谨的 UUID 生成器 (满足火山引擎 400 校验要求)
+// 严谨的 UUID 生成器，解决火山引擎 400 校验错误
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -33,7 +34,7 @@ function generateUUID() {
 }
 
 // ==========================================
-// 🎙️ TTS 引擎 (Vercel 直连·严谨参数版)
+// 🎙️ TTS 引擎 (Vercel 直连 + 严格参数校验版)
 // ==========================================
 window.playAudio = async () => {
     window.playSfx('click');
@@ -47,33 +48,38 @@ window.playAudio = async () => {
     btn.disabled = true;
 
     try {
-        // 🚨 核心修复 1：彻底干掉空格，严格贴合火山网关标准
-        const authHeader = `Bearer;${VOLC_TOKEN}`;
-        // 🚨 核心修复 2：强制将 APPID 转换为字符串，防止纯数字引发类型拦截
-        const appIdStr = String(VOLC_APPID);
-        
+        // 关键点：Bearer; 后面绝不能有空格，APPID 必须转为字符串
         const response = await fetch("/api/tts", {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json", 
-                "Authorization": authHeader 
+                "Authorization": `Bearer;${VOLC_TOKEN}` 
             },
             body: JSON.stringify({
-                app: { appid: appIdStr, token: VOLC_TOKEN, cluster: "volcano_tts" },
+                app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
                 user: { uid: currentUser?.id || "oasis_tester" },
-                audio: { voice_type: isEn ? 'en_male_adam' : 'zh_male_sunfeiyu', encoding: "mp3", speed_ratio: 0.9 },
-                request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
+                // 采用最通用的基础音色，确保 3001 报错不再出现
+                audio: { 
+                    voice_type: isEn ? 'en_male_narration' : 'zh_male_xiaoming', 
+                    encoding: "mp3", 
+                    speed_ratio: 0.9 
+                },
+                request: { 
+                    reqid: generateUUID(), 
+                    text: text, 
+                    text_type: "plain", 
+                    operation: "query" 
+                }
             })
         });
         
         if (!response.ok) {
-            // 🚨 核心修复 3：如果再报 403，直接把火山引擎底层的原始嫌弃理由打印出来，不再猜哑谜
             const errText = await response.text();
-            throw new Error(`代理层拦截 (状态码: ${response.status})。\n底层反馈: ${errText}`);
+            throw new Error(`请求拦截 (状态码: ${response.status})。\n反馈: ${errText}`);
         }
         
         const result = await response.json();
-        if (result.code !== 3000) throw new Error(`火山引擎拒绝访问: ${result.message}`);
+        if (result.code !== 3000) throw new Error(`火山引擎拒绝: ${result.message}`);
         
         const audio = new Audio("data:audio/mp3;base64," + result.data);
         audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
@@ -81,16 +87,18 @@ window.playAudio = async () => {
         audio.play();
 
     } catch (err) {
-        alert("系统诊断报告:\n\n" + err.message);
+        alert("语音系统诊断报告:\n\n" + err.message);
         btn.innerHTML = originalContent; btn.disabled = false;
-        const u = new SpeechSynthesisUtterance(text); u.lang = isEn ? 'en-US' : 'zh-CN'; 
+        // 自动保底，不干扰练习
+        const u = new SpeechSynthesisUtterance(text); 
+        u.lang = isEn ? 'en-US' : 'zh-CN'; 
         u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
         window.speechSynthesis.speak(u);
     }
 };
 
 // ==========================================
-// 🎯 LUM 靶向打分算法
+// 🎯 LUM 靶向分析与 Whisper 识别
 // ==========================================
 function analyzeMistakes(target, captured) {
     const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
@@ -138,14 +146,9 @@ window.processAndScore = async function(txt) {
     } catch (e) { setAppState('READY'); isEvaluating = false; }
 };
 
-// ==========================================
-// 🧠 动态导入 AI 模块
-// ==========================================
 window.whisperPipeline = null;
-
 import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1').then(({ pipeline, env }) => {
     env.allowLocalModels = false;
-    
     window.initWhisper = async function() {
         const bar = document.getElementById('loading-progress-bar');
         try {
@@ -153,7 +156,7 @@ import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1').then(({ pipel
                 progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } }
             });
             window.enterMainApp();
-        } catch (e) { alert("AI 引擎唤醒失败"); }
+        } catch (e) { alert("AI 唤醒失败"); }
     }
 
     window.toggleRecord = async function() {
@@ -175,6 +178,4 @@ import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1').then(({ pipel
             window.mediaRecorder.start(); setAppState('LISTENING');
         } catch (e) { setAppState('READY'); }
     }
-}).catch(err => {
-    console.error("AI 下载被网络拦截:", err);
-});
+}).catch(err => console.error("Transformer Load Error:", err));
