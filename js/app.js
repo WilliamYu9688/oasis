@@ -1,4 +1,80 @@
 // ==========================================
+// 🔐 登录与鉴权逻辑 (之前漏搬的模块)
+// ==========================================
+window.toggleAuthMode = function() {
+    playSfx('click');
+    const container = document.getElementById('confirm-password-container');
+    const isReg = document.getElementById('auth-title').innerText === "System Login";
+    if (isReg) { 
+        container.style.maxHeight = "100px"; container.style.opacity = "1"; 
+        document.getElementById('auth-title').innerText = "Create Account"; 
+        document.getElementById('auth-action-btn').innerText = "Register & Enter"; 
+    } else { 
+        container.style.maxHeight = "0"; container.style.opacity = "0"; 
+        document.getElementById('auth-title').innerText = "System Login"; 
+        document.getElementById('auth-action-btn').innerText = "Secure Access"; 
+    }
+}
+
+window.executeAuth = async function() {
+    const email = document.getElementById('email').value.trim(); 
+    const password = document.getElementById('password').value.trim();
+    const btn = document.getElementById('auth-action-btn'); 
+    btn.disabled = true; btn.innerText = "AUTHENTICATING...";
+    try {
+        const isReg = document.getElementById('auth-title').innerText === "Create Account";
+        const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentUser = data.user;
+        const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+        if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
+        state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
+        document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+        document.getElementById('auth-screen').classList.add('hidden-screen'); 
+        document.getElementById('step-1').classList.remove('hidden-screen');
+        playSfx('success');
+    } catch (err) { 
+        document.getElementById('auth-msg').innerText = "❌ " + err.message; 
+    } finally { 
+        btn.disabled = false; 
+        btn.innerText = document.getElementById('auth-title').innerText === "Create Account" ? "Register & Enter" : "Secure Access"; 
+    }
+}
+
+// ==========================================
+// 📺 广告管理器 (之前漏搬的模块)
+// ==========================================
+window.AdManager = {
+    adUnitId: 'ca-app-pub-5083945196856634/5740020253',
+    isNativeAdMob: false, isAdLoaded: false,
+    init: async function() {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
+            this.isNativeAdMob = true;
+            try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
+        }
+    },
+    loadAd: async function() {
+        if (!this.isNativeAdMob) return;
+        try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
+    },
+    showAd: async function(onSuccess, onCancel) {
+        if (this.isNativeAdMob) {
+            if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
+            const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
+            AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
+            AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
+            await AdMob.showRewardVideoAd();
+        } else {
+            const adUI = document.getElementById('web-ad-overlay');
+            adUI.style.display = 'flex';
+            document.getElementById('close-ad-btn').onclick = () => { adUI.style.display = 'none'; onSuccess(); };
+        }
+    }
+};
+document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
+
+// ... （下方保留您 js/app.js 原有的 function hideAll() 等代码不动）
+// ==========================================
 // 📺 弹窗控制与全局状态
 // ==========================================
 function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
