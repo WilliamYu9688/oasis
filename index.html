@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V42 - 企业级高清语音版</title>
+    <title>Oasis Bridge V43 - 终极体验归位版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="icon.svg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
         * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -41,7 +41,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V42</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V43</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -180,7 +180,9 @@
     </div>
 
     <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400 drop-shadow-md">Financial Center</h3><p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20 relative shadow-inner"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white outline-none"><option value="Payoneer">Payoneer Account</option><option value="Bank">UAE Local Bank</option></select><input id="payout-account" type="text" placeholder="Account ID / IBAN" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" id="withdraw-btn" class="px-6 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-xl text-white font-black text-xs active:scale-95">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div><hr class="border-white/5"><div class="space-y-3"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Virtual Upgrades</h4><div class="bg-gray-800/40 p-4 rounded-[20px] border border-white/5 relative"><h4 class="text-base font-bold text-white mb-1">LUM 错题透视仪</h4><button onclick="window.buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs mt-2 uppercase tracking-widest">50 AED Unlock</button></div></div></div></div></div>
+    
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
+    
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 active:scale-95 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
     <div id="history-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('history-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[80dvh]"><div class="flex justify-between items-center mb-4 shrink-0"><div><h3 class="text-2xl font-black text-blue-400 drop-shadow-md">Practice Log</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Session History</p></div><button onclick="window.closeModal('history-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div id="history-list" class="flex-grow overflow-y-auto space-y-2.5 no-scrollbar pb-4"></div></div></div>
 
@@ -216,7 +218,7 @@
     </script>
 
     <script>
-        // 核心配置区
+        // 【已硬编码：您的真实 Supabase 秘钥】
         let oasisCloud = null;
         try {
             const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
@@ -234,25 +236,25 @@
         
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v42_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v42_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v42_boost') || '{}'),
-            adLimit: localStorage.getItem('ob_v42_adlim') !== null ? parseInt(localStorage.getItem('ob_v42_adlim')) : 6,
+            scores: JSON.parse(localStorage.getItem('ob_v43_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v43_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v43_boost') || '{}'),
+            adLimit: localStorage.getItem('ob_v43_adlim') !== null ? parseInt(localStorage.getItem('ob_v43_adlim')) : 6,
             dbLevel: 1, cloudBalance: 0.00
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false;
 
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v42_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v42_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v43_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v43_refreshtime', now); saveData(); }
         }
 
         function saveData() {
-            localStorage.setItem('ob_v42_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v42_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v42_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v42_adlim', state.adLimit);
+            localStorage.setItem('ob_v43_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v43_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v43_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v43_adlim', state.adLimit);
         }
 
         window.toggleAuthMode = function() {
@@ -343,11 +345,16 @@
             }
         }
 
-        // 火山引擎 TTS 核心函数 (已填入您的真实钥匙)
+        // ==========================================
+        // 🎙️ TTS 引擎：火山大模型 (首选) + 猎犬隐藏音色 (完美备胎)
+        // ==========================================
         window.playAudio = async () => {
+            // 【已硬编码：您的真实火山引擎秘钥】
             const VOLC_APPID = '1093118246'; 
             const VOLC_TOKEN = 'RbveOFk3QKz41ne4lK6pltCm80cPp-NU'; 
+            
             const text = document.getElementById('target-text').innerText.replace(/"/g, "");
+            const isEn = state.path === 'en';
             if (!text || text === "Connecting...") return;
 
             const btn = event.currentTarget || document.querySelector('button[onclick="window.playAudio()"]');
@@ -360,19 +367,52 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer;${VOLC_TOKEN}` },
                     body: JSON.stringify({
-                        app: { appid: VOLC_APPID, token: VOLC_TOKEN, cluster: "volcano_tts" },
+                        app: { 
+                            appid: VOLC_APPID, 
+                            token: VOLC_TOKEN, 
+                            // 【升级】：强制调用 volcano_tts_large 大模型，逼真人声
+                            cluster: "volcano_tts_large" 
+                        },
                         user: { uid: currentUser?.id || "oasis_tester" },
-                        audio: { voice_type: state.path === 'en' ? 'en_male_adam' : 'zh_male_sunfeiyu', encoding: "mp3", speed_ratio: 0.95 },
+                        audio: { 
+                            // 【升级】：使用具有情绪起伏的口语化发音人
+                            voice_type: isEn ? 'en_male_conversation' : 'zh_male_xiaoming', 
+                            encoding: "mp3", 
+                            // 【升级】：语速降至 0.9，告别机械感，适合听力
+                            speed_ratio: 0.9 
+                        },
                         request: { reqid: crypto.randomUUID(), text: text, text_type: "plain", operation: "query" }
                     })
                 });
                 const result = await response.json();
+                // 只要不是 3000，立刻抛出错误，触发完美备胎
                 if (result.code !== 3000) throw new Error(result.message);
-                new Audio("data:audio/mp3;base64," + result.data).play();
+                
+                const audio = new Audio("data:audio/mp3;base64," + result.data);
+                audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                audio.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                audio.play();
+
             } catch (err) {
-                console.error("TTS Fault:", err);
-                const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u);
-            } finally { btn.innerHTML = originalContent; btn.disabled = false; }
+                console.warn("大模型发音波动，切换隐藏高级音色...", err);
+                
+                // 【完美备胎】：如果火山引擎失败，绝不用廉价机器音，自动翻找手机里的高级语音包
+                const u = new SpeechSynthesisUtterance(text); 
+                u.lang = isEn ? 'en-US' : 'zh-CN';
+                u.rate = 0.9;
+                
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    let bestVoice = voices.find(v => v.lang.includes(u.lang) && 
+                        (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
+                    if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(u.lang)); 
+                    if (bestVoice) u.voice = bestVoice;
+                }
+                
+                u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                window.speechSynthesis.speak(u);
+            }
         }
 
         // 打分算法 (85% 宽容度)
@@ -426,7 +466,9 @@
 
         window.watchAd = (type) => {
             window.AdManager.showAd(() => {
-                if (type === 'boost') { 
+                if (type === 'time') { 
+                    state.currentTime += 5; updateTopBar(); 
+                } else if (type === 'boost') { 
                     state.adLimit--; 
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                     state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
@@ -436,11 +478,15 @@
             }, () => setAppState('READY'));
         }
 
+        // 【已修复：完美还原您设计的补时长广告逻辑】
         window.promptExit = () => {
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
-            if (left <= 0) { content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 font-black">EXIT SESSION</button>`; }
-            else { content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 rounded-xl mb-2">QUIT ANYWAY</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">CONTINUE</button>`; }
+            if (left <= 0) { 
+                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><p class="text-slate-300 text-sm mb-6">Daily goal complete.</p><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black uppercase">Back to Main Menu</button>`; 
+            } else { 
+                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3 shadow-lg">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl font-black mb-3 uppercase">Quit Anyway</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">Continue Study</button>`; 
+            }
             window.openModal('exit-modal');
         }
 
