@@ -1,0 +1,12 @@
+# Netlify 跨域代理与路由配置
+[[redirects]]
+  from = "/api/tts"
+  to = "https://openspeech.bytedance.com/api/v1/tts"
+  status = 200
+  force = true
+
+# 保证 SPA (单页应用) 刷新不报 404
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
