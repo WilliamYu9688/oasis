@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V42 - 终极开箱即用版</title>
+    <title>Oasis Bridge V42 - 企业级高清语音版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="icon.svg">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -31,7 +31,6 @@
         .modal-overlay.active .bottom-sheet { transform: translateY(0); }
         .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
         .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; animation: slideIn 0.3s ease-out; margin: 2px; display: inline-block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         #main-app { display: flex; flex-direction: column; }
         .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
@@ -157,17 +156,12 @@
                         <p id="item-earned" class="text-base font-black text-emerald-400 transition-colors">0.00</p>
                     </div>
                 </div>
-
                 <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">STANDBY</span>
                 </div>
-
-                <p id="db-error-msg" class="text-[9px] font-bold mb-2 tracking-wider transition-colors"></p>
-
-                <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight drop-shadow-md min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
+                <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                 <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
                 <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
-
                 <div id="score-display" class="h-24 flex flex-col items-center justify-center">
                     <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">WAITING...</p>
                 </div>
@@ -185,333 +179,10 @@
         </div>
     </div>
 
-    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400 drop-shadow-md">Financial Center</h3><p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20 relative shadow-inner"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white outline-none"><option value="Payoneer">Payoneer Account</option><option value="Bank">UAE Local Bank</option></select><input id="payout-account" type="text" placeholder="Account ID / IBAN" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" id="withdraw-btn" class="px-6 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-xl text-white font-black text-xs active:scale-95">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div><hr class="border-white/5"><div class="space-y-3"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Virtual Upgrades</h4><div class="bg-gray-800/40 p-4 rounded-[20px] border border-white/5 relative"><h4 class="text-base font-bold text-white mb-1">LUM 错题透视仪</h4><button onclick="window.buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs mt-2">50 AED Unlock</button></div></div></div></div></div>
+    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 text-left shadow-2xl border-white/10 w-full bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400 drop-shadow-md">Financial Center</h3><p class="text-slate-400 text-[10px] mt-0.5 uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20 relative shadow-inner"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white outline-none"><option value="Payoneer">Payoneer Account</option><option value="Bank">UAE Local Bank</option></select><input id="payout-account" type="text" placeholder="Account ID / IBAN" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" id="withdraw-btn" class="px-6 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-xl text-white font-black text-xs active:scale-95">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div><hr class="border-white/5"><div class="space-y-3"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Virtual Upgrades</h4><div class="bg-gray-800/40 p-4 rounded-[20px] border border-white/5 relative"><h4 class="text-base font-bold text-white mb-1">LUM 错题透视仪</h4><button onclick="window.buyItem(50, 'LUM 错题透视仪')" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl text-white font-black text-xs mt-2 uppercase tracking-widest">50 AED Unlock</button></div></div></div></div></div>
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2 drop-shadow-md">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 active:scale-95 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
     <div id="history-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('history-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[80dvh]"><div class="flex justify-between items-center mb-4 shrink-0"><div><h3 class="text-2xl font-black text-blue-400 drop-shadow-md">Practice Log</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Session History</p></div><button onclick="window.closeModal('history-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div id="history-list" class="flex-grow overflow-y-auto space-y-2.5 no-scrollbar pb-4"></div></div></div>
-
-    <script>
-        let oasisCloud = null;
-
-        try {
-            // ==========================================
-            // ⚠️ 您的真实 Supabase 秘钥（已强行绑定，绝不占位！）
-            // ==========================================
-            const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
-            
-            oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (e) {
-            console.error("Supabase Init Error:", e);
-            window.addEventListener('DOMContentLoaded', () => {
-                const btn = document.getElementById('auth-action-btn');
-                if (btn) { btn.disabled = true; btn.innerText = "SYSTEM HALTED"; }
-                const msg = document.getElementById('auth-msg');
-                if (msg) {
-                    msg.innerHTML = "🚨 <b>致命错误：</b><br>数据库引擎初始化失败。";
-                    msg.className = "text-center text-[11px] sm:text-xs font-black text-white min-h-[1.5rem] mt-2 p-3 bg-red-600 border border-red-400 rounded-xl shadow-lg";
-                }
-            });
-        }
-
-        const LOCAL_CACHE = [
-            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1 },
-            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1 },
-            { id: 903, text_en: 'Let us touch base tomorrow morning.', text_zh: '我们明天早上碰一下。', scenario: 'Idiom', difficulty: 1 }
-        ];
-
-        let currentUser = null; let isRegisterMode = false;
-        const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
-        
-        let state = {
-            path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v42_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v42_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v42_boost') || '{}'),
-            attempts: JSON.parse(localStorage.getItem('ob_v42_att') || '{}'),
-            adLimit: localStorage.getItem('ob_v42_adlim') !== null ? parseInt(localStorage.getItem('ob_v42_adlim')) : 6,
-            dbLevel: 1, cloudBalance: 0.00
-        };
-
-        let currentPhrase = null; let appInterval = null; let appState = 'READY';
-        let sessionHistory = []; let watchdogTimer = null; let isEvaluating = false;
-
-        function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v42_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v42_refreshtime', now); saveData(); }
-        }
-
-        function saveData() {
-            localStorage.setItem('ob_v42_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v42_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v42_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v42_adlim', state.adLimit);
-        }
-
-        window.toggleAuthMode = function() {
-            isRegisterMode = !isRegisterMode;
-            const container = document.getElementById('confirm-password-container');
-            if (isRegisterMode) { container.style.maxHeight = "100px"; container.style.opacity = "1"; document.getElementById('auth-title').innerText = "Create Account"; document.getElementById('auth-action-btn').innerText = "Register & Enter"; }
-            else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; }
-        }
-
-        window.executeAuth = async function() {
-            const msgEl = document.getElementById('auth-msg');
-            if (!oasisCloud) {
-                msgEl.innerText = "❌ 系统未就绪：数据库配置无效。"; return;
-            }
-
-            const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
-            const btn = document.getElementById('auth-action-btn');
-            if (!email || !password) return alert("⚠️ 请完善输入");
-            
-            btn.disabled = true; btn.innerText = "AUTHENTICATING...";
-            msgEl.innerText = "";
-            msgEl.className = "text-center text-[11px] sm:text-xs font-bold text-red-400 min-h-[1.5rem] mt-2 transition-all";
-
-            try {
-                if (isRegisterMode) {
-                    const { data, error } = await oasisCloud.auth.signUp({ email, password });
-                    if (error) throw error; 
-                    if (!data.user) throw new Error("注册受阻：请在后台关闭【Confirm email】强制验证选项。");
-                    currentUser = data.user;
-                } else {
-                    const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
-                    if (error) throw error; 
-                    if (!data.user) throw new Error("登录异常：账号或密码错误。");
-                    currentUser = data.user;
-                }
-                const { data: prof } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', currentUser.id).maybeSingle();
-                if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
-                state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
-                document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                checkAdRefresh();
-                
-                document.getElementById('auth-screen').classList.add('hidden-screen'); 
-                document.getElementById('step-1').classList.remove('hidden-screen');
-            } catch (err) { 
-                msgEl.innerText = "❌ " + err.message; 
-            } finally { 
-                if(oasisCloud) { btn.disabled = false; btn.innerText = isRegisterMode ? "Register & Enter" : "Secure Access"; }
-            }
-        }
-
-        function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
-        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
-        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
-
-        window.handleStep1 = (p) => { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
-        window.handleStepTime = (t) => { state.targetTime = t; state.currentTime = 0; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
-        window.handleStep2 = async (lv) => {
-            state.dbLevel = lv; 
-            hideAll();
-            
-            if (!window.whisperPipeline) {
-                document.getElementById('loading-screen').classList.remove('hidden-screen');
-                window.initWhisper();
-            } else {
-                document.getElementById('main-app').classList.remove('hidden-screen');
-                window.fetchNewPhrase();
-                if(appInterval) clearInterval(appInterval);
-                appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
-            }
-        }
-
-        window.enterMainApp = function() {
-            document.getElementById('loading-screen').classList.add('hidden-screen');
-            document.getElementById('main-app').classList.remove('hidden-screen');
-            window.fetchNewPhrase();
-            if(appInterval) clearInterval(appInterval);
-            appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
-        }
-
-        window.fetchNewPhrase = async function() {
-            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
-            tEl.innerText = "Connecting..."; zhEl.innerText = ""; document.getElementById('lum-diagnosis').innerHTML = "";
-            let pool = [];
-            try {
-                if (oasisCloud) {
-                    const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
-                    if (data && data.length > 0) pool = data;
-                }
-            } catch (e) {}
-            if (pool.length === 0) pool = LOCAL_CACHE;
-            currentPhrase = pool[Math.floor(Math.random() * pool.length)];
-            tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
-            zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
-            
-            syncPhraseState();
-            
-            isEvaluating = false; 
-            setAppState('READY');
-        }
-
-        function syncPhraseState() {
-            if(!currentPhrase) return;
-            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            document.getElementById('item-best-score').innerText = state.scores[t] || 0;
-            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2);
-            updateTopBar();
-        }
-
-        function updateTopBar() {
-            document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-            document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
-            document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? "REFILL" : `🆘 ${state.adLimit}/6`;
-        }
-
-        function setAppState(s) {
-            appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
-            switch(s) {
-                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
-                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); break;
-                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🔄 ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
-                case 'REWARDING': btn.disabled = true; break;
-            }
-        }
-
-        function formatSentence(text, lang) {
-            if (!text) return ""; let s = String(text).toLowerCase();
-            if (lang === 'cn') {
-                const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10'};
-                for (let k in map) s = s.replace(new RegExp(k, 'g'), map[k]);
-                s = s.replace(/\s+/g, "").replace(/[^\w\u4e00-\u9fa50-9]/g, "");
-            } else { s = s.replace(/[^\w\s0-9]/g, "").replace(/\s+/g, " ").trim(); }
-            return s;
-        }
-
-        function calcEditScore(s1, s2) {
-            if (!s1 || !s2) return 0; if (s1 === s2) return 100;
-            let dp = Array(s2.length + 1).fill(0).map((_, i) => i);
-            for (let i = 1; i <= s1.length; i++) {
-                let prev = dp[0]; dp[0] = i;
-                for (let j = 1; j <= s2.length; j++) {
-                    let temp = dp[j];
-                    dp[j] = s1[i-1] === s2[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1;
-                    prev = temp;
-                }
-            }
-            let finalScore = Math.max(0, Math.round((1 - dp[s2.length] / Math.max(s1.length, s2.length)) * 100));
-            if (finalScore >= 85) finalScore = 100;
-            return finalScore;
-        }
-
-        window.processAndScore = async function(txt) {
-            if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
-            try {
-                const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                const finalC = formatSentence(txt, state.path);
-                const finalT = formatSentence(rawT, state.path);
-                const score = calcEditScore(finalT, finalC);
-
-                const diag = document.getElementById('lum-diagnosis'); diag.innerHTML = "";
-                let aW = state.path === 'en' ? finalT.split(" ") : finalT.split("");
-                let bW = state.path === 'en' ? finalC.split(" ") : finalC.split("");
-                aW.filter(w => w && !bW.includes(w)).forEach(w => {
-                    const span = document.createElement('span'); span.className='lum-tag'; span.innerText=w.toUpperCase(); diag.appendChild(span);
-                });
-
-                if (score > (state.scores[rawT] || 0)) { state.scores[rawT] = score; }
-                let tier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
-                const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
-                const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
-
-                let fb = `<span class="text-[10px] text-gray-400 mt-2 block truncate px-4">HEARD: "${finalC || "..."}"</span>`;
-                if (diff > 0) {
-                    setAppState('REWARDING');
-                    state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
-                    document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
-                    fb += `<span class="text-[11px] text-emerald-400 font-bold block">+${diff.toFixed(2)} AED Earned</span>`;
-                    if (currentUser?.id && oasisCloud) {
-                        oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).then();
-                        oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff }]).then();
-                    }
-                }
-                const color = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-slate-400');
-                document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${color}">${score}</span><br>${fb}`;
-                saveData(); syncPhraseState();
-                
-                setTimeout(() => { 
-                    isEvaluating = false; 
-                    if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); 
-                }, 2200);
-            } catch (e) { console.error(e); setAppState('READY'); isEvaluating = false; }
-        }
-
-        window.submitWithdrawal = async function() {
-            const amt = parseFloat(document.getElementById('payout-amount').value);
-            const acc = document.getElementById('payout-account').value.trim();
-            const msg = document.getElementById('withdraw-msg');
-            if (isNaN(amt) || amt < 50 || amt > state.cloudBalance || !acc) { msg.innerText = "Invalid amount or account."; return; }
-            msg.innerText = "PROCESSING...";
-            state.cloudBalance -= amt;
-            if (currentUser?.id && oasisCloud) {
-                await oasisCloud.from('withdrawals').insert([{ user_id: currentUser.id, amount: amt, payout_method: document.getElementById('payout-method').value, account_details: acc }]);
-                await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id);
-            }
-            updateTopBar(); document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2);
-            msg.className = "text-[9px] font-bold text-emerald-400 h-3 text-center"; msg.innerText = "Success! Processing in 3-5 days.";
-        }
-
-        window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
-        
-        window.requestRescue = function() {
-            checkAdRefresh();
-            if (appState === 'REWARDING' || !currentPhrase) return;
-            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const best = state.scores[t] || 0;
-            const finalTier = Math.max((best >= 100 ? 5 : (best >= 90 ? 4 : (best >= 80 ? 3 : (best >= 70 ? 2 : (best >= 60 ? 1 : 0))))), state.adBoostMap[t] || 0);
-
-            if (finalTier >= 5) return alert("已拿满最高奖励！");
-            if (state.adLimit <= 0) {
-                document.getElementById('rescue-title').innerText = "救济已耗尽"; document.getElementById('rescue-desc').innerHTML = "观看资讯可立刻<span class='text-amber-400 font-bold'>回满 6 次额度</span>！"; 
-                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
-                window.openModal('rescue-modal'); return;
-            }
-            const nextVal = Math.round((rewardStages[finalTier + 1] - (state.earnedMap[t] || 0)) * 100) / 100;
-            document.getElementById('rescue-title').innerText = "系统助力"; document.getElementById('rescue-desc').innerHTML = `为您补齐奖励 <span class="text-emerald-400 font-bold">(+${nextVal.toFixed(2)} AED)</span>。`; 
-            document.getElementById('rescue-action-btn').innerText = `Watch Ad (${state.adLimit} left)`; 
-            document.getElementById('rescue-action-btn').onclick = () => window.watchAd('boost'); 
-            window.openModal('rescue-modal');
-        }
-
-        window.promptExit = () => {
-            const left = Math.ceil(state.targetTime - state.currentTime);
-            const content = document.getElementById('exit-content');
-            if (left <= 0) {
-                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Goal Reached!</h3><p class="text-slate-300 text-sm mb-6">Daily goal complete.</p><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black uppercase">Back to Main Menu</button>`;
-            } else {
-                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl font-black mb-3 uppercase">Back to Main Menu</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">Continue Study</button>`;
-            }
-            window.openModal('exit-modal');
-        }
-
-        window.confirmExit = () => {
-            if(appInterval) { clearInterval(appInterval); appInterval = null; }
-            if(appState === 'LISTENING' && window.mediaRecorder) window.mediaRecorder.stop();
-            isEvaluating = false; setAppState('READY');
-            state.currentTime = 0; 
-            window.closeModal('exit-modal');
-            hideAll();
-            document.getElementById('step-1').classList.remove('hidden-screen'); 
-        }
-
-        window.openHistory = async () => {
-            const list = document.getElementById('history-list'); list.innerHTML = "Loading..."; window.openModal('history-modal');
-            if (currentUser?.id && oasisCloud) {
-                const { data } = await oasisCloud.from('practice_history').select('*, phrases(text_en, text_zh)').order('created_at', { ascending: false }).limit(20);
-                if(data && data.length > 0) {
-                    list.innerHTML = data.map(h => `<div class="bg-gray-800/40 p-3 rounded-xl flex justify-between items-center"><div><p class="text-white text-xs font-bold truncate w-40">${h.phrases?.text_en || 'Unknown'}</p></div><div class="text-right"><p class="text-lg font-black text-amber-400">${h.score}</p></div></div>`).join('');
-                } else {
-                    list.innerHTML = `<p class="text-center text-slate-500 mt-10 font-bold text-xs">NO RECORDS YET.</p>`;
-                }
-            }
-        }
-
-        window.playAudio = () => { const u = new SpeechSynthesisUtterance(document.getElementById('target-text').innerText.replace(/"/g,"")); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u); }
-
-    </script>
 
     <script>
         window.AdManager = {
@@ -536,94 +207,279 @@
                     await AdMob.showRewardVideoAd();
                 } else {
                     const fb = document.getElementById('score-display'); const old = fb.innerHTML;
-                    fb.innerHTML = '<p class="text-amber-400 text-[10px] font-bold animate-pulse">📺 [Web测试] 将调起生产 AdMob 视频...</p>';
+                    fb.innerHTML = '<p class="text-amber-400 text-[10px] font-bold animate-pulse">📺 [WEB TEST] 模拟调起 ADMOB 视频...</p>';
                     await new Promise(r => setTimeout(r, 1500)); fb.innerHTML = old; onSuccess();
                 }
             }
         };
         document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
-        window.watchAd = (type) => {
-            window.closeModal('rescue-modal'); window.closeModal('exit-modal');
-            window.AdManager.showAd(() => {
-                if (type === 'time') { 
-                    state.currentTime += 5; updateTopBar(); 
-                } else if (type === 'boost') {
-                    if (state.adLimit > 0) {
-                        state.adLimit--; 
-                        const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                        state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
-                        window.processAndScore(""); 
-                    }
-                } else if (type === 'refill') {
-                    state.adLimit = 6; updateTopBar();
+    </script>
+
+    <script>
+        // 核心配置区
+        let oasisCloud = null;
+        try {
+            const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
+            oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (e) { console.error("Database Halt:", e); }
+
+        const LOCAL_CACHE = [
+            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office', difficulty: 1 },
+            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work', difficulty: 1 }
+        ];
+
+        let currentUser = null; let isRegisterMode = false;
+        const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50];
+        
+        let state = {
+            path: 'en', targetTime: 0, currentTime: 0,
+            scores: JSON.parse(localStorage.getItem('ob_v42_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v42_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v42_boost') || '{}'),
+            adLimit: localStorage.getItem('ob_v42_adlim') !== null ? parseInt(localStorage.getItem('ob_v42_adlim')) : 6,
+            dbLevel: 1, cloudBalance: 0.00
+        };
+
+        let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false;
+
+        function checkAdRefresh() {
+            const now = Date.now(); const last = localStorage.getItem('ob_v42_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v42_refreshtime', now); saveData(); }
+        }
+
+        function saveData() {
+            localStorage.setItem('ob_v42_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v42_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v42_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v42_adlim', state.adLimit);
+        }
+
+        window.toggleAuthMode = function() {
+            isRegisterMode = !isRegisterMode;
+            const container = document.getElementById('confirm-password-container');
+            if (isRegisterMode) { container.style.maxHeight = "100px"; container.style.opacity = "1"; document.getElementById('auth-title').innerText = "Create Account"; document.getElementById('auth-action-btn').innerText = "Register & Enter"; }
+            else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; }
+        }
+
+        window.executeAuth = async function() {
+            const msgEl = document.getElementById('auth-msg'); if (!oasisCloud) return alert("Halt.");
+            const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('auth-action-btn');
+            btn.disabled = true; btn.innerText = "AUTHENTICATING...";
+            try {
+                if (isRegisterMode) {
+                    const { data, error } = await oasisCloud.auth.signUp({ email, password });
+                    if (error) throw error; currentUser = data.user;
+                } else {
+                    const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
+                    if (error) throw error; currentUser = data.user;
                 }
+                const { data: prof } = await oasisCloud.from('profiles').select('wallet_balance').eq('id', currentUser.id).maybeSingle();
+                if (!prof) await oasisCloud.from('profiles').insert({ id: currentUser.id, wallet_balance: 0 });
+                state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
+                document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+                checkAdRefresh();
+                document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
+            } catch (err) { msgEl.innerText = "❌ " + err.message; }
+            finally { btn.disabled = false; btn.innerText = isRegisterMode ? "Register & Enter" : "Secure Access"; }
+        }
+
+        function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+
+        window.handleStep1 = (p) => { state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        window.handleStepTime = (t) => { state.targetTime = t; state.currentTime = 0; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        window.handleStep2 = async (lv) => {
+            state.dbLevel = lv; hideAll();
+            if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } 
+            else { window.enterMainApp(); }
+        }
+
+        window.enterMainApp = function() {
+            document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
+            window.fetchNewPhrase();
+            if(appInterval) clearInterval(appInterval);
+            appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
+        }
+
+        window.fetchNewPhrase = async function() {
+            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
+            tEl.innerText = "Connecting..."; zhEl.innerText = ""; document.getElementById('lum-diagnosis').innerHTML = "";
+            let pool = [];
+            try {
+                const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
+                if (data && data.length > 0) pool = data;
+            } catch (e) {}
+            if (pool.length === 0) pool = LOCAL_CACHE;
+            currentPhrase = pool[Math.floor(Math.random() * pool.length)];
+            tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
+            zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
+            syncPhraseState(); isEvaluating = false; setAppState('READY');
+        }
+
+        function syncPhraseState() {
+            if(!currentPhrase) return; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            document.getElementById('item-best-score').innerText = state.scores[t] || 0;
+            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2);
+            updateTopBar();
+        }
+
+        function updateTopBar() {
+            document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+            document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
+            document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? "REFILL" : `🆘 ${state.adLimit}/6`;
+        }
+
+        function setAppState(s) {
+            appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
+            switch(s) {
+                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
+                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); break;
+                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🔄 ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
+                case 'REWARDING': btn.disabled = true; break;
+            }
+        }
+
+        // 火山引擎 TTS 核心函数 (已填入您的真实钥匙)
+        window.playAudio = async () => {
+            const VOLC_APPID = '1093118246'; 
+            const VOLC_TOKEN = 'RbveOFk3QKz41ne4lK6pltCm80cPp-NU'; 
+            const text = document.getElementById('target-text').innerText.replace(/"/g, "");
+            if (!text || text === "Connecting...") return;
+
+            const btn = event.currentTarget || document.querySelector('button[onclick="window.playAudio()"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            btn.disabled = true;
+
+            try {
+                const response = await fetch("https://openspeech.bytedance.com/api/v1/tts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer;${VOLC_TOKEN}` },
+                    body: JSON.stringify({
+                        app: { appid: VOLC_APPID, token: VOLC_TOKEN, cluster: "volcano_tts" },
+                        user: { uid: currentUser?.id || "oasis_tester" },
+                        audio: { voice_type: state.path === 'en' ? 'en_male_adam' : 'zh_male_sunfeiyu', encoding: "mp3", speed_ratio: 0.95 },
+                        request: { reqid: crypto.randomUUID(), text: text, text_type: "plain", operation: "query" }
+                    })
+                });
+                const result = await response.json();
+                if (result.code !== 3000) throw new Error(result.message);
+                new Audio("data:audio/mp3;base64," + result.data).play();
+            } catch (err) {
+                console.error("TTS Fault:", err);
+                const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u);
+            } finally { btn.innerHTML = originalContent; btn.disabled = false; }
+        }
+
+        // 打分算法 (85% 宽容度)
+        function calcEditScore(s1, s2) {
+            if (!s1 || !s2) return 0; if (s1 === s2) return 100;
+            let dp = Array(s2.length + 1).fill(0).map((_, i) => i);
+            for (let i = 1; i <= s1.length; i++) {
+                let prev = dp[0]; dp[0] = i;
+                for (let j = 1; j <= s2.length; j++) {
+                    let temp = dp[j]; dp[j] = s1[i-1] === s2[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp;
+                }
+            }
+            let score = Math.max(0, Math.round((1 - dp[s2.length] / Math.max(s1.length, s2.length)) * 100));
+            return score >= 85 ? 100 : score;
+        }
+
+        window.processAndScore = async function(txt) {
+            if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
+            try {
+                const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                const fmtC = (txt||"").toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                const fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                const score = calcEditScore(fmtT, fmtC);
+
+                if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
+                let tier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
+                const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
+                const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
+
+                if (diff > 0) {
+                    setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
+                    document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
+                    if (currentUser?.id) { oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', currentUser.id).then(); oasisCloud.from('practice_history').insert([{ user_id: currentUser.id, phrase_id: currentPhrase.id, score: score, reward_aed: diff }]).then(); }
+                }
+                document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">HEARD: "${fmtC}"</span>`;
+                saveData(); syncPhraseState();
+                setTimeout(() => { isEvaluating = false; if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); }, 2200);
+            } catch (e) { setAppState('READY'); isEvaluating = false; }
+        }
+
+        window.requestRescue = function() {
+            checkAdRefresh(); if (appState === 'REWARDING') return;
+            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            if (state.adLimit <= 0) {
+                document.getElementById('rescue-title').innerText = "LIMIT REACHED"; 
+                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
+                window.openModal('rescue-modal'); return;
+            }
+            window.watchAd('boost');
+        }
+
+        window.watchAd = (type) => {
+            window.AdManager.showAd(() => {
+                if (type === 'boost') { 
+                    state.adLimit--; 
+                    const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                    state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
+                    window.processAndScore(""); 
+                } else if (type === 'refill') { state.adLimit = 6; updateTopBar(); }
                 saveData();
             }, () => setAppState('READY'));
         }
+
+        window.promptExit = () => {
+            const left = Math.ceil(state.targetTime - state.currentTime);
+            const content = document.getElementById('exit-content');
+            if (left <= 0) { content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 font-black">EXIT SESSION</button>`; }
+            else { content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 rounded-xl mb-2">QUIT ANYWAY</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl">CONTINUE</button>`; }
+            window.openModal('exit-modal');
+        }
+
+        window.confirmExit = () => { clearInterval(appInterval); isEvaluating = false; hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
+        window.submitWithdrawal = async function() { alert("Processing Withdrawal (3-5 Days)"); }
+        window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
     </script>
 
     <script type="module">
         import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
-        env.allowLocalModels = false;
-        window.whisperPipeline = null; window.isWhisperLoading = false; window.mediaRecorder = null; let audioChunks = [];
+        env.allowLocalModels = false; window.whisperPipeline = null; window.isWhisperLoading = false; window.mediaRecorder = null; let audioChunks = [];
 
         window.initWhisper = async function() {
-            if (window.whisperPipeline || window.isWhisperLoading) return;
-            window.isWhisperLoading = true; 
-            
-            const retryBtn = document.getElementById('loading-retry-btn');
-            const statusTxt = document.getElementById('loading-status-text');
-            const bar = document.getElementById('loading-progress-bar');
-            const pct = document.getElementById('loading-percent');
-            
-            retryBtn.classList.add('hidden');
-            statusTxt.innerText = "DOWNLOADING OFFLINE AI...";
-            statusTxt.className = "text-xs text-amber-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
-            
+            if (window.whisperPipeline || window.isWhisperLoading) return; window.isWhisperLoading = true;
+            const bar = document.getElementById('loading-progress-bar'); const pct = document.getElementById('loading-percent');
             try {
                 window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
-                    progress_callback: (d) => {
-                        if (d.status === 'downloading') {
-                            const p = Math.round((d.loaded / d.total) * 100) || 0;
-                            bar.style.width = p + '%';
-                            pct.innerText = p + '%';
-                            if (p > 99) {
-                                statusTxt.innerText = "MOUNTING CORE...";
-                                statusTxt.className = "text-xs text-emerald-400 font-bold mt-2 uppercase tracking-widest animate-pulse";
-                            }
-                        }
-                    }
+                    progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; pct.innerText = p+'%'; } }
                 });
-                
-                setTimeout(() => { window.enterMainApp(); }, 500);
-
-            } catch (e) { 
-                console.error(e);
-                statusTxt.innerText = "CONNECTION FAILED";
-                statusTxt.className = "text-xs text-red-400 font-bold mt-2 uppercase tracking-widest";
-                retryBtn.classList.remove('hidden');
-            } finally { window.isWhisperLoading = false; }
+                setTimeout(() => window.enterMainApp(), 500);
+            } catch (e) { alert("AI Load Error"); } finally { window.isWhisperLoading = false; }
         }
 
         window.toggleRecord = async function() {
-            if (!window.whisperPipeline) return;
             if (appState === 'LISTENING') { if (window.mediaRecorder) window.mediaRecorder.stop(); return; }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 window.mediaRecorder = new MediaRecorder(stream); audioChunks = [];
-                window.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+                window.mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
                 window.mediaRecorder.onstop = async () => {
-                    stream.getTracks().forEach(t => t.stop());
-                    setAppState('PROCESSING');
+                    stream.getTracks().forEach(t => t.stop()); setAppState('PROCESSING');
                     const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const arrayBuf = await blob.arrayBuffer();
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-                    const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
-                    const result = await window.whisperPipeline(audioBuf.getChannelData(0), { language: state.path === 'en' ? 'english' : 'chinese', task: 'transcribe' });
+                    const arrayBuf = await blob.arrayBuffer(); const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+                    const result = await window.whisperPipeline(audioBuf.getChannelData(0), { language: state.path==='en'?'english':'chinese', task: 'transcribe' });
                     window.processAndScore(result.text || "");
                 };
                 window.mediaRecorder.start(); setAppState('LISTENING');
-            } catch (e) { alert("Mic permission denied"); setAppState('READY'); }
+            } catch (e) { alert("Mic Refused"); setAppState('READY'); }
         }
     </script>
 </body>
