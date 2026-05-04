@@ -29,14 +29,8 @@
             <input type="email" id="email" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-amber-500/50" placeholder="Email Address"></div>
             <div><label class="text-[10px] uppercase text-gray-500 ml-2">Access Key</label>
             <input type="password" id="password" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-amber-500/50" placeholder="Password"></div>
-            <div id="confirm-password-container" style="max-height: 0; opacity: 0; overflow: hidden; transition: 0.3s;">
-                <label class="text-[10px] uppercase text-gray-500 ml-2">Verify Key</label>
-                <input type="password" id="confirm-password" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-amber-500/50" placeholder="Repeat Password">
-            </div>
         </div>
         <button id="auth-action-btn" onclick="window.executeAuth()" class="w-full bg-amber-500 text-black font-bold p-4 rounded-xl hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20">Secure Access</button>
-        <p id="auth-msg" class="text-xs text-amber-500/80 min-h-[1em]"></p>
-        <button onclick="window.toggleAuthMode()" class="text-xs text-gray-500 hover:text-white underline">Switch between Login / Register</button>
     </div>
 
     <div id="step-1" class="hidden-screen w-full max-w-md space-y-6 text-center p-8">
@@ -93,14 +87,14 @@
         </div>
     </div>
 
-    <div id="lum-screen" class="hidden-screen fixed inset-0 z-50 glass backdrop-blur-2xl p-8 flex flex-col items-center">
-        <button onclick="window.closeLUM()" class="absolute top-6 left-6 z-50 p-2 bg-gray-800/80 rounded-full text-gray-300 hover:text-amber-400 shadow-lg shadow-black/50 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    <div id="lum-screen" class="hidden-screen fixed inset-0 z-[90] glass backdrop-blur-2xl p-8 flex flex-col items-center">
+        <button onclick="window.closeLUM()" class="absolute top-6 left-6 z-[100] p-3 bg-gray-800/90 rounded-full text-white hover:text-amber-400 shadow-2xl shadow-black transition-colors cursor-pointer border border-white/10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         </button>
 
-        <h3 class="text-xl font-bold text-white mb-8 tracking-tighter">LUM Insight Dashboard</h3>
+        <h3 class="text-xl font-bold text-white mb-8 tracking-tighter mt-4">LUM Insight Dashboard</h3>
         
-        <div id="lum-lock-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-md z-40 flex flex-col items-center justify-center p-8 text-center">
+        <div id="lum-lock-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-md z-[95] flex flex-col items-center justify-center p-8 text-center">
             <div class="p-6 bg-amber-500/10 rounded-full mb-6"><svg class="w-12 h-12 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
             <h4 class="text-2xl font-bold text-white mb-2">Targeted Insight Locked</h4>
             <p class="text-gray-400 text-sm mb-8 leading-relaxed">Pay 10 AED using your earnings to unlock real-time error tracking and performance analytics.</p>
@@ -118,15 +112,6 @@
         </div>
     </div>
 
-    <div id="loading-screen" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center space-y-8">
-        <div class="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-        <div class="space-y-2 text-center">
-            <p class="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-bold">Waking up Oasis AI</p>
-            <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden"><div id="loading-progress-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div></div>
-            <p id="loading-percent" class="text-[10px] text-gray-600">0%</p>
-        </div>
-    </div>
-
     <div id="web-ad-overlay" class="hidden fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-8 space-y-8">
         <div class="w-full max-w-sm aspect-video glass rounded-3xl flex items-center justify-center relative overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent"></div>
@@ -135,8 +120,11 @@
         <button id="close-ad-btn" class="bg-white text-black font-bold px-12 py-4 rounded-2xl active:scale-95 transition-all">Claim Reward & Exit</button>
     </div>
 
+    <div id="loading-screen" class="hidden-screen fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center space-y-8">
+        <div class="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/app.js"></script>
