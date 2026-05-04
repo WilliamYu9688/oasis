@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V45 - LUM 智慧透视版</title>
+    <title>Oasis Bridge V46 - 体验全修复版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -32,23 +32,18 @@
         .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); max-height: 90dvh; display: flex; flex-direction: column; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
         .modal-overlay.active .bottom-sheet { transform: translateY(0); }
         .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
-        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; animation: slideIn 0.3s ease-out; margin: 2px; display: inline-block; }
+        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; }
         #main-app { display: flex; flex-direction: column; }
         .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
-    <audio id="sfx-record" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
-    <audio id="sfx-success" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" preload="auto"></audio>
-
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V45</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V46</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -152,11 +147,11 @@
                 <div class="flex justify-between items-center mb-5 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
                         <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Best</p>
-                        <p id="item-best-score" class="text-base font-black text-amber-400">0</p>
+                        <p id="item-best-score" class="text-base font-black text-amber-400 transition-colors">0</p>
                     </div>
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-right">
                         <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Earned</p>
-                        <p id="item-earned" class="text-base font-black text-emerald-400">0.00</p>
+                        <p id="item-earned" class="text-base font-black text-emerald-400 transition-colors">0.00</p>
                     </div>
                 </div>
                 <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
@@ -173,8 +168,8 @@
 
         <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
-                <button id="refresh-btn" onclick="window.fetchNewPhrase()" disabled class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
-                <button id="record-btn" onclick="window.toggleRecord()" disabled class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
+                <button id="refresh-btn" onclick="window.fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+                <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                     <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
                 <button onclick="window.playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
@@ -193,67 +188,145 @@
                 <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与薄弱单词靶向分析。</p>
                 <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">50.00 AED Unlock</button>
             </div>
-            
             <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
                 <div><h3 class="text-2xl font-black text-blue-400">LUM Analytics</h3><p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Real-time Capability Mapping</p></div>
                 <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-
             <div class="flex-grow overflow-y-auto no-scrollbar space-y-8 pb-10 relative z-10">
                 <div class="glass-panel p-6 rounded-[28px] border-white/5 flex flex-col items-center">
                     <canvas id="lumRadarChart" width="300" height="300"></canvas>
                 </div>
                 <div class="space-y-4">
                     <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-2">High-Frequency Weak Points</h4>
-                    <div id="lum-weak-words" class="flex flex-wrap gap-2 px-1">
-                        </div>
+                    <div id="lum-weak-words" class="flex flex-wrap gap-2 px-1"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400">Financial Center</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white"><option value="Payoneer">Payoneer</option><option value="Bank">UAE Bank</option></select><input id="payout-account" type="text" placeholder="Account ID" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" class="px-6 bg-emerald-600 rounded-xl text-white font-black text-xs">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div></div></div></div>
+    
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
+    
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
 
+    <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white">
+        <svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2>
+        <p class="text-sm text-gray-400 mb-8">（仅用于 Web 端测试点击逻辑）</p>
+        <button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button>
+    </div>
+
     <script>
-        // 【音效播放函数】
-        function playSfx(id) {
-            const audio = document.getElementById(id);
-            if (audio) { audio.currentTime = 0; audio.play().catch(()=>{}); }
+        // ==========================================
+        // 🎵 原生 Web Audio 音效引擎 (告别延迟和链接失效)
+        // ==========================================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            
+            if (type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'success') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(1000, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'record') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(300, now);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
         }
 
-        // 【已完全锁定：真实配置，不再删改】
+        // ==========================================
+        // 📺 广告管理器 (彻底修复 Web 端卡死问题)
+        // ==========================================
+        window.AdManager = {
+            adUnitId: 'ca-app-pub-5083945196856634/5740020253',
+            isNativeAdMob: false, isAdLoaded: false,
+            init: async function() {
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
+                    this.isNativeAdMob = true;
+                    try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
+                }
+            },
+            loadAd: async function() {
+                if (!this.isNativeAdMob) return;
+                try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
+            },
+            showAd: async function(onSuccess, onCancel) {
+                if (this.isNativeAdMob) {
+                    if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
+                    const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
+                    AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
+                    AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
+                    await AdMob.showRewardVideoAd();
+                } else {
+                    // Web 端强制弹出专属遮罩，防止被后台代码打断
+                    const adUI = document.getElementById('web-ad-overlay');
+                    adUI.style.display = 'flex';
+                    document.getElementById('close-ad-btn').onclick = () => {
+                        adUI.style.display = 'none';
+                        onSuccess();
+                    };
+                }
+            }
+        };
+        document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
+
+        // ==========================================
+        // 🔐 全局状态与配置
+        // ==========================================
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         const VOLC_APPID = '1093118246'; 
         const VOLC_TOKEN = 'RbveOFk3QKz41ne4lK6pltCm80cPp-NU';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // 扩充本地题库，保证切换能看出变化
+        const LOCAL_CACHE = [
+            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office' },
+            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work' },
+            { id: 903, text_en: 'Let us discuss the strategy tomorrow.', text_zh: '我们明天讨论一下策略。', scenario: 'Meeting' },
+            { id: 904, text_en: 'Can you send me the latest report?', text_zh: '你能把最新报告发给我吗？', scenario: 'Office' },
+            { id: 905, text_en: 'The project deadline is this Friday.', text_zh: '项目截止日期是这周五。', scenario: 'Management' }
+        ];
+
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v45_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v45_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v45_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v45_missed') || '{}'),
-            lumUnlocked: localStorage.getItem('ob_v45_lum') === 'true',
-            adLimit: localStorage.getItem('ob_v45_adlim') !== null ? parseInt(localStorage.getItem('ob_v45_adlim')) : 6,
+            scores: JSON.parse(localStorage.getItem('ob_v46_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v46_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v46_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v46_missed') || '{}'),
+            lumUnlocked: localStorage.getItem('ob_v46_lum') === 'true',
+            adLimit: localStorage.getItem('ob_v46_adlim') !== null ? parseInt(localStorage.getItem('ob_v46_adlim')) : 6,
             dbLevel: 1, cloudBalance: 0.00
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
 
         function saveData() {
-            localStorage.setItem('ob_v45_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v45_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v45_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v45_adlim', state.adLimit);
-            localStorage.setItem('ob_v45_lum', state.lumUnlocked);
-            localStorage.setItem('ob_v45_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v46_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v46_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v46_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v46_adlim', state.adLimit);
+            localStorage.setItem('ob_v46_lum', state.lumUnlocked);
+            localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
+        }
+
+        function checkAdRefresh() {
+            const now = Date.now(); const last = localStorage.getItem('ob_v46_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v46_refreshtime', now); saveData(); }
         }
 
         window.toggleAuthMode = function() {
-            playSfx('sfx-click');
+            playSfx('click');
             const container = document.getElementById('confirm-password-container');
             const isReg = document.getElementById('auth-title').innerText === "System Login";
             if (isReg) { container.style.maxHeight = "100px"; container.style.opacity = "1"; document.getElementById('auth-title').innerText = "Create Account"; document.getElementById('auth-action-btn').innerText = "Register & Enter"; }
@@ -261,10 +334,8 @@
         }
 
         window.executeAuth = async function() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const btn = document.getElementById('auth-action-btn');
-            btn.disabled = true; btn.innerText = "AUTHENTICATING...";
+            const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('auth-action-btn'); btn.disabled = true; btn.innerText = "AUTHENTICATING...";
             try {
                 const isReg = document.getElementById('auth-title').innerText === "Create Account";
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
@@ -273,43 +344,43 @@
                 if (!prof) await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0 });
                 state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
                 document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                document.getElementById('auth-screen').classList.add('hidden-screen'); 
-                document.getElementById('step-1').classList.remove('hidden-screen');
-                playSfx('sfx-success');
+                document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
+                playSfx('success');
             } catch (err) { document.getElementById('auth-msg').innerText = "❌ " + err.message; }
             finally { btn.disabled = false; btn.innerText = "Secure Access"; }
         }
 
         function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
         window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
-        window.openModal = function(id) { document.getElementById(id).classList.add('active'); playSfx('sfx-click'); }
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); playSfx('click'); }
 
-        window.handleStep1 = (p) => { playSfx('sfx-click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
-        window.handleStepTime = (t) => { playSfx('sfx-click'); state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
-        window.handleStep2 = async (lv) => {
-            playSfx('sfx-click'); state.dbLevel = lv; hideAll();
-            if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } 
-            else { window.enterMainApp(); }
-        }
+        window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        window.handleStepTime = (t) => { playSfx('click'); state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
 
         window.enterMainApp = function() {
-            document.getElementById('loading-screen').classList.add('hidden-screen'); 
-            document.getElementById('main-app').classList.remove('hidden-screen');
+            document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             window.fetchNewPhrase();
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
         }
 
+        // 【已修复：彻底清空旧的打分UI，保证语料切换的视觉反馈】
         window.fetchNewPhrase = async function() {
+            playSfx('click');
             const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
             tEl.innerText = "Connecting..."; 
+            document.getElementById('lum-diagnosis').innerHTML = ""; // 强制清空上一题遗留的标签
+            
             let pool = [];
-            try {
-                const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
-                if (data && data.length > 0) pool = data;
-            } catch (e) {}
+            try { const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel); if (data && data.length > 0) pool = data; } catch (e) {}
             if (pool.length === 0) pool = LOCAL_CACHE;
-            currentPhrase = pool[Math.floor(Math.random() * pool.length)];
+            
+            // 防止抽到和上一句一样的
+            let newPhrase;
+            do { newPhrase = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
+            currentPhrase = newPhrase;
+
             tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
             zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
@@ -332,18 +403,18 @@
         function setAppState(s) {
             appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
             switch(s) {
-                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`; btn.classList.remove('recording-active'); btn.disabled = false; break;
-                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); break;
+                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
+                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); document.getElementById('refresh-btn').disabled = true; break;
                 case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🔄 ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
                 case 'REWARDING': btn.disabled = true; break;
             }
         }
 
         // ==========================================
-        // 🎙️ TTS 引擎：火山大模型 (带UI音效)
+        // 🎙️ TTS 引擎 (已撤销大模型，回归最高质量标准商业音)
         // ==========================================
         window.playAudio = async () => {
-            playSfx('sfx-click');
+            playSfx('click');
             const text = document.getElementById('target-text').innerText.replace(/"/g, "");
             if (!text || text === "Connecting...") return;
             const btn = event.currentTarget || document.querySelector('button[onclick="window.playAudio()"]');
@@ -355,18 +426,22 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer;${VOLC_TOKEN}` },
                     body: JSON.stringify({
-                        app: { appid: VOLC_APPID, token: VOLC_TOKEN, cluster: "volcano_tts_large" },
+                        app: { appid: VOLC_APPID, token: VOLC_TOKEN, cluster: "volcano_tts" }, // 强制调回标准商业版，避免无权限拦截
                         user: { uid: "oasis_tester" },
-                        audio: { voice_type: state.path === 'en' ? 'en_male_conversation' : 'zh_male_xiaoming', encoding: "mp3", speed_ratio: 0.9 },
+                        audio: { voice_type: state.path === 'en' ? 'en_male_adam' : 'zh_male_sunfeiyu', encoding: "mp3", speed_ratio: 0.9 },
                         request: { reqid: crypto.randomUUID(), text: text, text_type: "plain", operation: "query" }
                     })
                 });
                 const result = await response.json();
                 if (result.code !== 3000) throw new Error(result.message);
-                new Audio("data:audio/mp3;base64," + result.data).play();
+                const audio = new Audio("data:audio/mp3;base64," + result.data);
+                audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                audio.play();
             } catch (err) {
-                const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u);
-            } finally { btn.innerHTML = originalContent; btn.disabled = false; }
+                const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; 
+                u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                window.speechSynthesis.speak(u);
+            }
         }
 
         // ==========================================
@@ -387,7 +462,6 @@
                 const fmtC = (txt||"").toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                 const fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                 
-                // 执行靶向分析，记录错词
                 analyzeMistakes(fmtT, fmtC);
 
                 const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
@@ -408,7 +482,7 @@
                 if (diff > 0) {
                     setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
                     document.getElementById('total-earned').classList.add('money-jump');
-                    playSfx('sfx-success'); // 播放金币掉落音效
+                    playSfx('success');
                     if (oasisCloud.auth.user()) {
                         oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', oasisCloud.auth.user().id).then();
                     }
@@ -419,11 +493,8 @@
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
-        // ==========================================
-        // 👁️ LUM 智慧雷达图渲染逻辑
-        // ==========================================
         window.openLUM = () => {
-            playSfx('sfx-click');
+            playSfx('click');
             if (state.lumUnlocked) {
                 document.getElementById('lum-locked-overlay').style.display = 'none';
                 renderLUMChart(); renderWeakWords();
@@ -434,11 +505,11 @@
         }
 
         window.buyLUM = () => {
-            playSfx('sfx-click');
+            playSfx('click');
             if (state.cloudBalance >= 50) {
                 state.cloudBalance -= 50; state.lumUnlocked = true; saveData(); updateTopBar();
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0');
-                playSfx('sfx-success');
+                playSfx('success');
                 setTimeout(() => {
                     document.getElementById('lum-locked-overlay').style.display = 'none';
                     renderLUMChart(); renderWeakWords();
@@ -487,19 +558,19 @@
         }
 
         // ==========================================
-        // 🛡️ 原有退出与广告逻辑 (已被死锁保护)
+        // 📺 弹窗控制逻辑 (保证全覆盖、全释放)
         // ==========================================
         window.promptExit = () => {
-            playSfx('sfx-click');
+            playSfx('click');
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
-            if (left <= 0) { content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 font-black">EXIT</button>`; }
-            else { content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3 shadow-lg">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 rounded-xl mb-2">QUIT ANYWAY</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">CONTINUE</button>`; }
+            if (left <= 0) { content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">EXIT</button>`; }
+            else { content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3 shadow-lg">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl mb-2">QUIT ANYWAY</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">CONTINUE</button>`; }
             window.openModal('exit-modal');
         }
 
         window.requestRescue = function() {
-            playSfx('sfx-click'); checkAdRefresh(); if (appState === 'REWARDING') return;
+            playSfx('click'); checkAdRefresh(); if (appState === 'REWARDING') return;
             if (state.adLimit <= 0) {
                 document.getElementById('rescue-title').innerText = "LIMIT REACHED"; 
                 document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
@@ -509,6 +580,7 @@
         }
 
         window.watchAd = (type) => {
+            playSfx('click');
             window.closeModal('rescue-modal'); window.closeModal('exit-modal');
             window.AdManager.showAd(() => {
                 if (type === 'time') { state.currentTime += 5; updateTopBar(); }
@@ -520,11 +592,13 @@
                 }
                 else if (type === 'refill') { state.adLimit = 6; updateTopBar(); }
                 saveData();
+                playSfx('success');
             }, () => setAppState('READY'));
         }
 
         window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
+        window.submitWithdrawal = async function() { alert("Processing Withdrawal (3-5 Days)"); }
     </script>
 
     <script type="module">
@@ -543,7 +617,7 @@
             if (appState === 'LISTENING') { if (window.mediaRecorder) window.mediaRecorder.stop(); return; }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                playSfx('sfx-record'); // 触发录音提示音
+                playSfx('record');
                 window.mediaRecorder = new MediaRecorder(stream); let chunks = [];
                 window.mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
                 window.mediaRecorder.onstop = async () => {
