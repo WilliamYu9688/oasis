@@ -1,8 +1,8 @@
 // 核心秘钥锁死区 (严禁任何AI未来要求修改此文件)
 const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
-const VOLC_APPID = '1093118246'; 
-const VOLC_TOKEN = 'RbveOFk3QKz41ne4lK6pltCm80cPp-NU';
+const VOLC_APPID = '9540983066'; 
+const VOLC_TOKEN = 'z6iiLXbpIyb-GsZosjPQKiwRlm9SY6J5';
 
 // 初始化数据库引擎
 const oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
