@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/tts",
+      "destination": "https://openspeech.bytedance.com/api/v1/tts"
+    }
+  ]
+}
