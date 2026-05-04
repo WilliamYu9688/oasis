@@ -25,7 +25,6 @@ window.playSfx = function(type) {
     }
 };
 
-// 严谨的 UUID 生成器，解决火山引擎 400 校验错误
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -34,7 +33,7 @@ function generateUUID() {
 }
 
 // ==========================================
-// 🎙️ TTS 引擎 (完美对接火山引擎真实音色版)
+// 🎙️ TTS 引擎 (中英双轨分流混动版)
 // ==========================================
 window.playAudio = async () => {
     window.playSfx('click');
@@ -47,6 +46,27 @@ window.playAudio = async () => {
     btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     btn.disabled = true;
 
+    // 🚀 如果是英文环境：直接切回您喜欢的系统级原生发音！
+    if (isEn) {
+        const u = new SpeechSynthesisUtterance(text); 
+        u.lang = 'en-US';
+        u.rate = 0.9; // 稍微放慢语速，适合学习
+        
+        // 智能寻优：优先抓取设备上的高级发音人 (Premium / Siri / Google 原声)
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
+            if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('en')); 
+            if (bestVoice) u.voice = bestVoice;
+        }
+
+        u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+        u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+        window.speechSynthesis.speak(u);
+        return; // 英文播放完毕，直接退出函数，不再调用火山引擎
+    }
+
+    // 🚀 如果是中文环境：走刚刚跑通的火山引擎
     try {
         const response = await fetch("/api/tts", {
             method: "POST",
@@ -57,18 +77,8 @@ window.playAudio = async () => {
             body: JSON.stringify({
                 app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
                 user: { uid: currentUser?.id || "oasis_tester" },
-                // 🚨 核心修复：填入您后台真实的音色代号！
-                audio: { 
-                    voice_type: isEn ? 'BV001_streaming' : 'BV002_streaming', 
-                    encoding: "mp3", 
-                    speed_ratio: 0.9 
-                },
-                request: { 
-                    reqid: generateUUID(), 
-                    text: text, 
-                    text_type: "plain", 
-                    operation: "query" 
-                }
+                audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 0.9 },
+                request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
             })
         });
         
@@ -88,9 +98,8 @@ window.playAudio = async () => {
     } catch (err) {
         alert("语音系统诊断报告:\n\n" + err.message);
         btn.innerHTML = originalContent; btn.disabled = false;
-        // 自动保底，不干扰练习
-        const u = new SpeechSynthesisUtterance(text); 
-        u.lang = isEn ? 'en-US' : 'zh-CN'; 
+        // 中文火山引擎失败时的最终保底
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'zh-CN'; 
         u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
         window.speechSynthesis.speak(u);
     }
