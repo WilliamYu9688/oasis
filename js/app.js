@@ -1,24 +1,35 @@
 // ==========================================
-// 🌟 核心状态还原 (业务红线：0.5 & 10)
+// 🌟 核心状态 (严格执行 0.5 & 10 逻辑)
 // ==========================================
-window.state = { path: 'en', cloudBalance: 0.00, adChances: 6, missedWords: {}, scores: {}, adBoostMap: {}, earnedMap: {} };
+window.state = { 
+    path: 'en', 
+    cloudBalance: 0.00, 
+    adChances: 6, 
+    targetTime: 30, 
+    currentLevel: 1,
+    missedWords: {}, 
+    scores: {}, 
+    lumUnlocked: false 
+};
 window.appState = 'READY';
-window.currentUser = null;
 window.currentPhrase = { text_en: "Please forward the email to my work account", text_zh: "请把邮件转发到我的工作邮箱" };
 
-window.saveData = () => localStorage.setItem('oasis_state_v2', JSON.stringify(window.state));
+window.saveData = () => localStorage.setItem('oasis_v48_state', JSON.stringify(window.state));
 window.loadData = () => {
-    const s = localStorage.getItem('oasis_state_v2');
+    const s = localStorage.getItem('oasis_v48_state');
     if(s) window.state = {...window.state, ...JSON.parse(s)};
 };
 
 // ==========================================
-// 🔐 登录逻辑还原 (解决无法登录问题)
+// 🔐 登录逻辑 (对接 V48 ID)
 // ==========================================
 window.toggleAuthMode = function() {
-    window.playSfx('click');
     const isLogin = document.getElementById('auth-title').innerText === "System Login";
     document.getElementById('auth-title').innerText = isLogin ? "Create Account" : "System Login";
+    document.getElementById('auth-action-btn').innerText = isLogin ? "Register Now" : "Secure Access";
+    const container = document.getElementById('confirm-password-container');
+    container.style.maxHeight = isLogin ? "100px" : "0";
+    container.style.opacity = isLogin ? "1" : "0";
 };
 
 window.executeAuth = async function() {
@@ -27,9 +38,9 @@ window.executeAuth = async function() {
     const btn = document.getElementById('auth-action-btn');
     const msg = document.getElementById('auth-msg');
 
-    if (!email || !password) return alert("Please enter credentials.");
-
+    if (!email || !password) return;
     btn.disabled = true; btn.innerText = "AUTHENTICATING...";
+
     try {
         const isReg = document.getElementById('auth-title').innerText === "Create Account";
         const { data, error } = isReg 
@@ -38,67 +49,50 @@ window.executeAuth = async function() {
 
         if (error) throw error;
         
-        window.currentUser = data.user;
-        window.playSfx('success');
         document.getElementById('auth-screen').classList.add('hidden-screen');
         document.getElementById('step-1').classList.remove('hidden-screen');
+        window.playSfx('success');
     } catch (err) {
         msg.innerText = "❌ " + err.message;
     } finally {
-        btn.disabled = false; btn.innerText = "Secure Access";
+        btn.disabled = false; btn.innerText = isReg ? "Register Now" : "Secure Access";
     }
 };
 
 // ==========================================
-// 📺 收益逻辑 (0.5 AED 广告)
+// 🚶 步进逻辑 (解决“点击没反应”的核心修复)
 // ==========================================
-window.triggerAd = function() {
+window.handleStep1 = (path) => {
     window.playSfx('click');
-    if (window.state.adChances <= 0) return alert("Daily boosts exhausted.");
-    
-    const overlay = document.getElementById('web-ad-overlay');
-    overlay.style.display = 'flex';
-    document.getElementById('close-ad-btn').onclick = () => {
-        window.state.adChances -= 1;
-        window.state.cloudBalance += 0.5; // 还原 0.5 逻辑
-        document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
-        document.getElementById('ad-chances-display').innerText = window.state.adChances;
-        overlay.style.display = 'none';
-        window.saveData();
-        window.playSfx('success');
-    };
-};
-
-// ==========================================
-// 👁️ LUM 逻辑 (10 AED 解锁)
-// ==========================================
-window.unlockLUM = function() {
-    window.playSfx('click');
-    if (window.state.cloudBalance >= 10) {  
-        window.state.cloudBalance -= 10;
-        document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
-        window.saveData();
-        document.getElementById('lum-lock-overlay').style.display = 'none';
-        window.renderMockChart();
-    } else {
-        alert(`Need ${(10 - window.state.cloudBalance).toFixed(2)} AED more. Use 'Boost' or practice.`);
-    }
-};
-
-window.closeLUM = () => { window.playSfx('click'); document.getElementById('lum-screen').classList.add('hidden-screen'); };
-window.toggleLUM = () => { window.playSfx('click'); document.getElementById('lum-screen').classList.remove('hidden-screen'); };
-
-// ==========================================
-// 🚀 核心流程引导
-// ==========================================
-window.startPractice = (lang) => {
-    window.playSfx('click');
-    window.state.path = lang;
+    window.state.path = path;
     document.getElementById('step-1').classList.add('hidden-screen');
+    document.getElementById('step-time').classList.remove('hidden-screen');
+};
+
+window.handleStepTime = (minutes) => {
+    window.playSfx('click');
+    window.state.targetTime = minutes;
+    document.getElementById('step-time').classList.add('hidden-screen');
+    document.getElementById('step-2').classList.remove('hidden-screen');
+};
+
+window.handleStep2 = (level) => {
+    window.playSfx('click');
+    window.state.currentLevel = level;
+    document.getElementById('step-2').classList.add('hidden-screen');
     document.getElementById('loading-screen').classList.remove('hidden-screen');
-    // 如果 Whisper 引擎已加载，直接进；否则等 1.5s
-    if (window.initWhisper) window.initWhisper();
-    else setTimeout(window.enterMainApp, 1500);
+    
+    // 模拟加载进度，对齐 V48 loading 效果
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 5;
+        document.getElementById('loading-progress-bar').style.width = progress + '%';
+        document.getElementById('loading-percent').innerText = progress + '%';
+        if (progress >= 100) {
+            clearInterval(interval);
+            window.enterMainApp();
+        }
+    }, 50);
 };
 
 window.enterMainApp = () => {
@@ -106,41 +100,95 @@ window.enterMainApp = () => {
     document.getElementById('main-app').classList.remove('hidden-screen');
     window.loadData();
     window.fetchNewPhrase();
+    
+    // 初始 UI 赋值
     document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
-    document.getElementById('ad-chances-display').innerText = window.state.adChances !== undefined ? window.state.adChances : 6;
+    document.getElementById('ad-limit-display').innerText = `🆘 ${window.state.adChances}/6`;
+    document.getElementById('time-display').innerText = `0/${window.state.targetTime}m`;
 };
 
+// ==========================================
+// 🎙️ 录音与内容逻辑
+// ==========================================
 window.fetchNewPhrase = () => {
-    document.getElementById('target-text').innerText = window.state.path === 'en' ? window.currentPhrase.text_en : window.currentPhrase.text_zh;
-    document.getElementById('translated-text').innerText = window.state.path === 'en' ? window.currentPhrase.text_zh : window.currentPhrase.text_en;
+    const isEn = window.state.path === 'en';
+    document.getElementById('target-text').innerText = isEn ? window.currentPhrase.text_en : window.currentPhrase.text_zh;
+    document.getElementById('target-zh').innerText = isEn ? window.currentPhrase.text_zh : window.currentPhrase.text_en;
     window.setAppState('READY');
 };
 
 window.setAppState = (s) => {
     window.appState = s;
-    const b = document.getElementById('record-btn');
-    const i = document.getElementById('mic-icon');
+    const ring = document.getElementById('mic-inner-ring');
+    const status = document.getElementById('score-display');
     if (s === 'READY') {
-        b.className = "w-24 h-24 bg-white text-black rounded-full flex items-center justify-center shadow-2xl z-10";
-        i.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-20a3 3 0 00-3 3v8a3 3 0 006 0V5a3 3 0 00-3-3z"></path>';
-        document.getElementById('status-text').innerText = "TAP TO SPEAK";
+        ring.style.background = "linear-gradient(145deg, #fbbf24, #d97706)";
+        status.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`;
     } else if (s === 'LISTENING') {
-        b.className = "w-24 h-24 bg-red-500 text-white rounded-full flex items-center justify-center shadow-2xl recording-pulse z-10";
-        i.innerHTML = '<rect x="9" y="9" width="6" height="6" fill="currentColor"></rect>';
-        document.getElementById('status-text').innerText = "LISTENING...";
+        ring.style.background = "#ef4444";
+        status.innerHTML = `<p class="text-red-500 font-bold text-[10px] uppercase tracking-widest animate-pulse">LISTENING...</p>`;
     }
 };
 
-window.renderMockChart = () => {
-    const c = document.getElementById('lumChart');
-    if (c && window.Chart) {
-        new Chart(c, {
-            type: 'radar',
-            data: {
-                labels: ['Pronunciation', 'Fluency', 'Grammar', 'Vocabulary', 'Speed'],
-                datasets: [{ label: 'LUM', data: [80, 70, 90, 85, 75], backgroundColor: 'rgba(245, 158, 11, 0.2)', borderColor: '#f59e0b' }]
-            },
-            options: { scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { display: false } } }
-        });
+// ==========================================
+// 💰 商业逻辑 (0.50 & 10.00)
+// ==========================================
+window.requestRescue = () => {
+    document.getElementById('rescue-modal').classList.remove('hidden-screen');
+    document.getElementById('rescue-desc').innerText = `需要系统助力？观看赞助内容可立即获得 0.50 AED 收益。今日剩余: ${window.state.adChances} 次`;
+    document.getElementById('rescue-action-btn').onclick = window.triggerAd;
+};
+
+window.triggerAd = function() {
+    document.getElementById('rescue-modal').classList.add('hidden-screen');
+    const adOverlay = document.getElementById('web-ad-overlay');
+    adOverlay.style.display = 'flex';
+    
+    document.getElementById('close-ad-btn').onclick = () => {
+        window.state.adChances -= 1;
+        window.state.cloudBalance += 0.5;
+        document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
+        document.getElementById('ad-limit-display').innerText = `🆘 ${window.state.adChances}/6`;
+        adOverlay.style.display = 'none';
+        window.saveData();
+        window.playSfx('success');
+    };
+};
+
+window.openLUM = () => {
+    document.getElementById('lum-modal').style.display = 'flex';
+    if (window.state.lumUnlocked) {
+        document.getElementById('lum-locked-overlay').style.display = 'none';
+        window.renderRadarChart();
     }
 };
+
+window.buyLUM = () => {
+    if (window.state.cloudBalance >= 10) {
+        window.state.cloudBalance -= 10;
+        window.state.lumUnlocked = true;
+        document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
+        document.getElementById('lum-locked-overlay').style.display = 'none';
+        window.saveData();
+        window.renderRadarChart();
+    } else {
+        alert("余额不足 10.00 AED");
+    }
+};
+
+window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
+
+window.renderRadarChart = () => {
+    const ctx = document.getElementById('lumRadarChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Pronunciation', 'Fluency', 'Scenario', 'Vocabulary', 'Accuracy'],
+            datasets: [{ data: [85, 70, 90, 65, 80], backgroundColor: 'rgba(245, 158, 11, 0.2)', borderColor: '#f59e0b', pointBackgroundColor: '#fbbf24' }]
+        },
+        options: { scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } }, plugins: { legend: { display: false } } }
+    });
+};
+
+window.playSfx = (type) => { /* 这里接您的音效逻辑 */ };
