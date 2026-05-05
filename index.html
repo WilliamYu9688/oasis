@@ -213,7 +213,7 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white">
         <svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2>
-        <p class="text-sm text-gray-400 mb-8">（仅用于 Web 端测试点击逻辑）</p>
+        <p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p>
         <button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button>
     </div>
 
@@ -245,21 +245,42 @@
         }
 
         // ==========================================
-        // 📺 广告管理器 (Web端直接模拟成功)
+        // 📺 广告管理器
         // ==========================================
         window.AdManager = {
-            showAd: function(onSuccess, onCancel) {
-                const adUI = document.getElementById('web-ad-overlay');
-                adUI.style.display = 'flex';
-                document.getElementById('close-ad-btn').onclick = () => {
-                    adUI.style.display = 'none';
-                    onSuccess();
-                };
+            adUnitId: 'ca-app-pub-5083945196856634/5740020253',
+            isNativeAdMob: false, isAdLoaded: false,
+            init: async function() {
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
+                    this.isNativeAdMob = true;
+                    try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
+                }
+            },
+            loadAd: async function() {
+                if (!this.isNativeAdMob) return;
+                try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
+            },
+            showAd: async function(onSuccess, onCancel) {
+                if (this.isNativeAdMob) {
+                    if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
+                    const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
+                    AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
+                    AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
+                    await AdMob.showRewardVideoAd();
+                } else {
+                    const adUI = document.getElementById('web-ad-overlay');
+                    adUI.classList.remove('hidden'); adUI.style.display = 'flex';
+                    document.getElementById('close-ad-btn').onclick = () => {
+                        adUI.classList.add('hidden'); adUI.style.display = 'none';
+                        onSuccess();
+                    };
+                }
             }
         };
+        document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
 
         // ==========================================
-        // 🔐 全局状态与大厂秘钥
+        // 🔐 全局状态与秘钥
         // ==========================================
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
@@ -270,12 +291,10 @@
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office' },
             { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work' },
-            { id: 903, text_en: 'Let us discuss the strategy tomorrow.', text_zh: '我们明天讨论一下策略。', scenario: 'Meeting' },
-            { id: 904, text_en: 'Can you send me the latest report?', text_zh: '你能把最新报告发给我吗？', scenario: 'Office' },
-            { id: 905, text_en: 'The project deadline is this Friday.', text_zh: '项目截止日期是这周五。', scenario: 'Management' }
+            { id: 903, text_en: 'Let us discuss the strategy tomorrow.', text_zh: '我们明天讨论一下策略。', scenario: 'Meeting' }
         ];
 
-        // 🚨 绝对核心修复：阶梯返现档位 [0分, 60分, 70分, 80分, 90分, 100分]
+        // 🚨 您的神级算法：0档=0, 1档(60分)=0.30, 2档(70分)=0.35, 3档(80分)=0.40, 4档(90分)=0.45, 5档(100分)=0.50
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let state = {
@@ -300,7 +319,11 @@
             localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
         }
 
-        // 身份与路由...
+        function checkAdRefresh() {
+            const now = Date.now(); const last = localStorage.getItem('ob_v46_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v46_refreshtime', now); saveData(); }
+        }
+
         window.toggleAuthMode = function() {
             playSfx('click');
             const container = document.getElementById('confirm-password-container');
@@ -392,7 +415,7 @@
         }
 
         // ==========================================
-        // 🎙️ TTS 发音引擎：中文绝对隔离浏览器合成
+        // 🎙️ TTS 发音引擎：GitHub Pages 全环境穿透
         // ==========================================
         window.playAudio = async () => {
             playSfx('click');
@@ -406,7 +429,6 @@
             btn.disabled = true;
 
             if (isEn) {
-                // 英文：调用苹果/谷歌的原生语音
                 const u = new SpeechSynthesisUtterance(text); 
                 u.lang = 'en-US'; u.rate = 0.9;
                 const voices = window.speechSynthesis.getVoices();
@@ -421,9 +443,14 @@
                 return;
             }
 
-            // 中文：强锁火山引擎，失败宁可静音也绝对不让浏览器老外音出来恶心人
             try {
-                const response = await fetch("/api/tts", {
+                // 🚨 核心修复：如果是 github.io 或者没配 vercel.json，强制走前端跨域代理！保证绝对能听到标准中文！
+                const isGithub = window.location.hostname.includes('github.io');
+                const apiEndpoint = isGithub 
+                    ? `https://corsproxy.io/?url=${encodeURIComponent("https://openspeech.bytedance.com/api/v1/tts")}` 
+                    : "/api/tts";
+
+                const response = await fetch(apiEndpoint, {
                     method: "POST",
                     headers: { 
                         "Content-Type": "application/json", 
@@ -432,13 +459,12 @@
                     body: JSON.stringify({
                         app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
                         user: { uid: "oasis_tester" },
-                        audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 0.9 }, 
+                        audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 1.0 }, 
                         request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
                     })
                 });
                 
-                if (!response.ok) throw new Error("API拦截");
-                
+                if (!response.ok) throw new Error("API跨域拦截");
                 const result = await response.json();
                 if (result.code !== 3000) throw new Error(result.message);
                 
@@ -446,16 +472,16 @@
                 audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
                 audio.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
                 audio.play();
-
             } catch (err) {
                 console.error("中文发音失败:", err);
-                alert("中文语音获取失败，请确保 Vercel 代理配置正常。");
+                // 🚨 如果代理也挂了，直接报错闭嘴，绝对不让老外读中文。
+                alert("网络连接受限，无法获取原生中文发音。请检查网络。");
                 btn.innerHTML = originalContent; btn.disabled = false;
             }
         }
 
         // ==========================================
-        // 🎯 核心算法：精准对应您要求的打分与差价逻辑
+        // 🎯 LUM 靶向分析与 阶梯打分机制
         // ==========================================
         function analyzeMistakes(target, captured) {
             const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
@@ -486,19 +512,15 @@
 
                 if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                 
-                // 🚨 绝对核心修复：严格匹配您的计分档位 (0=0, 1=60+, 2=70+, 3=80+, 4=90+, 5=100)
+                // 🚨 阶梯算法修复：严格挂钩 0 到 0.50 AED
                 let tier = 0;
                 if (score >= 100) tier = 5;
                 else if (score >= 90) tier = 4;
                 else if (score >= 80) tier = 3;
                 else if (score >= 70) tier = 2;
                 else if (score >= 60) tier = 1;
-                else tier = 0;
 
-                // 广告提升了哪一档，最终取哪一档（最高到第5档 0.5AED）
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
-                
-                // 计算当前档次与之前获得档次金额的“差价”进行补发
                 const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
 
                 if (diff > 0) {
@@ -528,7 +550,7 @@
 
         window.buyLUM = () => {
             playSfx('click');
-            if (state.cloudBalance >= 10) {
+            if (state.cloudBalance >= 10) { // 10 AED 解锁
                 state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0');
                 playSfx('success');
@@ -580,12 +602,13 @@
         }
 
         // ==========================================
-        // 📺 退出的时间广告与助力控制
+        // 📺 退出流程与广告控制
         // ==========================================
         window.promptExit = () => {
             playSfx('click');
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
+            // 🚨 恢复了时间未达成时弹出看广告的界面
             if (left <= 0) { 
                 content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">EXIT</button>`; 
             } else { 
@@ -601,7 +624,6 @@
                 document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
                 window.openModal('rescue-modal'); return;
             }
-            // 这里将触发广告，看完后给当前句子提分并补差价
             window.watchAd('boost');
         }
 
@@ -609,7 +631,9 @@
             playSfx('click');
             window.closeModal('rescue-modal'); window.closeModal('exit-modal');
             window.AdManager.showAd(() => {
-                if (type === 'time') { state.currentTime += 5; updateTopBar(); }
+                if (type === 'time') { 
+                    state.currentTime += 5; updateTopBar(); 
+                }
                 else if (type === 'boost') { 
                     state.adLimit--; 
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
@@ -623,6 +647,7 @@
             }, () => setAppState('READY'));
         }
 
+        // 🚨 退出直接回到路径选择
         window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
         window.submitWithdrawal = async function() { alert("Processing Withdrawal (3-5 Days)"); }
