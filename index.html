@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V46 - Whisper繁简识别修复版</title>
+    <title>Oasis Bridge V46 - 游戏化沉浸打分版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -24,9 +24,23 @@
         .glass-btn { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
+        
+        /* 🚨 游戏化动画引擎 */
         @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6), 0 0 15px rgba(239, 68, 68, 0.3); } 100% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0), 0 0 30px rgba(239, 68, 68, 0.1); } }
         .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
         @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        
+        /* 🚨 COMBO 爆屏动画 */
+        .animate-pop-in { animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { 
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-10deg); } 
+            40% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(5deg); } 
+            60% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2) translateY(-20px); } 
+        }
+        .combo-text-perfect { background: linear-gradient(to bottom, #fde047, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(245, 158, 11, 0.6); }
+        .combo-text-excellent { background: linear-gradient(to bottom, #93c5fd, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(59, 130, 246, 0.6); }
+
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -34,7 +48,7 @@
         .modal-overlay.active .bottom-sheet { transform: translateY(0); }
         .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
         #main-app { display: flex; flex-direction: column; }
-        .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; }
+        .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; position: relative; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
     </style>
 </head>
@@ -126,7 +140,10 @@
                 <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
                     <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
                         <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">Wallet</p>
-                        <h1 id="total-earned" class="text-sm font-black text-emerald-400 transition-colors">0.00</h1>
+                        <h1 class="text-sm font-black text-emerald-400 transition-colors flex items-center justify-center">
+                            <span id="total-earned">0.00</span>
+                            <span id="streak-flame" class="ml-1 text-xs opacity-0 transition-opacity">🔥<span id="streak-count" class="text-[10px]">0</span></span>
+                        </h1>
                     </div>
                 </div>
                 <div class="text-center flex-1 border-x border-white/10 mx-1">
@@ -143,6 +160,11 @@
         </div>
 
         <div class="main-content-area px-4 sm:px-6">
+            <div id="game-feedback" class="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 z-[100] text-center w-full">
+                <h1 id="feedback-text" class="text-5xl font-black italic tracking-tighter">PERFECT!</h1>
+                <p id="feedback-sub" class="text-white font-bold text-sm bg-black/50 inline-block px-3 py-1 rounded-full mt-2 border border-white/20">+0.50 AED</p>
+            </div>
+
             <div class="max-w-md mx-auto w-full text-center">
                 <div class="flex justify-between items-center mb-5 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
@@ -196,7 +218,6 @@
                 <div class="w-full relative flex justify-center items-center h-[240px] sm:h-[280px]">
                     <canvas id="lumRadarChart"></canvas>
                 </div>
-                
                 <div class="space-y-3">
                     <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-2 flex justify-between items-center">
                         Weak Words Vault
@@ -260,6 +281,30 @@
             }
         }
 
+        // 🚨 新增：游戏爆屏特效函数
+        function triggerGameFeedback(tier, diff) {
+            const feedbackBox = document.getElementById('game-feedback');
+            const textEl = document.getElementById('feedback-text');
+            const subEl = document.getElementById('feedback-sub');
+            
+            feedbackBox.classList.remove('animate-pop-in');
+            void feedbackBox.offsetWidth; // 触发重绘
+            
+            if(tier >= 5) {
+                textEl.innerText = "PERFECT! 🔥";
+                textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect";
+            } else if(tier >= 3) {
+                textEl.innerText = "EXCELLENT! ✨";
+                textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent";
+            } else {
+                textEl.innerText = "GOOD! 👍";
+                textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md";
+            }
+            
+            subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : 'COMBO!';
+            feedbackBox.classList.add('animate-pop-in');
+        }
+
         // ==========================================
         // 📺 广告管理器
         // ==========================================
@@ -296,7 +341,7 @@
         document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
 
         // ==========================================
-        // 🔐 全局配置与状态
+        // 🔐 全局配置
         // ==========================================
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
@@ -320,6 +365,7 @@
             missedWords: JSON.parse(localStorage.getItem('ob_v46_missed') || '{}'),
             lumUnlocked: localStorage.getItem('ob_v46_lum') === 'true',
             adLimit: localStorage.getItem('ob_v46_adlim') !== null ? parseInt(localStorage.getItem('ob_v46_adlim')) : 6,
+            streak: 0, // 新增连击记录
             dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -340,7 +386,7 @@
                 if (user) {
                     await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id);
                 }
-            } catch (e) { console.error("同步钱包失败", e); }
+            } catch (e) {}
         }
 
         function checkAdRefresh() {
@@ -388,9 +434,6 @@
             appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
         }
 
-        // ==========================================
-        // 🔄 调度器与翻译接口
-        // ==========================================
         window.handleRefresh = function() {
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
                 window.practiceWeakLang(state.path); 
@@ -477,6 +520,15 @@
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
             document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
             document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? "REFILL" : `🆘 ${state.adLimit}/6`;
+            
+            // 连击火焰更新
+            const flame = document.getElementById('streak-flame');
+            if(state.streak > 1) {
+                flame.classList.remove('opacity-0');
+                document.getElementById('streak-count').innerText = state.streak;
+            } else {
+                flame.classList.add('opacity-0');
+            }
         }
 
         function syncPhraseState() {
@@ -532,9 +584,6 @@
             window.speechSynthesis.speak(u);
         }
 
-        // ==========================================
-        // 🎯 核心识别打分：加入 OpenCC 繁简转换
-        // ==========================================
         function analyzeMistakes(target, captured) {
             const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
             const cWords = captured.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
@@ -548,7 +597,7 @@
             try {
                 const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 
-                // 🚨 核心修复：1. 繁转简 2. 去除多余空格
+                // 🚨 核心修复：繁转简，消灭 57分 Bug！
                 let safeTxt = txt || "";
                 if (state.path === 'cn' && window.OpenCC) {
                     const converter = window.OpenCC.Converter({ from: 't', to: 'cn' });
@@ -558,7 +607,7 @@
                 let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                 let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                 
-                // 中文模式下，去掉所有空格以便精准匹配
+                // 完全剥离空格，极速匹配
                 if (state.path === 'cn') {
                     fmtC = fmtC.replace(/\s+/g, "");
                     fmtT = fmtT.replace(/\s+/g, "");
@@ -576,7 +625,14 @@
                         let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp;
                     }
                 }
-                let score = Math.max(0, Math.round((1 - dp[fmtC.length] / Math.max(fmtT.length, fmtC.length)) * 100));
+                
+                // 🚨 智能游戏化打分曲线 (15% 绝对容错率)
+                let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
+                let score = 0;
+                if (rawRatio >= 0.85) score = 100; // 只要准度超85%，爽快给满分！
+                else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio-0.7)*60);
+                else if (rawRatio >= 0.50) score = 75 + Math.floor((rawRatio-0.5)*75);
+                else score = Math.max(0, Math.round(rawRatio * 100));
 
                 if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                 
@@ -586,6 +642,9 @@
                 else if (score >= 80) tier = 3;
                 else if (score >= 70) tier = 2;
                 else if (score >= 60) tier = 1;
+
+                // Combo连击计算
+                if(score >= 80) state.streak += 1; else state.streak = 0;
 
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
                 const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
@@ -604,6 +663,9 @@
                     syncWalletToCloud(); 
                 }
                 
+                // 🚨 爆屏特效触发
+                if(txt !== "") { triggerGameFeedback(tier, diff); }
+
                 const heardText = safeTxt ? `HEARD: "${safeTxt}"` : "NO AUDIO CAPTURED";
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`;
                 
@@ -690,7 +752,6 @@
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
             
-            // 🚨 若当前在生词模式，退出时只切回普通模式
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
                 content.innerHTML = `<h3 class="text-2xl font-black text-amber-400 mb-2">结束专攻特训？</h3><p class="text-slate-300 text-sm mb-6">返回常规剧情练习</p><button onclick="window.exitWeakMode()" class="w-full py-4 bg-amber-600 text-white font-black rounded-xl mb-3 shadow-lg">Yes, Return</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">Keep Practicing</button>`;
                 window.openModal('exit-modal');
@@ -705,12 +766,7 @@
             window.openModal('exit-modal');
         }
 
-        // 🚨 退出生词专攻模式回到正常句子
-        window.exitWeakMode = () => {
-            playSfx('click');
-            window.closeModal('exit-modal');
-            window.fetchNewPhrase();
-        }
+        window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); window.fetchNewPhrase(); }
 
         window.requestRescue = function() {
             playSfx('click'); checkAdRefresh(); if (appState === 'REWARDING') return;
@@ -751,10 +807,7 @@
 
     <script type="module">
         import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
-        env.allowLocalModels = false; 
-        window.whisperPipeline = null;
-        
-        // 🚨 新增：全局音频流缓存变量
+        env.allowLocalModels = false; window.whisperPipeline = null;
         window.globalAudioStream = null; 
 
         window.initWhisper = async function() {
@@ -769,26 +822,17 @@
 
         window.toggleRecord = async function() {
             if (appState === 'LISTENING') { 
-                if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') {
-                    window.mediaRecorder.stop(); 
-                }
+                if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') { window.mediaRecorder.stop(); }
                 return; 
             }
             try {
-                // 🚨 核心修复：只在第一次点击时申请权限，之后永久复用通道，彻底消灭弹窗！
-                // 同时开启底层的硬件降噪和回声消除
                 if (!window.globalAudioStream) {
-                    window.globalAudioStream = await navigator.mediaDevices.getUserMedia({ 
-                        audio: { echoCancellation: true, noiseSuppression: true } 
-                    });
+                    window.globalAudioStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
                 }
-
                 playSfx('record');
                 window.mediaRecorder = new MediaRecorder(window.globalAudioStream); 
                 let chunks = [];
-                window.mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) chunks.push(e.data);
-                };
+                window.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
                 window.mediaRecorder.onstop = async () => {
                     setAppState('PROCESSING');
                     const blob = new Blob(chunks, { type: 'audio/webm' });
@@ -796,26 +840,20 @@
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
                     const decoded = await audioCtx.decodeAudioData(buf);
                     
-                    // 将繁简转换提前到识别结果输出的瞬间
                     const result = await window.whisperPipeline(decoded.getChannelData(0), { 
                         language: state.path === 'en' ? 'english' : 'chinese', 
                         task: 'transcribe' 
                     });
-                    
                     window.processAndScore(result.text || "");
                 };
-                
                 window.mediaRecorder.start(); 
                 setAppState('LISTENING');
             } catch (e) { 
-                console.error("麦克风权限错误:", e);
-                alert("无法访问麦克风，请在浏览器设置中确保已授予录音权限。");
+                console.error("麦克风错误:", e);
+                alert("无法访问麦克风，请在设置中开启权限。");
                 setAppState('READY'); 
             }
         }
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
