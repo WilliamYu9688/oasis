@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V46 - 体验全修复版</title>
+    <title>Oasis Bridge V46 - 核心逻辑完美版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -219,7 +219,7 @@
 
     <script>
         // ==========================================
-        // 🎵 原生 Web Audio 音效引擎 (告别延迟和链接失效)
+        // 🎵 音效系统
         // ==========================================
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSfx(type) {
@@ -245,39 +245,18 @@
         }
 
         // ==========================================
-        // 📺 广告管理器 (完全保留 V46 逻辑)
+        // 📺 广告管理器 (Web端直接模拟成功)
         // ==========================================
         window.AdManager = {
-            adUnitId: 'ca-app-pub-5083945196856634/5740020253',
-            isNativeAdMob: false, isAdLoaded: false,
-            init: async function() {
-                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
-                    this.isNativeAdMob = true;
-                    try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
-                }
-            },
-            loadAd: async function() {
-                if (!this.isNativeAdMob) return;
-                try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
-            },
-            showAd: async function(onSuccess, onCancel) {
-                if (this.isNativeAdMob) {
-                    if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
-                    const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
-                    AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
-                    AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
-                    await AdMob.showRewardVideoAd();
-                } else {
-                    const adUI = document.getElementById('web-ad-overlay');
-                    adUI.style.display = 'flex';
-                    document.getElementById('close-ad-btn').onclick = () => {
-                        adUI.style.display = 'none';
-                        onSuccess();
-                    };
-                }
+            showAd: function(onSuccess, onCancel) {
+                const adUI = document.getElementById('web-ad-overlay');
+                adUI.style.display = 'flex';
+                document.getElementById('close-ad-btn').onclick = () => {
+                    adUI.style.display = 'none';
+                    onSuccess();
+                };
             }
         };
-        document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
 
         // ==========================================
         // 🔐 全局状态与大厂秘钥
@@ -296,8 +275,8 @@
             { id: 905, text_en: 'The project deadline is this Friday.', text_zh: '项目截止日期是这周五。', scenario: 'Management' }
         ];
 
-        // 🚨 核心修复：找回丢失的打分补给数组，保证广告收益正常！
-        const rewardStages = [0, 0.5, 1.0, 1.5, 2.0, 2.5]; 
+        // 🚨 绝对核心修复：阶梯返现档位 [0分, 60分, 70分, 80分, 90分, 100分]
+        const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
@@ -321,11 +300,7 @@
             localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
         }
 
-        function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v46_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v46_refreshtime', now); saveData(); }
-        }
-
+        // 身份与路由...
         window.toggleAuthMode = function() {
             playSfx('click');
             const container = document.getElementById('confirm-password-container');
@@ -417,7 +392,7 @@
         }
 
         // ==========================================
-        // 🎙️ TTS 引擎：火山引擎 (昨天您确认的 /api/tts 接口直连版)
+        // 🎙️ TTS 发音引擎：中文绝对隔离浏览器合成
         // ==========================================
         window.playAudio = async () => {
             playSfx('click');
@@ -431,7 +406,7 @@
             btn.disabled = true;
 
             if (isEn) {
-                // 英文：高级原生声带
+                // 英文：调用苹果/谷歌的原生语音
                 const u = new SpeechSynthesisUtterance(text); 
                 u.lang = 'en-US'; u.rate = 0.9;
                 const voices = window.speechSynthesis.getVoices();
@@ -446,8 +421,8 @@
                 return;
             }
 
+            // 中文：强锁火山引擎，失败宁可静音也绝对不让浏览器老外音出来恶心人
             try {
-                // 🚨 核心修复：昨天调测成功的直连代码，依赖根目录的 vercel.json 代理
                 const response = await fetch("/api/tts", {
                     method: "POST",
                     headers: { 
@@ -456,19 +431,16 @@
                     },
                     body: JSON.stringify({
                         app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
-                        user: { uid: oasisCloud.auth.user()?.id || "oasis_tester" },
-                        audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 0.9 }, // 还原了地道男声
+                        user: { uid: "oasis_tester" },
+                        audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 0.9 }, 
                         request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
                     })
                 });
                 
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`请求拦截 (状态码: ${response.status})。\n反馈: ${errText}`);
-                }
+                if (!response.ok) throw new Error("API拦截");
                 
                 const result = await response.json();
-                if (result.code !== 3000) throw new Error(`火山引擎拒绝: ${result.message}`);
+                if (result.code !== 3000) throw new Error(result.message);
                 
                 const audio = new Audio("data:audio/mp3;base64," + result.data);
                 audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
@@ -476,16 +448,14 @@
                 audio.play();
 
             } catch (err) {
-                console.error("TTS引擎被拦截或失败，切回本地保底：", err);
-                const u = new SpeechSynthesisUtterance(text); 
-                u.lang = 'zh-CN'; // 保底也强制锁定中文
-                u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                window.speechSynthesis.speak(u);
+                console.error("中文发音失败:", err);
+                alert("中文语音获取失败，请确保 Vercel 代理配置正常。");
+                btn.innerHTML = originalContent; btn.disabled = false;
             }
         }
 
         // ==========================================
-        // 🎯 LUM 靶向分析与打分算法
+        // 🎯 核心算法：精准对应您要求的打分与差价逻辑
         // ==========================================
         function analyzeMistakes(target, captured) {
             const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
@@ -515,10 +485,20 @@
                 if(score >= 85) score = 100;
 
                 if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
-                let tier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
+                
+                // 🚨 绝对核心修复：严格匹配您的计分档位 (0=0, 1=60+, 2=70+, 3=80+, 4=90+, 5=100)
+                let tier = 0;
+                if (score >= 100) tier = 5;
+                else if (score >= 90) tier = 4;
+                else if (score >= 80) tier = 3;
+                else if (score >= 70) tier = 2;
+                else if (score >= 60) tier = 1;
+                else tier = 0;
+
+                // 广告提升了哪一档，最终取哪一档（最高到第5档 0.5AED）
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
                 
-                // 这里调用 rewardStages，就是您最精妙的 0.5 自动补给算法！
+                // 计算当前档次与之前获得档次金额的“差价”进行补发
                 const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
 
                 if (diff > 0) {
@@ -548,7 +528,6 @@
 
         window.buyLUM = () => {
             playSfx('click');
-            // 🚨 核心修复：10 AED 即可解锁！
             if (state.cloudBalance >= 10) {
                 state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0');
@@ -601,14 +580,12 @@
         }
 
         // ==========================================
-        // 📺 弹窗控制与退出逻辑 (保证 V46 时间广告完整性)
+        // 📺 退出的时间广告与助力控制
         // ==========================================
         window.promptExit = () => {
             playSfx('click');
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
-            
-            // 🚨 核心修复：完全保留 V46 的时间未达标弹出广告逻辑！
             if (left <= 0) { 
                 content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">EXIT</button>`; 
             } else { 
@@ -624,7 +601,7 @@
                 document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
                 window.openModal('rescue-modal'); return;
             }
-            // 🚨 这是您原本的设计：点击直接触发 boost 提分，进而联动产生 0.5 AED 的收益
+            // 这里将触发广告，看完后给当前句子提分并补差价
             window.watchAd('boost');
         }
 
@@ -632,12 +609,11 @@
             playSfx('click');
             window.closeModal('rescue-modal'); window.closeModal('exit-modal');
             window.AdManager.showAd(() => {
-                if (type === 'time') { 
-                    state.currentTime += 5; updateTopBar(); 
-                }
+                if (type === 'time') { state.currentTime += 5; updateTopBar(); }
                 else if (type === 'boost') { 
                     state.adLimit--; 
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                    // 最高升到第五档 (100分，0.50 AED)
                     state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
                     window.processAndScore(""); 
                 }
@@ -647,14 +623,7 @@
             }, () => setAppState('READY'));
         }
 
-        // 🚨 退出后回到选频道的界面（Step 1）
-        window.confirmExit = () => { 
-            clearInterval(appInterval); 
-            hideAll(); 
-            document.getElementById('step-1').classList.remove('hidden-screen'); 
-            window.closeModal('exit-modal'); 
-        }
-        
+        window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
         window.submitWithdrawal = async function() { alert("Processing Withdrawal (3-5 Days)"); }
     </script>
