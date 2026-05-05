@@ -751,7 +751,12 @@
 
     <script type="module">
         import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
-        env.allowLocalModels = false; window.whisperPipeline = null;
+        env.allowLocalModels = false; 
+        window.whisperPipeline = null;
+        
+        // 🚨 新增：全局音频流缓存变量
+        window.globalAudioStream = null; 
+
         window.initWhisper = async function() {
             const bar = document.getElementById('loading-progress-bar');
             try {
@@ -761,25 +766,56 @@
                 window.enterMainApp();
             } catch (e) { alert("AI Load Error"); }
         }
+
         window.toggleRecord = async function() {
-            if (appState === 'LISTENING') { if (window.mediaRecorder) window.mediaRecorder.stop(); return; }
+            if (appState === 'LISTENING') { 
+                if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') {
+                    window.mediaRecorder.stop(); 
+                }
+                return; 
+            }
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // 🚨 核心修复：只在第一次点击时申请权限，之后永久复用通道，彻底消灭弹窗！
+                // 同时开启底层的硬件降噪和回声消除
+                if (!window.globalAudioStream) {
+                    window.globalAudioStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: { echoCancellation: true, noiseSuppression: true } 
+                    });
+                }
+
                 playSfx('record');
-                window.mediaRecorder = new MediaRecorder(stream); let chunks = [];
-                window.mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+                window.mediaRecorder = new MediaRecorder(window.globalAudioStream); 
+                let chunks = [];
+                window.mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
                 window.mediaRecorder.onstop = async () => {
                     setAppState('PROCESSING');
                     const blob = new Blob(chunks, { type: 'audio/webm' });
                     const buf = await blob.arrayBuffer();
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
                     const decoded = await audioCtx.decodeAudioData(buf);
-                    const result = await window.whisperPipeline(decoded.getChannelData(0), { language: state.path==='en'?'english':'chinese', task: 'transcribe' });
+                    
+                    // 将繁简转换提前到识别结果输出的瞬间
+                    const result = await window.whisperPipeline(decoded.getChannelData(0), { 
+                        language: state.path === 'en' ? 'english' : 'chinese', 
+                        task: 'transcribe' 
+                    });
+                    
                     window.processAndScore(result.text || "");
                 };
-                window.mediaRecorder.start(); setAppState('LISTENING');
-            } catch (e) { setAppState('READY'); }
+                
+                window.mediaRecorder.start(); 
+                setAppState('LISTENING');
+            } catch (e) { 
+                console.error("麦克风权限错误:", e);
+                alert("无法访问麦克风，请在浏览器设置中确保已授予录音权限。");
+                setAppState('READY'); 
+            }
         }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
