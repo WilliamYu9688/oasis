@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V4.6 - 生词专攻极简版</title>
+    <title>Oasis Bridge V46 - 生词专攻强化版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -167,7 +167,7 @@
 
         <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
-                <button id="refresh-btn" onclick="window.fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+                <button id="refresh-btn" onclick="window.handleRefresh()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
                 <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                     <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
@@ -184,7 +184,7 @@
                     <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
                 <h3 class="text-2xl font-black text-white mb-2">LUM 智慧透视仪</h3>
-                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与薄弱生词专攻库。</p>
+                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与生词专攻特训。</p>
                 <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 AED Unlock</button>
             </div>
             <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
@@ -405,6 +405,73 @@
             syncPhraseState(); setAppState('READY');
         }
 
+        // 🚨 新增：处理刷新按钮点击的调度器，维持用户在生词专攻模式
+        window.handleRefresh = function() {
+            if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
+                window.practiceWeakLang(state.path);
+            } else {
+                window.fetchNewPhrase();
+            }
+        }
+
+        // 🚨 新增：调用轻量级免费 API 进行单词自动翻译注解
+        window.translateWord = async function(word, isEn) {
+            try {
+                const langpair = isEn ? 'en|zh-CN' : 'zh-CN|en';
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${langpair}`);
+                const data = await res.json();
+                return data.responseData.translatedText;
+            } catch (e) {
+                return isEn ? '生词释义加载失败' : 'Translation unavailable';
+            }
+        }
+
+        // 🚨 修正：智能双语生词调度器，带有自动翻译注解
+        window.practiceWeakLang = async (lang) => {
+            playSfx('click');
+            const isCn = (lang === 'cn');
+            const words = Object.entries(state.missedWords);
+            
+            let filtered = words.filter(([word, count]) => {
+                if (isCn) return /[\u4e00-\u9fa5]/.test(word);
+                else return /[a-zA-Z]/.test(word);
+            });
+            
+            if (filtered.length === 0) {
+                alert(isCn ? "暂无中文生词，请先完成更多练习。" : "No English weak words yet. Keep practicing!");
+                return;
+            }
+            
+            filtered.sort((a,b) => b[1] - a[1]);
+            const poolSize = Math.min(5, filtered.length);
+            const pickedWord = filtered[Math.floor(Math.random() * poolSize)][0];
+            
+            window.closeModal('lum-modal');
+            state.path = lang;
+
+            // UI 占位过渡
+            document.getElementById('target-text').innerText = "Translating...";
+            document.getElementById('target-zh').innerText = "";
+            document.getElementById('scene-display').innerText = "SCENE: WEAK WORD";
+            
+            // 自动翻译注解获取
+            const translation = await window.translateWord(pickedWord, !isCn);
+            
+            currentPhrase = {
+                id: 'weak_' + pickedWord,
+                text_en: isCn ? translation : pickedWord,
+                text_zh: isCn ? pickedWord : translation,
+                scenario: 'WEAK WORD'
+            };
+            
+            document.getElementById('target-text').innerText = `"${pickedWord}"`;
+            document.getElementById('target-zh').innerText = `💡 ${translation}`; // 增加翻译注解
+            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            
+            syncPhraseState();
+            setAppState('READY');
+        }
+
         function updateTopBar() {
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
             document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
@@ -490,7 +557,6 @@
                 }
                 let score = Math.max(0, Math.round((1 - dp[fmtC.length] / Math.max(fmtT.length, fmtC.length)) * 100));
 
-                // 🚨 修正：保证数据库里存的是绝对真实的分数！
                 if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                 
                 let tier = 0;
@@ -524,37 +590,10 @@
                 
                 setTimeout(() => { 
                     isEvaluating = false; 
-                    // 如果在看广告后自动结算差价，就不跳下一题；如果正常录音得高分，跳下一题
-                    if (diff > 0 && txt !== "") window.fetchNewPhrase(); 
+                    if (diff > 0 && txt !== "") window.handleRefresh(); // 🚨 修正：通过调度器决定去向
                     else setAppState('READY'); 
                 }, 2200);
             } catch (e) { setAppState('READY'); isEvaluating = false; }
-        }
-
-        window.openLUM = () => {
-            playSfx('click');
-            if (state.lumUnlocked) {
-                document.getElementById('lum-locked-overlay').style.display = 'none';
-                renderLUMChart();
-            } else {
-                document.getElementById('lum-locked-overlay').style.display = 'flex';
-            }
-            window.openModal('lum-modal');
-        }
-
-        window.buyLUM = () => {
-            playSfx('click');
-            if (state.cloudBalance >= 10) { 
-                state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
-                syncWalletToCloud(); 
-
-                document.getElementById('lum-locked-overlay').classList.add('opacity-0');
-                playSfx('success');
-                setTimeout(() => {
-                    document.getElementById('lum-locked-overlay').style.display = 'none';
-                    renderLUMChart();
-                }, 500);
-            } else { alert("AED 余额不足 10.00，快去练习吧！"); }
         }
 
         function renderLUMChart() {
@@ -596,50 +635,6 @@
                     plugins: { legend: { display: false } }
                 }
             });
-        }
-
-        // 🚨 修正：智能双语生词调度器
-        window.practiceWeakLang = (lang) => {
-            playSfx('click');
-            const isCn = (lang === 'cn');
-            const words = Object.entries(state.missedWords);
-            
-            // 利用正则智能过滤：中文找汉字，英文找字母
-            let filtered = words.filter(([word, count]) => {
-                if (isCn) return /[\u4e00-\u9fa5]/.test(word);
-                else return /[a-zA-Z]/.test(word);
-            });
-            
-            if (filtered.length === 0) {
-                alert(isCn ? "暂无中文生词，请先完成更多练习。" : "No English weak words yet. Keep practicing!");
-                return;
-            }
-            
-            // 按错词频率排序，从前三名里随机抽一个（避免一直只练第一名）
-            filtered.sort((a,b) => b[1] - a[1]);
-            const poolSize = Math.min(3, filtered.length);
-            const pickedWord = filtered[Math.floor(Math.random() * poolSize)][0];
-            
-            window.closeModal('lum-modal');
-            
-            // 🚨 同步切换系统识别通道，确保发音打分匹配
-            state.path = lang;
-            
-            // 组装特训短句
-            currentPhrase = {
-                id: 'weak_' + pickedWord,
-                text_en: isCn ? 'Targeted Practice' : pickedWord,
-                text_zh: isCn ? pickedWord : '生词专攻',
-                scenario: 'WEAK WORD'
-            };
-            
-            document.getElementById('target-text').innerText = `"${pickedWord}"`;
-            document.getElementById('target-zh').innerText = isCn ? 'Targeted Practice' : '生词专攻';
-            document.getElementById('scene-display').innerText = "SCENE: WEAK WORD";
-            document.getElementById('lum-diagnosis').innerHTML = ""; 
-            
-            syncPhraseState();
-            setAppState('READY');
         }
 
         window.promptExit = () => {
