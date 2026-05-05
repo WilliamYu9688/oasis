@@ -3,199 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V48 - 模块化专业版</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <link rel="apple-touch-icon" href="icon.svg">
-
+    <title>Oasis Bridge</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
+        body { font-family: 'Space+Grotesk', sans-serif; background: #0a0a0c; color: #e2e8f0; overflow: hidden; touch-action: manipulation; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .hidden-screen { display: none !important; }
+        .money-jump { animation: jump 0.5s ease-out; color: #fbbf24 !important; }
+        @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        .recording-pulse { animation: pulse 1.5s infinite; background: rgba(239, 68, 68, 0.2); }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+    </style>
 </head>
-<body>
-    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
-        <div class="mb-8 text-center mt-auto">
-            <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V48</p>
+<body class="h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="auth-screen" class="w-full max-w-md space-y-8 p-8 glass rounded-3xl text-center">
+        <h2 id="auth-title" class="text-3xl font-bold text-white tracking-tighter">System Login</h2>
+        <div class="space-y-4 text-left">
+            <input type="email" id="email" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-amber-500/50" placeholder="Email Address">
+            <input type="password" id="password" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-amber-500/50" placeholder="Password">
         </div>
-        <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
-            <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
-            <form onsubmit="event.preventDefault(); window.executeAuth();" class="space-y-4 relative z-10">
-                <input id="email" type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
-                <input id="password" type="password" placeholder="Password" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
-                <div id="confirm-password-container" class="overflow-hidden transition-all duration-300 max-h-0 opacity-0">
-                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
-                </div>
-                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-transform shadow-lg uppercase">Secure Access</button>
-                <p id="auth-msg" class="text-center text-[11px] sm:text-xs font-bold text-red-400 min-h-[1.5rem] mt-2 transition-all"></p>
-            </form>
-            <div class="mt-5 text-center border-t border-white/5 pt-4">
-                <p class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">
-                    <span id="auth-switch-text">New to Oasis?</span> 
-                    <button onclick="window.toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 ml-1 font-black underline underline-offset-4 py-2 px-2">Create Account</button>
-                </p>
-            </div>
-        </div>
+        <button onclick="window.executeAuth()" class="w-full bg-amber-500 text-black font-bold p-4 rounded-xl hover:bg-amber-400 transition-all">Secure Access</button>
     </div>
 
-    <div id="step-1" class="app-screen z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
-        <div class="space-y-4 max-w-sm mx-auto w-full">
-            <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
+    <div id="step-1" class="hidden-screen w-full max-w-md space-y-6 text-center p-8">
+        <h1 class="text-4xl font-bold text-white mb-12 tracking-tighter">Oasis Bridge</h1>
+        <div class="grid grid-cols-1 gap-4">
+            <button onclick="window.startPractice('zh')" class="glass p-8 rounded-3xl hover:border-amber-500/50 transition-all text-2xl font-bold text-white">
+                中文练习 (CN)
             </button>
-            <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
+            <button onclick="window.startPractice('en')" class="glass p-8 rounded-3xl hover:border-amber-500/50 transition-all text-2xl font-bold text-white">
+                English Practice
             </button>
         </div>
     </div>
 
-    <div id="step-time" class="app-screen z-[57] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2><p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p></div>
-        <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
-            <button onclick="window.handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600">15 Min</button>
-            <button onclick="window.handleStepTime(30)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600">30 Min</button>
-            <button onclick="window.handleStepTime(45)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600">45 Min</button>
-            <button onclick="window.handleStepTime(60)" class="glass-panel py-8 rounded-[24px] font-black text-lg text-amber-400 border-amber-500/30">60 Min</button>
+    <div id="main-app" class="hidden-screen w-full max-w-md h-full flex flex-col relative pt-safe">
+        <div class="flex justify-between items-center p-6 bg-black/40 backdrop-blur-md z-10">
+            <div onclick="window.triggerAd()" class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full cursor-pointer hover:bg-white/10 active:scale-95 transition-all">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-amber-500">BOOST: <span id="ad-chances-display">6</span></span>
+            </div>
+            <div class="text-right">
+                <span id="total-earned" class="text-3xl font-black text-white tracking-tighter">0.00</span>
+                <span class="text-[10px] text-amber-500 block font-bold tracking-widest">AED BALANCE</span>
+            </div>
+        </div>
+
+        <button onclick="window.toggleLUM()" class="absolute top-24 right-6 glass p-3 rounded-2xl z-20 hover:text-amber-500 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <span class="text-[8px] block font-bold text-center mt-1">LUM</span>
+        </button>
+
+        <div class="flex-1 flex flex-col items-center justify-center px-8 text-center space-y-12">
+            <div id="score-display" class="min-h-[100px] flex items-center justify-center">
+                <div class="text-gray-600 text-sm italic tracking-widest uppercase">Target Analysis Ready</div>
+            </div>
+            <div class="space-y-4">
+                <h2 id="target-text" class="text-4xl font-bold text-white tracking-tight leading-tight">Connecting...</h2>
+                <p id="translated-text" class="text-gray-500 text-lg font-light"></p>
+            </div>
+            <button onclick="window.playAudio()" class="w-16 h-16 rounded-full glass flex items-center justify-center text-amber-500 hover:scale-110 active:scale-95 transition-all">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+            </button>
+        </div>
+
+        <div class="p-12 flex flex-col items-center">
+            <button id="record-btn" onclick="window.toggleRecord()" class="w-24 h-24 bg-white text-black rounded-full flex items-center justify-center shadow-2xl hover:bg-amber-400 transition-all z-10">
+                <svg id="mic-icon" class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-20a3 3 0 00-3 3v8a3 3 0 006 0V5a3 3 0 00-3-3z"></path></svg>
+            </button>
+            <p id="status-text" class="text-[10px] uppercase tracking-[0.3em] text-gray-600 mt-6 font-bold">Tap to Speak</p>
         </div>
     </div>
 
-    <div id="step-2" class="app-screen z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2></div>
-        <div class="space-y-4 max-w-sm mx-auto w-full">
-            <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
-                <div><p class="font-bold text-base text-slate-200">入门级 (L1)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活与生存</p></div><div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
-            </div>
-            <div onclick="window.handleStep2(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
-                <div><p class="font-bold text-base text-slate-200">职场级 (L2)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协作</p></div><div class="font-black text-white text-xl">299<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
-            </div>
-            <div onclick="window.handleStep2(3)" class="glass-panel p-5 rounded-[24px] border-amber-500/40 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-transparent"></div>
-                <div class="relative z-10"><p class="font-bold text-base text-amber-400">精英级 (L3)</p><p class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报</p></div><div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
-            </div>
-        </div>
-    </div>
+    <div id="lum-screen" class="hidden-screen fixed inset-0 z-[90] glass backdrop-blur-2xl p-8 flex flex-col items-center">
+        <button onclick="window.closeLUM()" class="absolute top-6 left-6 z-[100] p-3 bg-gray-800/90 rounded-full text-white hover:text-amber-400 shadow-2xl transition-colors border border-white/10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </button>
 
-    <div id="loading-screen" class="app-screen z-[55] flex flex-col justify-center items-center hidden-screen">
-        <div class="w-full max-w-xs text-center px-6 relative z-10">
-            <div class="mb-8">
-                <svg class="w-16 h-16 mx-auto text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <h2 class="text-2xl font-black text-white mt-4 tracking-wider uppercase">AI ENGINE</h2>
-                <p id="loading-status-text" class="text-xs text-blue-400 font-bold mt-2 uppercase tracking-widest">Loading Neurals...</p>
-            </div>
-            <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden border border-white/10 relative">
-                <div id="loading-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-blue-400 w-0 transition-all duration-300"></div>
-            </div>
-            <p id="loading-percent" class="text-right text-[10px] text-gray-400 font-bold mt-1">0%</p>
-        </div>
-    </div>
-
-    <div id="main-app" class="app-screen z-30 hidden-screen relative">
-        <button onclick="window.promptExit()" class="absolute top-4 left-4 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90">⏏ Quit</button>
-        <button onclick="window.openLUM()" class="absolute top-4 right-4 z-50 bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90">👁️ LUM</button>
-
-        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-14 pb-4 px-2 z-40 shrink-0 shadow-lg">
-            <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
-                <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
-                    <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
-                        <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">Wallet</p>
-                        <h1 id="total-earned" class="text-sm font-black text-emerald-400 transition-colors">0.00</h1>
-                    </div>
-                </div>
-                <div class="text-center flex-1 border-x border-white/10 mx-1">
-                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Session</p>
-                    <h1 id="time-display" class="text-base font-black text-white">0/30m</h1>
-                </div>
-                <div class="text-center cursor-pointer flex-1" onclick="window.requestRescue()">
-                    <div class="bg-blue-500/10 rounded-xl py-1.5 mx-1 border border-blue-500/20">
-                        <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">Limit</p>
-                        <h1 id="ad-limit-display" class="text-sm font-black text-blue-400">🆘 6/6</h1>
-                    </div>
-                </div>
-            </div>
+        <h3 class="text-xl font-bold text-white mb-8 mt-4 tracking-widest">Large User-label Model</h3>
+        
+        <div id="lum-lock-overlay" class="absolute inset-0 bg-black/80 backdrop-blur-md z-[95] flex flex-col items-center justify-center p-8 text-center">
+            <h4 class="text-2xl font-bold text-white mb-2">Targeted Insight Locked</h4>
+            <p class="text-gray-400 text-sm mb-8">Pay 10 AED using your earnings to unlock.</p>
+            <button onclick="window.unlockLUM()" class="bg-amber-500 text-black font-bold px-8 py-4 rounded-2xl shadow-xl active:scale-95 transition-all">Unlock for 10.00 AED</button>
         </div>
 
-        <div class="main-content-area px-4 sm:px-6">
-            <div class="max-w-md mx-auto w-full text-center">
-                <div class="flex justify-between items-center mb-5 max-w-xs mx-auto w-full">
-                    <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
-                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Best</p>
-                        <p id="item-best-score" class="text-base font-black text-amber-400 transition-colors">0</p>
-                    </div>
-                    <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-right">
-                        <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Earned</p>
-                        <p id="item-earned" class="text-base font-black text-emerald-400 transition-colors">0.00</p>
-                    </div>
-                </div>
-                <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
-                    <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">STANDBY</span>
-                </div>
-                <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
-                <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
-                <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
-                <div id="score-display" class="h-24 flex flex-col items-center justify-center">
-                    <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-controls shrink-0 relative z-40">
-            <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
-                <button id="refresh-btn" onclick="window.fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
-                <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                    <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
-                </button>
-                <button onclick="window.playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
-            </div>
-        </div>
-    </div>
-
-    <div id="lum-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[110]">
-        <div class="flex-grow w-full" onclick="window.closeModal('lum-modal')"></div>
-        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[85dvh] relative overflow-hidden">
-            <div id="lum-locked-overlay" class="absolute inset-0 z-20 bg-[#020617]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
-                <div class="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/30 mb-6 animate-pulse">
-                    <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <h3 class="text-2xl font-black text-white mb-2">LUM 智慧透视仪</h3>
-                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与薄弱单词靶向分析。</p>
-                <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">50.00 AED Unlock</button>
-            </div>
-            <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
-                <div><h3 class="text-2xl font-black text-blue-400">LUM Analytics</h3><p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Real-time Capability Mapping</p></div>
-                <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div class="flex-grow overflow-y-auto no-scrollbar space-y-8 pb-10 relative z-10">
-                <div class="glass-panel p-6 rounded-[28px] border-white/5 flex flex-col items-center">
-                    <canvas id="lumRadarChart" width="300" height="300"></canvas>
-                </div>
-                <div class="space-y-4">
-                    <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-2">High-Frequency Weak Points</h4>
-                    <div id="lum-weak-words" class="flex flex-wrap gap-2 px-1"></div>
+        <div class="w-full flex-1 space-y-8 mt-12">
+            <div class="glass p-6 rounded-3xl h-64 relative"><canvas id="lumChart"></canvas></div>
+            <div class="space-y-4">
+                <h5 class="text-[10px] uppercase font-bold text-amber-500 tracking-widest">Weak Points</h5>
+                <div id="mistake-list" class="flex flex-wrap gap-2 text-sm text-gray-300">
+                    <span class="px-3 py-1 bg-white/5 rounded-full border border-white/5">Training data needed...</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400">Financial Center</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white"><option value="Payoneer">Payoneer</option><option value="Bank">UAE Bank</option></select><input id="payout-account" type="text" placeholder="Account ID" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" class="px-6 bg-emerald-600 rounded-xl text-white font-black text-xs">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div></div></div></div>
-    
-    <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
-    
-    <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
-
-    <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white">
-        <svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2>
-        <p class="text-sm text-gray-400 mb-8">（仅用于 Web 端测试点击逻辑）</p>
-        <button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button>
+    <div id="web-ad-overlay" class="hidden fixed inset-0 z-[200] bg-black/90 flex flex-col items-center justify-center p-8 space-y-8">
+        <div class="text-center">
+            <p class="text-amber-500 text-xs font-bold mb-2 uppercase tracking-widest">Sponsored Content</p>
+            <h3 class="text-3xl font-bold text-white">Earn +0.50 AED</h3>
+        </div>
+        <button id="close-ad-btn" class="bg-white text-black font-bold px-12 py-4 rounded-2xl active:scale-95 transition-all">Claim Reward & Exit</button>
     </div>
 
+    <div id="loading-screen" class="hidden-screen fixed inset-0 z-[150] bg-black flex flex-col items-center justify-center space-y-8">
+        <div class="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+        <p id="loading-percent" class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Waking up AI Engine...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/config.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/app.js"></script>
-
 </body>
 </html>
