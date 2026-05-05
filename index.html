@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V48 - 模块化专业版</title>
+    <title>Oasis Bridge V46 - 体验全修复版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -13,29 +13,45 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* 确保背景和基础字体符合您的原有风格 */
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;900&display=swap');
-        body { font-family: 'Space+Grotesk', sans-serif; background: #020617; color: #e2e8f0; }
-        .hidden-screen { display: none !important; }
-        .text-gold-gradient { background: linear-gradient(to right, #f59e0b, #fbbf24, #b45309); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        input { -webkit-user-select: auto; user-select: auto; background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
+        input:focus { border-color: #fbbf24; }
+        .app-screen { background: radial-gradient(circle at top right, #1e293b, #020617 85%); color: #f3f4f6; width: 100vw; height: 100vh; height: 100dvh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .glass-panel { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
+        .glass-btn { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6), 0 0 15px rgba(239, 68, 68, 0.3); } 100% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0), 0 0 30px rgba(239, 68, 68, 0.1); } }
+        .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
+        @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
+        .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); max-height: 90dvh; display: flex; flex-direction: column; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
+        .modal-overlay.active .bottom-sheet { transform: translateY(0); }
+        .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
+        .lum-tag { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; }
+        #main-app { display: flex; flex-direction: column; }
+        .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; }
+        .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
     </style>
 </head>
 <body>
-    <div id="auth-screen" class="fixed inset-0 z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500 bg-[#020617]">
+
+    <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V48</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V46</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
             <form onsubmit="event.preventDefault(); window.executeAuth();" class="space-y-4 relative z-10">
-                <input id="email" type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider bg-black/20 border border-white/10 text-white focus:outline-none focus:border-amber-500">
-                <input id="password" type="password" placeholder="Password" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider bg-black/20 border border-white/10 text-white focus:outline-none focus:border-amber-500">
+                <input id="email" type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
+                <input id="password" type="password" placeholder="Password" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
                 <div id="confirm-password-container" class="overflow-hidden transition-all duration-300 max-h-0 opacity-0">
-                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-4 rounded-xl text-sm font-bold tracking-wider bg-black/20 border border-white/10 text-white">
+                    <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
                 </div>
                 <button type="submit" id="auth-action-btn" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-transform shadow-lg uppercase">Secure Access</button>
                 <p id="auth-msg" class="text-center text-[11px] sm:text-xs font-bold text-red-400 min-h-[1.5rem] mt-2 transition-all"></p>
@@ -49,7 +65,7 @@
         </div>
     </div>
 
-    <div id="step-1" class="fixed inset-0 z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen bg-[#020617]">
+    <div id="step-1" class="app-screen z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
@@ -61,7 +77,7 @@
         </div>
     </div>
 
-    <div id="step-time" class="fixed inset-0 z-[57] flex flex-col p-6 sm:p-8 justify-center hidden-screen bg-[#020617]">
+    <div id="step-time" class="app-screen z-[57] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2><p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p></div>
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
             <button onclick="window.handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600">15 Min</button>
@@ -71,7 +87,7 @@
         </div>
     </div>
 
-    <div id="step-2" class="fixed inset-0 z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen bg-[#020617]">
+    <div id="step-2" class="app-screen z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
@@ -87,7 +103,7 @@
         </div>
     </div>
 
-    <div id="loading-screen" class="fixed inset-0 z-[55] flex flex-col justify-center items-center hidden-screen bg-[#020617]">
+    <div id="loading-screen" class="app-screen z-[55] flex flex-col justify-center items-center hidden-screen">
         <div class="w-full max-w-xs text-center px-6 relative z-10">
             <div class="mb-8">
                 <svg class="w-16 h-16 mx-auto text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -101,7 +117,7 @@
         </div>
     </div>
 
-    <div id="main-app" class="fixed inset-0 z-30 hidden-screen relative flex flex-col bg-[#020617]">
+    <div id="main-app" class="app-screen z-30 hidden-screen relative">
         <button onclick="window.promptExit()" class="absolute top-4 left-4 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90">⏏ Quit</button>
         <button onclick="window.openLUM()" class="absolute top-4 right-4 z-50 bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90">👁️ LUM</button>
 
@@ -110,7 +126,7 @@
                 <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
                     <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
                         <p class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">Wallet</p>
-                        <h1 id="total-earned" class="text-sm font-black text-emerald-400">0.00</h1>
+                        <h1 id="total-earned" class="text-sm font-black text-emerald-400 transition-colors">0.00</h1>
                     </div>
                 </div>
                 <div class="text-center flex-1 border-x border-white/10 mx-1">
@@ -126,16 +142,16 @@
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-4 sm:px-6 py-6 flex flex-col items-center">
-            <div class="max-w-md mx-auto w-full text-center mt-auto mb-auto">
+        <div class="main-content-area px-4 sm:px-6">
+            <div class="max-w-md mx-auto w-full text-center">
                 <div class="flex justify-between items-center mb-5 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
                         <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Best</p>
-                        <p id="item-best-score" class="text-base font-black text-amber-400">0</p>
+                        <p id="item-best-score" class="text-base font-black text-amber-400 transition-colors">0</p>
                     </div>
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-right">
                         <p class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Earned</p>
-                        <p id="item-earned" class="text-base font-black text-emerald-400">0.00</p>
+                        <p id="item-earned" class="text-base font-black text-emerald-400 transition-colors">0.00</p>
                     </div>
                 </div>
                 <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
@@ -143,63 +159,537 @@
                 </div>
                 <h2 id="target-text" class="font-bold mb-2 flex items-center justify-center italic text-white px-2 leading-tight min-h-[80px]" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                 <p id="target-zh" class="text-xs text-slate-400 mb-4 min-h-[20px] px-2"></p>
+                <div id="lum-diagnosis" class="min-h-[28px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
                 <div id="score-display" class="h-24 flex flex-col items-center justify-center">
                     <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
                 </div>
             </div>
         </div>
 
-        <div class="pb-10 pt-4 shrink-0 relative z-40 bg-gradient-to-t from-[#020617] to-transparent">
+        <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-4 max-w-sm mx-auto px-4 w-full">
-                <button id="refresh-btn" onclick="window.fetchNewPhrase()" class="w-12 h-12 glass-panel rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
-                <button id="record-btn" onclick="window.toggleRecord()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                    <div id="mic-inner-ring" class="w-20 h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg id="mic-icon" class="w-10 h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
+                <button id="refresh-btn" onclick="window.fetchNewPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+                <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
+                    <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
-                <button onclick="window.playAudio()" class="w-12 h-12 glass-panel rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
+                <button onclick="window.playAudio()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90"><svg class="w-5 h-5 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button>
             </div>
         </div>
     </div>
 
-    <div id="lum-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex-col justify-end z-[110]">
+    <div id="lum-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[110]">
         <div class="flex-grow w-full" onclick="window.closeModal('lum-modal')"></div>
-        <div class="glass-panel rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[85dvh] relative overflow-hidden">
-            <div id="lum-locked-overlay" class="absolute inset-0 z-20 bg-[#020617]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center">
+        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[85dvh] relative overflow-hidden">
+            <div id="lum-locked-overlay" class="absolute inset-0 z-20 bg-[#020617]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
                 <div class="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/30 mb-6 animate-pulse">
                     <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
                 <h3 class="text-2xl font-black text-white mb-2">LUM 智慧透视仪</h3>
-                <p class="text-slate-400 text-xs mb-8 leading-relaxed">解锁多维度能力雷达与薄弱单词靶向分析。</p>
+                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与薄弱单词靶向分析。</p>
                 <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 AED Unlock</button>
             </div>
             <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
-                <div><h3 class="text-2xl font-black text-blue-400">LUM Analytics</h3><p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Capability Mapping</p></div>
-                <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-panel rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <div><h3 class="text-2xl font-black text-blue-400">LUM Analytics</h3><p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Real-time Capability Mapping</p></div>
+                <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div class="flex-grow overflow-y-auto space-y-8 pb-10 relative z-10">
-                <div class="glass-panel p-6 rounded-[28px] flex flex-col items-center"><canvas id="lumRadarChart" width="300" height="300"></canvas></div>
+            <div class="flex-grow overflow-y-auto no-scrollbar space-y-8 pb-10 relative z-10">
+                <div class="glass-panel p-6 rounded-[28px] border-white/5 flex flex-col items-center">
+                    <canvas id="lumRadarChart" width="300" height="300"></canvas>
+                </div>
                 <div class="space-y-4">
-                    <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Weak Points</h4>
+                    <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-2">High-Frequency Weak Points</h4>
                     <div id="lum-weak-words" class="flex flex-wrap gap-2 px-1"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="store-modal" class="fixed inset-0 bg-black/60 hidden flex-col justify-end z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400">Financial Center</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-panel rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div></div></div>
+    <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div><div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[85dvh] flex flex-col"><div class="flex justify-between items-center mb-5 shrink-0"><div><h3 class="text-2xl font-black text-emerald-400">Financial Center</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Balance: <span id="store-balance" class="text-white">0.00</span> AED</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6"><div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20"><h4 class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 AED</span></h4><div class="space-y-3"><select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white"><option value="Payoneer">Payoneer</option><option value="Bank">UAE Bank</option></select><input id="payout-account" type="text" placeholder="Account ID" class="w-full p-3 rounded-xl text-xs font-bold"><div class="flex gap-2"><input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50"><button onclick="window.submitWithdrawal()" class="px-6 bg-emerald-600 rounded-xl text-white font-black text-xs">Cash Out</button></div><p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p></div></div></div></div></div>
     
-    <div id="exit-modal" class="fixed inset-0 bg-black/60 hidden flex-col justify-end z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"></div></div>
+    <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
     
-    <div id="rescue-modal" class="fixed inset-0 bg-black/60 hidden flex-col justify-end z-[100]"><div class="flex-grow w-full" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 bg-amber-600 rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-panel rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
+    <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div><div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95"><h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">专属系统助力</h3><p id="rescue-desc" class="text-slate-300 text-xs mb-6"></p><button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase">Get Sponsored</button><button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button></div></div>
 
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white">
         <svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2>
-        <p class="text-sm text-gray-400 mb-8">Earn +0.50 AED</p>
+        <p class="text-sm text-gray-400 mb-8">（仅用于 Web 端测试点击逻辑）</p>
         <button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button>
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/app.js"></script>
+    <script>
+        // ==========================================
+        // 🎵 原生 Web Audio 音效引擎 (告别延迟和链接失效)
+        // ==========================================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            
+            if (type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'success') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(1000, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'record') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(300, now);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
+        }
+
+        // ==========================================
+        // 📺 广告管理器 (完全保留 V46 逻辑)
+        // ==========================================
+        window.AdManager = {
+            adUnitId: 'ca-app-pub-5083945196856634/5740020253',
+            isNativeAdMob: false, isAdLoaded: false,
+            init: async function() {
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
+                    this.isNativeAdMob = true;
+                    try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
+                }
+            },
+            loadAd: async function() {
+                if (!this.isNativeAdMob) return;
+                try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
+            },
+            showAd: async function(onSuccess, onCancel) {
+                if (this.isNativeAdMob) {
+                    if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
+                    const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
+                    AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
+                    AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
+                    await AdMob.showRewardVideoAd();
+                } else {
+                    const adUI = document.getElementById('web-ad-overlay');
+                    adUI.style.display = 'flex';
+                    document.getElementById('close-ad-btn').onclick = () => {
+                        adUI.style.display = 'none';
+                        onSuccess();
+                    };
+                }
+            }
+        };
+        document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
+
+        // ==========================================
+        // 🔐 全局状态与大厂秘钥
+        // ==========================================
+        const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
+        const VOLC_APPID = '1093118246'; 
+        const VOLC_TOKEN = 'RbveOFk3QKz41ne4lK6pltCm80cPp-NU';
+        let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const LOCAL_CACHE = [
+            { id: 901, text_en: 'Please forward the email to my work account.', text_zh: '请将邮件转发到我的工作邮箱。', scenario: 'Office' },
+            { id: 902, text_en: 'Is the handover document ready?', text_zh: '交接文档准备好了吗？', scenario: 'Work' },
+            { id: 903, text_en: 'Let us discuss the strategy tomorrow.', text_zh: '我们明天讨论一下策略。', scenario: 'Meeting' },
+            { id: 904, text_en: 'Can you send me the latest report?', text_zh: '你能把最新报告发给我吗？', scenario: 'Office' },
+            { id: 905, text_en: 'The project deadline is this Friday.', text_zh: '项目截止日期是这周五。', scenario: 'Management' }
+        ];
+
+        // 🚨 核心修复：找回丢失的打分补给数组，保证广告收益正常！
+        const rewardStages = [0, 0.5, 1.0, 1.5, 2.0, 2.5]; 
+
+        let state = {
+            path: 'en', targetTime: 0, currentTime: 0,
+            scores: JSON.parse(localStorage.getItem('ob_v46_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v46_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v46_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v46_missed') || '{}'),
+            lumUnlocked: localStorage.getItem('ob_v46_lum') === 'true',
+            adLimit: localStorage.getItem('ob_v46_adlim') !== null ? parseInt(localStorage.getItem('ob_v46_adlim')) : 6,
+            dbLevel: 1, cloudBalance: 0.00
+        };
+
+        let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
+
+        function saveData() {
+            localStorage.setItem('ob_v46_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v46_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v46_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v46_adlim', state.adLimit);
+            localStorage.setItem('ob_v46_lum', state.lumUnlocked);
+            localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
+        }
+
+        function checkAdRefresh() {
+            const now = Date.now(); const last = localStorage.getItem('ob_v46_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v46_refreshtime', now); saveData(); }
+        }
+
+        window.toggleAuthMode = function() {
+            playSfx('click');
+            const container = document.getElementById('confirm-password-container');
+            const isReg = document.getElementById('auth-title').innerText === "System Login";
+            if (isReg) { container.style.maxHeight = "100px"; container.style.opacity = "1"; document.getElementById('auth-title').innerText = "Create Account"; document.getElementById('auth-action-btn').innerText = "Register & Enter"; }
+            else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; }
+        }
+
+        window.executeAuth = async function() {
+            const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('auth-action-btn'); btn.disabled = true; btn.innerText = "AUTHENTICATING...";
+            try {
+                const isReg = document.getElementById('auth-title').innerText === "Create Account";
+                const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+                if (!prof) await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0 });
+                state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
+                document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+                document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
+                playSfx('success');
+            } catch (err) { document.getElementById('auth-msg').innerText = "❌ " + err.message; }
+            finally { btn.disabled = false; btn.innerText = "Secure Access"; }
+        }
+
+        function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); playSfx('click'); }
+
+        window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        window.handleStepTime = (t) => { playSfx('click'); state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
+
+        window.enterMainApp = function() {
+            document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
+            window.fetchNewPhrase();
+            if(appInterval) clearInterval(appInterval);
+            appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
+        }
+
+        window.fetchNewPhrase = async function() {
+            playSfx('click');
+            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
+            tEl.innerText = "Connecting..."; 
+            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            
+            let pool = [];
+            try { const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel); if (data && data.length > 0) pool = data; } catch (e) {}
+            if (pool.length === 0) pool = LOCAL_CACHE;
+            
+            let newPhrase;
+            do { newPhrase = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
+            currentPhrase = newPhrase;
+
+            tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
+            zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
+            syncPhraseState(); setAppState('READY');
+        }
+
+        function updateTopBar() {
+            document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+            document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
+            document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? "REFILL" : `🆘 ${state.adLimit}/6`;
+        }
+
+        function syncPhraseState() {
+            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            document.getElementById('item-best-score').innerText = state.scores[t] || 0;
+            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2);
+            updateTopBar();
+        }
+
+        function setAppState(s) {
+            appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
+            switch(s) {
+                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
+                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🎙️ RECORDING...</p>`; btn.classList.add('recording-active'); document.getElementById('refresh-btn').disabled = true; break;
+                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">🔄 ANALYZING...</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
+                case 'REWARDING': btn.disabled = true; break;
+            }
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // ==========================================
+        // 🎙️ TTS 引擎：火山引擎 (昨天您确认的 /api/tts 接口直连版)
+        // ==========================================
+        window.playAudio = async () => {
+            playSfx('click');
+            const text = document.getElementById('target-text').innerText.replace(/"/g, "");
+            const isEn = state.path === 'en';
+            if (!text || text === "Connecting...") return;
+
+            const btn = event.currentTarget || document.querySelector('button[onclick="window.playAudio()"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            btn.disabled = true;
+
+            if (isEn) {
+                // 英文：高级原生声带
+                const u = new SpeechSynthesisUtterance(text); 
+                u.lang = 'en-US'; u.rate = 0.9;
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
+                    if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('en')); 
+                    if (bestVoice) u.voice = bestVoice;
+                }
+                u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                window.speechSynthesis.speak(u);
+                return;
+            }
+
+            try {
+                // 🚨 核心修复：昨天调测成功的直连代码，依赖根目录的 vercel.json 代理
+                const response = await fetch("/api/tts", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "Authorization": `Bearer;${VOLC_TOKEN}` 
+                    },
+                    body: JSON.stringify({
+                        app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
+                        user: { uid: oasisCloud.auth.user()?.id || "oasis_tester" },
+                        audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 0.9 }, // 还原了地道男声
+                        request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`请求拦截 (状态码: ${response.status})。\n反馈: ${errText}`);
+                }
+                
+                const result = await response.json();
+                if (result.code !== 3000) throw new Error(`火山引擎拒绝: ${result.message}`);
+                
+                const audio = new Audio("data:audio/mp3;base64," + result.data);
+                audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                audio.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                audio.play();
+
+            } catch (err) {
+                console.error("TTS引擎被拦截或失败，切回本地保底：", err);
+                const u = new SpeechSynthesisUtterance(text); 
+                u.lang = 'zh-CN'; // 保底也强制锁定中文
+                u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // ==========================================
+        // 🎯 LUM 靶向分析与打分算法
+        // ==========================================
+        function analyzeMistakes(target, captured) {
+            const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
+            const cWords = captured.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
+            const missed = tWords.filter(w => w && !cWords.includes(w));
+            missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; });
+            return missed;
+        }
+
+        window.processAndScore = async function(txt) {
+            if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
+            try {
+                const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                const fmtC = (txt||"").toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                const fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                
+                analyzeMistakes(fmtT, fmtC);
+
+                const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
+                for (let i = 1; i <= fmtT.length; i++) {
+                    let prev = dp[0]; dp[0] = i;
+                    for (let j = 1; j <= fmtC.length; j++) {
+                        let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp;
+                    }
+                }
+                let score = Math.max(0, Math.round((1 - dp[fmtC.length] / Math.max(fmtT.length, fmtC.length)) * 100));
+                if(score >= 85) score = 100;
+
+                if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
+                let tier = score >= 100 ? 5 : (score >= 90 ? 4 : (score >= 80 ? 3 : (score >= 70 ? 2 : (score >= 60 ? 1 : 0))));
+                const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
+                
+                // 这里调用 rewardStages，就是您最精妙的 0.5 自动补给算法！
+                const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
+
+                if (diff > 0) {
+                    setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
+                    document.getElementById('total-earned').classList.add('money-jump');
+                    playSfx('success');
+                    if (oasisCloud.auth.user()) {
+                        oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', oasisCloud.auth.user().id).then();
+                    }
+                }
+                document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">HEARD: "${fmtC}"</span>`;
+                saveData(); syncPhraseState();
+                setTimeout(() => { isEvaluating = false; if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); }, 2200);
+            } catch (e) { setAppState('READY'); isEvaluating = false; }
+        }
+
+        window.openLUM = () => {
+            playSfx('click');
+            if (state.lumUnlocked) {
+                document.getElementById('lum-locked-overlay').style.display = 'none';
+                renderLUMChart(); renderWeakWords();
+            } else {
+                document.getElementById('lum-locked-overlay').style.display = 'flex';
+            }
+            window.openModal('lum-modal');
+        }
+
+        window.buyLUM = () => {
+            playSfx('click');
+            // 🚨 核心修复：10 AED 即可解锁！
+            if (state.cloudBalance >= 10) {
+                state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
+                document.getElementById('lum-locked-overlay').classList.add('opacity-0');
+                playSfx('success');
+                setTimeout(() => {
+                    document.getElementById('lum-locked-overlay').style.display = 'none';
+                    renderLUMChart(); renderWeakWords();
+                }, 500);
+            } else { alert("AED 余额不足 10.00，快去练习吧！"); }
+        }
+
+        function renderLUMChart() {
+            const ctx = document.getElementById('lumRadarChart').getContext('2d');
+            const scoresArr = Object.values(state.scores);
+            const avg = scoresArr.length ? scoresArr.reduce((a,b)=>a+b,0)/scoresArr.length : 0;
+            const mastery = Math.min(100, (scoresArr.length / 50) * 100);
+            
+            if (lumChart) lumChart.destroy();
+            lumChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Articulation', 'Fluency', 'Scenario Mastery'],
+                    datasets: [{
+                        data: [avg, (avg * 0.9) + 5, mastery],
+                        backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                        borderColor: '#fbbf24',
+                        pointBackgroundColor: '#fbbf24',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderWeakWords() {
+            const container = document.getElementById('lum-weak-words');
+            container.innerHTML = "";
+            const sorted = Object.entries(state.missedWords).sort((a,b)=>b[1]-a[1]).slice(0, 15);
+            if (sorted.length === 0) {
+                container.innerHTML = `<p class="text-slate-600 text-[10px] italic">暂无薄弱单词，请继续练习。</p>`; return;
+            }
+            sorted.forEach(([word, count]) => {
+                const tag = document.createElement('span'); tag.className = "lum-tag";
+                tag.innerHTML = `${word.toUpperCase()} <span class="text-[8px] opacity-50 ml-1">x${count}</span>`;
+                container.appendChild(tag);
+            });
+        }
+
+        // ==========================================
+        // 📺 弹窗控制与退出逻辑 (保证 V46 时间广告完整性)
+        // ==========================================
+        window.promptExit = () => {
+            playSfx('click');
+            const left = Math.ceil(state.targetTime - state.currentTime);
+            const content = document.getElementById('exit-content');
+            
+            // 🚨 核心修复：完全保留 V46 的时间未达标弹出广告逻辑！
+            if (left <= 0) { 
+                content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">EXIT</button>`; 
+            } else { 
+                content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">Goal Not Met</h3><p class="text-slate-300 text-sm mb-6">${left} mins remaining.</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3 shadow-lg">Watch Ad (+5 Mins)</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl mb-2">QUIT ANYWAY</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">CONTINUE</button>`; 
+            }
+            window.openModal('exit-modal');
+        }
+
+        window.requestRescue = function() {
+            playSfx('click'); checkAdRefresh(); if (appState === 'REWARDING') return;
+            if (state.adLimit <= 0) {
+                document.getElementById('rescue-title').innerText = "LIMIT REACHED"; 
+                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
+                window.openModal('rescue-modal'); return;
+            }
+            // 🚨 这是您原本的设计：点击直接触发 boost 提分，进而联动产生 0.5 AED 的收益
+            window.watchAd('boost');
+        }
+
+        window.watchAd = (type) => {
+            playSfx('click');
+            window.closeModal('rescue-modal'); window.closeModal('exit-modal');
+            window.AdManager.showAd(() => {
+                if (type === 'time') { 
+                    state.currentTime += 5; updateTopBar(); 
+                }
+                else if (type === 'boost') { 
+                    state.adLimit--; 
+                    const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                    state.adBoostMap[t] = Math.min(5, (state.adBoostMap[t] || 0) + 1);
+                    window.processAndScore(""); 
+                }
+                else if (type === 'refill') { state.adLimit = 6; updateTopBar(); }
+                saveData();
+                playSfx('success');
+            }, () => setAppState('READY'));
+        }
+
+        // 🚨 退出后回到选频道的界面（Step 1）
+        window.confirmExit = () => { 
+            clearInterval(appInterval); 
+            hideAll(); 
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
+            window.closeModal('exit-modal'); 
+        }
+        
+        window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
+        window.submitWithdrawal = async function() { alert("Processing Withdrawal (3-5 Days)"); }
+    </script>
+
+    <script type="module">
+        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
+        env.allowLocalModels = false; window.whisperPipeline = null;
+        window.initWhisper = async function() {
+            const bar = document.getElementById('loading-progress-bar');
+            try {
+                window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
+                    progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } }
+                });
+                window.enterMainApp();
+            } catch (e) { alert("AI Load Error"); }
+        }
+        window.toggleRecord = async function() {
+            if (appState === 'LISTENING') { if (window.mediaRecorder) window.mediaRecorder.stop(); return; }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                playSfx('record');
+                window.mediaRecorder = new MediaRecorder(stream); let chunks = [];
+                window.mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+                window.mediaRecorder.onstop = async () => {
+                    setAppState('PROCESSING');
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    const buf = await blob.arrayBuffer();
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                    const decoded = await audioCtx.decodeAudioData(buf);
+                    const result = await window.whisperPipeline(decoded.getChannelData(0), { language: state.path==='en'?'english':'chinese', task: 'transcribe' });
+                    window.processAndScore(result.text || "");
+                };
+                window.mediaRecorder.start(); setAppState('LISTENING');
+            } catch (e) { setAppState('READY'); }
+        }
+    </script>
 </body>
 </html>
