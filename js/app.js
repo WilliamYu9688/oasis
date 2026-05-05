@@ -1,103 +1,83 @@
 // ==========================================
-// 🌟 状态初始化 (0.5 & 10 红线)
+// 🌟 状态初始化 (0.5 & 10 逻辑)
 // ==========================================
 window.state = { path: 'en', cloudBalance: 0.00, adChances: 6, targetTime: 30, currentLevel: 1, lumUnlocked: false };
+
 window.saveData = () => localStorage.setItem('oasis_v48_state', JSON.stringify(window.state));
 
 // ==========================================
-// 🚶 导航逻辑 (严格对齐 V48 HTML)
+// 🚶 步进导航 (严格对接 V48 HTML 按钮)
 // ==========================================
 window.executeAuth = () => {
     document.getElementById('auth-screen').classList.add('hidden-screen');
     document.getElementById('step-1').classList.remove('hidden-screen');
 };
 
-window.handleStep1 = (p) => {
-    window.state.path = p;
+window.handleStep1 = (path) => {
+    window.state.path = path; // 'cn' 或 'en'
     document.getElementById('step-1').classList.add('hidden-screen');
     document.getElementById('step-time').classList.remove('hidden-screen');
 };
 
-window.handleStepTime = (t) => {
-    window.state.targetTime = t;
+window.handleStepTime = (minutes) => {
+    window.state.targetTime = minutes;
     document.getElementById('step-time').classList.add('hidden-screen');
     document.getElementById('step-2').classList.remove('hidden-screen');
 };
 
-window.handleStep2 = (l) => {
-    window.state.currentLevel = l;
+window.handleStep2 = (level) => {
+    window.state.currentLevel = level;
     document.getElementById('step-2').classList.add('hidden-screen');
     document.getElementById('loading-screen').classList.remove('hidden-screen');
+    
+    // 进度条动画
     let p = 0;
     const inv = setInterval(() => {
-        p += 10;
+        p += 5;
         document.getElementById('loading-progress-bar').style.width = p + '%';
         document.getElementById('loading-percent').innerText = p + '%';
         if (p >= 100) { clearInterval(inv); window.enterMainApp(); }
-    }, 100);
+    }, 50);
 };
 
 window.enterMainApp = () => {
     document.getElementById('loading-screen').classList.add('hidden-screen');
     document.getElementById('main-app').classList.remove('hidden-screen');
     window.fetchNewPhrase();
-    // 初始化 V48 UI 数值
+    // 还原 V48 顶栏 UI 数据
     document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
     document.getElementById('ad-limit-display').innerText = `🆘 ${window.state.adChances}/6`;
     document.getElementById('time-display').innerText = `0/${window.state.targetTime}m`;
 };
 
-window.fetchNewPhrase = () => {
-    const isEn = window.state.path === 'en';
-    const enText = "Please forward the email to my work account";
-    const zhText = "请把邮件转发到我的工作邮箱";
-    document.getElementById('target-text').innerText = isEn ? enText : zhText;
-    document.getElementById('target-zh').innerText = isEn ? zhText : enText;
-    document.getElementById('scene-display').innerText = "BUSINESS";
-};
-
 // ==========================================
-// 🚪 退出逻辑 (修复点击退出没反应)
+// 🚪 退出逻辑 (修复 Quit 按钮没反应)
 // ==========================================
 window.promptExit = () => {
     const modal = document.getElementById('exit-modal');
     const content = document.getElementById('exit-content');
-    modal.style.display = 'flex';
+    modal.classList.remove('hidden-screen');
+    // 强制赋予 flex 布局确保可见
+    modal.style.display = 'flex'; 
     content.innerHTML = `
-        <h3 class="text-2xl font-black text-white mb-2">退出当前会话？</h3>
-        <p class="text-slate-400 text-xs mb-8 uppercase tracking-widest text-center">Session Progress will be saved</p>
-        <div class="space-y-3">
-            <button onclick="location.reload()" class="w-full py-4 bg-red-600 text-white font-black rounded-xl uppercase tracking-widest shadow-lg shadow-red-600/20">确认结束</button>
-            <button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-panel text-white font-bold rounded-xl uppercase tracking-widest">返回练习</button>
+        <div class="p-6">
+            <h3 class="text-2xl font-black text-white mb-2">Terminate Session?</h3>
+            <p class="text-slate-400 text-xs mb-8 uppercase tracking-widest">Progress will be saved</p>
+            <div class="space-y-4">
+                <button onclick="location.reload()" class="w-full py-4 bg-red-600 text-white font-black rounded-xl uppercase active:scale-95">Confirm Exit</button>
+                <button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-panel text-white font-bold rounded-xl uppercase active:scale-95">Cancel</button>
+            </div>
         </div>
     `;
 };
 
 // ==========================================
-// 💰 商业逻辑 (0.50 & 10.00)
+// 👁️ LUM 逻辑 (10 AED)
 // ==========================================
-window.requestRescue = () => {
-    if (window.state.adChances <= 0) return alert("Daily boosts exhausted.");
-    document.getElementById('rescue-modal').style.display = 'flex';
-    document.getElementById('rescue-desc').innerText = "观看赞助视频获取 0.50 AED 助力奖励";
-    document.getElementById('rescue-action-btn').onclick = window.triggerAd;
-};
-
-window.triggerAd = () => {
-    document.getElementById('rescue-modal').style.display = 'none';
-    document.getElementById('web-ad-overlay').classList.remove('hidden');
-    document.getElementById('close-ad-btn').onclick = () => {
-        window.state.adChances -= 1;
-        window.state.cloudBalance += 0.5; // 0.5 AED 逻辑
-        document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
-        document.getElementById('ad-limit-display').innerText = `🆘 ${window.state.adChances}/6`;
-        document.getElementById('web-ad-overlay').classList.add('hidden');
-        window.saveData();
-    };
-};
-
 window.openLUM = () => {
-    document.getElementById('lum-modal').style.display = 'flex';
+    const modal = document.getElementById('lum-modal');
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden-screen');
     if (window.state.lumUnlocked) {
         document.getElementById('lum-locked-overlay').style.display = 'none';
         window.renderRadarChart();
@@ -105,18 +85,33 @@ window.openLUM = () => {
 };
 
 window.buyLUM = () => {
-    if (window.state.cloudBalance >= 10) { // 10 AED 逻辑
+    if (window.state.cloudBalance >= 10) {
         window.state.cloudBalance -= 10;
         window.state.lumUnlocked = true;
         document.getElementById('total-earned').innerText = window.state.cloudBalance.toFixed(2);
         document.getElementById('lum-locked-overlay').style.display = 'none';
+        window.saveData();
         window.renderRadarChart();
-    } else {
-        alert("Need 10.00 AED to unlock.");
-    }
+    } else { alert("Need 10.00 AED"); }
 };
 
-window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
+window.closeModal = (id) => {
+    const m = document.getElementById(id);
+    m.style.display = 'none';
+    m.classList.add('hidden-screen');
+};
+
+// ==========================================
+// 🎙️ 录音与业务逻辑
+// ==========================================
+window.fetchNewPhrase = () => {
+    const en = "Please forward the email to my work account";
+    const zh = "请把邮件转发到我的工作邮箱";
+    const isEn = window.state.path === 'en';
+    document.getElementById('target-text').innerText = isEn ? en : zh;
+    document.getElementById('target-zh').innerText = isEn ? zh : en;
+    document.getElementById('scene-display').innerText = "BUSINESS";
+};
 
 window.renderRadarChart = () => {
     const ctx = document.getElementById('lumRadarChart');
@@ -129,10 +124,4 @@ window.renderRadarChart = () => {
         },
         options: { scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } }, plugins: { legend: { display: false } } }
     });
-};
-
-window.setAppState = (s) => {
-    const ring = document.getElementById('mic-inner-ring');
-    if (s === 'LISTENING') ring.style.background = "#ef4444";
-    else ring.style.background = "linear-gradient(145deg, #fbbf24, #d97706)";
 };
