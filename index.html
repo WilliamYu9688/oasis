@@ -184,7 +184,7 @@
                     <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
                 <h3 class="text-2xl font-black text-white mb-2">LUM 智慧透视仪</h3>
-                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与生词专攻特训。</p>
+                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与薄弱生词专攻库。</p>
                 <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 AED Unlock</button>
             </div>
             <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
@@ -296,7 +296,7 @@
         document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
 
         // ==========================================
-        // 🔐 全局配置
+        // 🔐 全局配置与状态
         // ==========================================
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
@@ -334,10 +334,14 @@
             localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
         }
 
+        // 🚨 修正：解决重置 20 AED 问题，使用 Supabase V2 最新语法 getUser()
         async function syncWalletToCloud() {
-            if (oasisCloud.auth.user()) {
-                await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', oasisCloud.auth.user().id);
-            }
+            try {
+                const { data: { user } } = await oasisCloud.auth.getUser();
+                if (user) {
+                    await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id);
+                }
+            } catch (e) { console.error("同步钱包失败", e); }
         }
 
         function checkAdRefresh() {
@@ -385,36 +389,16 @@
             appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
         }
 
-        window.fetchNewPhrase = async function() {
-            playSfx('click');
-            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
-            tEl.innerText = "Connecting..."; 
-            document.getElementById('lum-diagnosis').innerHTML = ""; 
-            
-            let pool = [];
-            try { const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel); if (data && data.length > 0) pool = data; } catch (e) {}
-            if (pool.length === 0) pool = LOCAL_CACHE;
-            
-            let newPhrase;
-            do { newPhrase = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
-            currentPhrase = newPhrase;
-
-            tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
-            zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
-            syncPhraseState(); setAppState('READY');
-        }
-
-        // 🚨 新增：处理刷新按钮点击的调度器，维持用户在生词专攻模式
+        // 🚨 修正：维持生词专攻状态的刷新调度器
         window.handleRefresh = function() {
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
-                window.practiceWeakLang(state.path);
+                window.practiceWeakLang(state.path); // 如果在专攻模式，继续抽生词
             } else {
-                window.fetchNewPhrase();
+                window.fetchNewPhrase(); // 常规模式，抽新句子
             }
         }
 
-        // 🚨 新增：调用轻量级免费 API 进行单词自动翻译注解
+        // 🚨 核心增强：轻量级自动翻译生词释义
         window.translateWord = async function(word, isEn) {
             try {
                 const langpair = isEn ? 'en|zh-CN' : 'zh-CN|en';
@@ -454,7 +438,7 @@
             document.getElementById('target-zh').innerText = "";
             document.getElementById('scene-display').innerText = "SCENE: WEAK WORD";
             
-            // 自动翻译注解获取
+            // 获取自动翻译注解
             const translation = await window.translateWord(pickedWord, !isCn);
             
             currentPhrase = {
@@ -465,11 +449,31 @@
             };
             
             document.getElementById('target-text').innerText = `"${pickedWord}"`;
-            document.getElementById('target-zh').innerText = `💡 ${translation}`; // 增加翻译注解
+            document.getElementById('target-zh').innerText = `💡 ${translation}`; // 显示带有💡的释义
             document.getElementById('lum-diagnosis').innerHTML = ""; 
             
             syncPhraseState();
             setAppState('READY');
+        }
+
+        window.fetchNewPhrase = async function() {
+            playSfx('click');
+            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh');
+            tEl.innerText = "Connecting..."; 
+            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            
+            let pool = [];
+            try { const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel); if (data && data.length > 0) pool = data; } catch (e) {}
+            if (pool.length === 0) pool = LOCAL_CACHE;
+            
+            let newPhrase;
+            do { newPhrase = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
+            currentPhrase = newPhrase;
+
+            tEl.innerText = `"${state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh}"`;
+            zhEl.innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            document.getElementById('scene-display').innerText = "SCENE: " + (currentPhrase.scenario || "WORK").toUpperCase();
+            syncPhraseState(); setAppState('READY');
         }
 
         function updateTopBar() {
@@ -590,10 +594,45 @@
                 
                 setTimeout(() => { 
                     isEvaluating = false; 
-                    if (diff > 0 && txt !== "") window.handleRefresh(); // 🚨 修正：通过调度器决定去向
+                    if (diff > 0 && txt !== "") window.handleRefresh(); 
                     else setAppState('READY'); 
                 }, 2200);
             } catch (e) { setAppState('READY'); isEvaluating = false; }
+        }
+
+        // 🚨 修正：找回丢失的 openLUM 和 buyLUM 函数
+        window.openLUM = () => {
+            playSfx('click');
+            if (state.lumUnlocked) {
+                document.getElementById('lum-locked-overlay').style.display = 'none';
+                renderLUMChart();
+            } else {
+                document.getElementById('lum-locked-overlay').style.display = 'flex';
+                document.getElementById('lum-locked-overlay').classList.remove('opacity-0');
+            }
+            window.openModal('lum-modal');
+        }
+
+        window.buyLUM = () => {
+            playSfx('click');
+            if (state.cloudBalance >= 10) { 
+                state.cloudBalance -= 10; 
+                state.lumUnlocked = true; 
+                saveData(); 
+                updateTopBar();
+                
+                // 强制云端同步扣款，防止重置！
+                syncWalletToCloud(); 
+
+                document.getElementById('lum-locked-overlay').classList.add('opacity-0');
+                playSfx('success');
+                setTimeout(() => {
+                    document.getElementById('lum-locked-overlay').style.display = 'none';
+                    renderLUMChart();
+                }, 500);
+            } else { 
+                alert("AED 余额不足 10.00，快去练习吧！"); 
+            }
         }
 
         function renderLUMChart() {
