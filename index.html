@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V46 - 数据严谨修复版</title>
+    <title>Oasis Bridge V4.6 - 生词专攻极简版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -195,14 +195,24 @@
                 <div class="w-full relative flex justify-center items-center h-[240px] sm:h-[280px]">
                     <canvas id="lumRadarChart"></canvas>
                 </div>
+                
                 <div class="space-y-3">
                     <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-2 flex justify-between items-center">
                         Weak Words Vault
                         <span class="text-[9px] text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">TARGETED</span>
                     </h4>
-                    <div id="lum-weak-words" class="flex flex-col gap-2 px-1">
-                        </div>
+                    <div class="flex gap-3 px-1">
+                        <button onclick="window.practiceWeakLang('cn')" class="flex-1 py-4 bg-gradient-to-br from-red-500/10 to-red-600/20 border border-red-500/30 rounded-2xl flex flex-col items-center justify-center active:scale-95 transition-transform shadow-lg shadow-red-900/20">
+                            <span class="text-3xl mb-2 drop-shadow-md">🇨🇳</span>
+                            <span class="text-red-100 font-bold text-xs tracking-wider">练习中文生词</span>
+                        </button>
+                        <button onclick="window.practiceWeakLang('en')" class="flex-1 py-4 bg-gradient-to-br from-blue-500/10 to-blue-600/20 border border-blue-500/30 rounded-2xl flex flex-col items-center justify-center active:scale-95 transition-transform shadow-lg shadow-blue-900/20">
+                            <span class="text-3xl mb-2 drop-shadow-md">🇦🇪</span>
+                            <span class="text-blue-100 font-bold text-xs tracking-wider">Practice English</span>
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -324,7 +334,6 @@
             localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
         }
 
-        // 🚨 核心修复：更新 Supabase 中的资金，防止刷新后重置
         async function syncWalletToCloud() {
             if (oasisCloud.auth.user()) {
                 await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', oasisCloud.auth.user().id);
@@ -480,9 +489,8 @@
                     }
                 }
                 let score = Math.max(0, Math.round((1 - dp[fmtC.length] / Math.max(fmtT.length, fmtC.length)) * 100));
-                
-                // 🚨 修改点1：彻底删除强制改为100分的作弊代码，显示绝对真实的得分。
-                // 仅更新最高历史记录
+
+                // 🚨 修正：保证数据库里存的是绝对真实的分数！
                 if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                 
                 let tier = 0;
@@ -506,7 +514,7 @@
                     setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     
                     playSfx('success');
-                    syncWalletToCloud(); // 确保赚的钱立刻存入云端
+                    syncWalletToCloud(); 
                 }
                 
                 const heardText = fmtC ? `HEARD: "${fmtC}"` : "NO AUDIO CAPTURED";
@@ -516,6 +524,7 @@
                 
                 setTimeout(() => { 
                     isEvaluating = false; 
+                    // 如果在看广告后自动结算差价，就不跳下一题；如果正常录音得高分，跳下一题
                     if (diff > 0 && txt !== "") window.fetchNewPhrase(); 
                     else setAppState('READY'); 
                 }, 2200);
@@ -526,7 +535,7 @@
             playSfx('click');
             if (state.lumUnlocked) {
                 document.getElementById('lum-locked-overlay').style.display = 'none';
-                renderLUMChart(); renderWeakWords();
+                renderLUMChart();
             } else {
                 document.getElementById('lum-locked-overlay').style.display = 'flex';
             }
@@ -537,15 +546,13 @@
             playSfx('click');
             if (state.cloudBalance >= 10) { 
                 state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
-                
-                // 🚨 修正：买 LUM 花掉的 10 AED，立刻提交给云端，防止刷新后重置回20多！
                 syncWalletToCloud(); 
 
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0');
                 playSfx('success');
                 setTimeout(() => {
                     document.getElementById('lum-locked-overlay').style.display = 'none';
-                    renderLUMChart(); renderWeakWords();
+                    renderLUMChart();
                 }, 500);
             } else { alert("AED 余额不足 10.00，快去练习吧！"); }
         }
@@ -591,43 +598,43 @@
             });
         }
 
-        // 🚨 修改点2：全新的“生词特训库” UI 与交互
-        function renderWeakWords() {
-            const container = document.getElementById('lum-weak-words');
-            container.innerHTML = "";
-            const sorted = Object.entries(state.missedWords).sort((a,b)=>b[1]-a[1]).slice(0, 15);
-            if (sorted.length === 0) {
-                container.innerHTML = `<p class="text-slate-600 text-[10px] italic text-center py-4">You have no weak words yet.</p>`; return;
-            }
-            sorted.forEach(([word, count]) => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/10 shadow-sm";
-                div.innerHTML = `
-                    <div>
-                        <p class="text-white font-bold tracking-wider">${word.toUpperCase()}</p>
-                        <p class="text-[10px] text-amber-500/70 mt-0.5 uppercase">Missed: ${count} times</p>
-                    </div>
-                    <button onclick="window.practiceWeakWord('${word}')" class="px-4 py-2 bg-blue-500/20 border border-blue-500/40 text-blue-400 font-bold text-xs rounded-lg active:scale-95 transition-transform">Practice</button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // 生词特训调度函数
-        window.practiceWeakWord = (word) => {
+        // 🚨 修正：智能双语生词调度器
+        window.practiceWeakLang = (lang) => {
             playSfx('click');
+            const isCn = (lang === 'cn');
+            const words = Object.entries(state.missedWords);
+            
+            // 利用正则智能过滤：中文找汉字，英文找字母
+            let filtered = words.filter(([word, count]) => {
+                if (isCn) return /[\u4e00-\u9fa5]/.test(word);
+                else return /[a-zA-Z]/.test(word);
+            });
+            
+            if (filtered.length === 0) {
+                alert(isCn ? "暂无中文生词，请先完成更多练习。" : "No English weak words yet. Keep practicing!");
+                return;
+            }
+            
+            // 按错词频率排序，从前三名里随机抽一个（避免一直只练第一名）
+            filtered.sort((a,b) => b[1] - a[1]);
+            const poolSize = Math.min(3, filtered.length);
+            const pickedWord = filtered[Math.floor(Math.random() * poolSize)][0];
+            
             window.closeModal('lum-modal');
             
-            // 临时组装一个生词训练题目
+            // 🚨 同步切换系统识别通道，确保发音打分匹配
+            state.path = lang;
+            
+            // 组装特训短句
             currentPhrase = {
-                id: 'weak_' + word,
-                text_en: word,
-                text_zh: '生词专攻 / Targeted Practice',
+                id: 'weak_' + pickedWord,
+                text_en: isCn ? 'Targeted Practice' : pickedWord,
+                text_zh: isCn ? pickedWord : '生词专攻',
                 scenario: 'WEAK WORD'
             };
             
-            document.getElementById('target-text').innerText = `"${word}"`;
-            document.getElementById('target-zh').innerText = currentPhrase.text_zh;
+            document.getElementById('target-text').innerText = `"${pickedWord}"`;
+            document.getElementById('target-zh').innerText = isCn ? 'Targeted Practice' : '生词专攻';
             document.getElementById('scene-display').innerText = "SCENE: WEAK WORD";
             document.getElementById('lum-diagnosis').innerHTML = ""; 
             
@@ -670,8 +677,8 @@
                     state.adLimit--; 
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                     const currentBoost = state.adBoostMap[t] || 0;
-                    state.adBoostMap[t] = Math.min(5, currentBoost + 1); // 提档
-                    window.processAndScore(""); // 传空字符串，纯结算差价，界面立刻同步
+                    state.adBoostMap[t] = Math.min(5, currentBoost + 1);
+                    window.processAndScore(""); 
                 }
                 else if (type === 'refill') { 
                     state.adLimit = 6; updateTopBar(); 
