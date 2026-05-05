@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V46 - 生词专攻强化版</title>
+    <title>Oasis Bridge V46 - LUM修复最终版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -296,7 +296,7 @@
         document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
 
         // ==========================================
-        // 🔐 全局配置与状态
+        // 🔐 全局配置
         // ==========================================
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
@@ -334,7 +334,6 @@
             localStorage.setItem('ob_v46_missed', JSON.stringify(state.missedWords));
         }
 
-        // 🚨 修正：解决重置 20 AED 问题，使用 Supabase V2 最新语法 getUser()
         async function syncWalletToCloud() {
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
@@ -389,33 +388,34 @@
             appInterval = setInterval(() => { if(state.currentTime < state.targetTime) { state.currentTime += (1/60); updateTopBar(); } }, 1000);
         }
 
-        // 🚨 修正：维持生词专攻状态的刷新调度器
+        // 🚨 核心修复 2：刷新键专属调度器，判定当前是否在【生词专攻】模式
         window.handleRefresh = function() {
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
-                window.practiceWeakLang(state.path); // 如果在专攻模式，继续抽生词
+                window.practiceWeakLang(state.path); // 如果在专攻模式，直接继续抽生词！
             } else {
-                window.fetchNewPhrase(); // 常规模式，抽新句子
+                window.fetchNewPhrase(); // 否则，抽正常的句子
             }
         }
 
-        // 🚨 核心增强：轻量级自动翻译生词释义
+        // 🚨 核心修复 1：轻量级自动翻译，用于为生词添加准确的外语注解
         window.translateWord = async function(word, isEn) {
             try {
+                // 如果是需要翻译为中文（即原来是英文），使用 en|zh-CN；反之用 zh-CN|en
                 const langpair = isEn ? 'en|zh-CN' : 'zh-CN|en';
                 const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${langpair}`);
                 const data = await res.json();
                 return data.responseData.translatedText;
             } catch (e) {
-                return isEn ? '生词释义加载失败' : 'Translation unavailable';
+                return isEn ? '暂无释义' : 'Translation unavailable';
             }
         }
 
-        // 🚨 修正：智能双语生词调度器，带有自动翻译注解
         window.practiceWeakLang = async (lang) => {
             playSfx('click');
             const isCn = (lang === 'cn');
             const words = Object.entries(state.missedWords);
             
+            // 智能过滤：中文按钮只挑汉字生词，英文按钮只挑字母生词
             let filtered = words.filter(([word, count]) => {
                 if (isCn) return /[\u4e00-\u9fa5]/.test(word);
                 else return /[a-zA-Z]/.test(word);
@@ -426,6 +426,7 @@
                 return;
             }
             
+            // 优先挑最高频出错的词
             filtered.sort((a,b) => b[1] - a[1]);
             const poolSize = Math.min(5, filtered.length);
             const pickedWord = filtered[Math.floor(Math.random() * poolSize)][0];
@@ -433,23 +434,23 @@
             window.closeModal('lum-modal');
             state.path = lang;
 
-            // UI 占位过渡
+            // UI 占位：提示用户正在拉取释义注解
             document.getElementById('target-text').innerText = "Translating...";
             document.getElementById('target-zh').innerText = "";
             document.getElementById('scene-display').innerText = "SCENE: WEAK WORD";
             
-            // 获取自动翻译注解
+            // 自动翻译获取注解
             const translation = await window.translateWord(pickedWord, !isCn);
             
             currentPhrase = {
                 id: 'weak_' + pickedWord,
                 text_en: isCn ? translation : pickedWord,
                 text_zh: isCn ? pickedWord : translation,
-                scenario: 'WEAK WORD'
+                scenario: 'WEAK WORD' // 设置特定场景标识，让系统记住处于专攻模式
             };
             
             document.getElementById('target-text').innerText = `"${pickedWord}"`;
-            document.getElementById('target-zh').innerText = `💡 ${translation}`; // 显示带有💡的释义
+            document.getElementById('target-zh').innerText = `💡 ${translation}`; // 增加翻译注解
             document.getElementById('lum-diagnosis').innerHTML = ""; 
             
             syncPhraseState();
@@ -594,13 +595,14 @@
                 
                 setTimeout(() => { 
                     isEvaluating = false; 
+                    // 如果在看广告后自动结算差价，就不跳下一题；如果正常录音得高分，跳下一题
                     if (diff > 0 && txt !== "") window.handleRefresh(); 
                     else setAppState('READY'); 
                 }, 2200);
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
-        // 🚨 修正：找回丢失的 openLUM 和 buyLUM 函数
+        // 🚨 修复 LUM 弹窗调用的崩溃问题
         window.openLUM = () => {
             playSfx('click');
             if (state.lumUnlocked) {
@@ -616,12 +618,7 @@
         window.buyLUM = () => {
             playSfx('click');
             if (state.cloudBalance >= 10) { 
-                state.cloudBalance -= 10; 
-                state.lumUnlocked = true; 
-                saveData(); 
-                updateTopBar();
-                
-                // 强制云端同步扣款，防止重置！
+                state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
                 syncWalletToCloud(); 
 
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0');
@@ -630,9 +627,7 @@
                     document.getElementById('lum-locked-overlay').style.display = 'none';
                     renderLUMChart();
                 }, 500);
-            } else { 
-                alert("AED 余额不足 10.00，快去练习吧！"); 
-            }
+            } else { alert("AED 余额不足 10.00，快去练习吧！"); }
         }
 
         function renderLUMChart() {
