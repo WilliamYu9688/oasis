@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V46 - 体验全修复版</title>
+    <title>Oasis Bridge V46.1 - 本地极速纯净版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -185,7 +185,7 @@
                     <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
                 <h3 class="text-2xl font-black text-white mb-2">LUM 智慧透视仪</h3>
-                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（LUM），<br>解锁多维度能力雷达与薄弱单词靶向分析。</p>
+                <p class="text-slate-400 text-xs mb-8 leading-relaxed">基于大规模用户标签模型（Large User-label Model），<br>解锁多维度能力雷达与薄弱单词靶向分析。</p>
                 <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 AED Unlock</button>
             </div>
             <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
@@ -245,7 +245,7 @@
         }
 
         // ==========================================
-        // 📺 广告管理器 
+        // 📺 广告管理器
         // ==========================================
         window.AdManager = {
             adUnitId: 'ca-app-pub-5083945196856634/5740020253',
@@ -280,15 +280,10 @@
         document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
 
         // ==========================================
-        // 🔐 全局状态与大厂秘钥
+        // 🔐 全局状态与网络请求配置
         // ==========================================
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
-        
-        // 🚨 修正：您的专属火山引擎秘钥
-        const VOLC_APPID = '9540983066'; 
-        const VOLC_TOKEN = 'z6iiLXbpIyb-GsZosjPQKiwRlm9SY6J5';
-        
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const LOCAL_CACHE = [
@@ -299,8 +294,7 @@
             { id: 905, text_en: 'The project deadline is this Friday.', text_zh: '项目截止日期是这周五。', scenario: 'Management' }
         ];
 
-        // 🚨 修正1：您专属的神级阶梯算法！
-        // 对应：[0=0分, 1=60分(0.30), 2=70分(0.35), 3=80分(0.40), 4=90分(0.45), 5=100分(0.50)]
+        // 🚨 阶梯返现档位: [0档(0分), 1档(60分), 2档(70分), 3档(80分), 4档(90分), 5档(100分)]
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let state = {
@@ -413,15 +407,8 @@
             }
         }
 
-        function generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-
         // ==========================================
-        // 🎙️ TTS 发音引擎 (昨日调测OK的纯净版！)
+        // 🎙️ TTS 发音引擎：零成本本地极速版 (彻底抛弃火山 API)
         // ==========================================
         window.playAudio = async () => {
             playSfx('click');
@@ -434,60 +421,34 @@
             btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
             btn.disabled = true;
 
+            const u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.9;
+            let voices = window.speechSynthesis.getVoices();
+
             if (isEn) {
-                const u = new SpeechSynthesisUtterance(text); 
-                u.lang = 'en-US'; u.rate = 0.9;
-                const voices = window.speechSynthesis.getVoices();
+                u.lang = 'en-US';
                 if (voices.length > 0) {
                     let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
                     if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('en')); 
                     if (bestVoice) u.voice = bestVoice;
                 }
-                u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                window.speechSynthesis.speak(u);
-                return;
-            }
-
-            try {
-                // 🚨 绝对纯净，使用您昨天通过测试的代码，不加多余的代理！
-                // (前提：请确保 Vercel 根目录下配置了 vercel.json)
-                const response = await fetch("/api/tts", {
-                    method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json", 
-                        "Authorization": `Bearer;${VOLC_TOKEN}` 
-                    },
-                    body: JSON.stringify({
-                        app: { appid: String(VOLC_APPID), token: VOLC_TOKEN, cluster: "volcano_tts" },
-                        user: { uid: "oasis_tester" },
-                        audio: { voice_type: 'BV002_streaming', encoding: "mp3", speed_ratio: 0.9 },
-                        request: { reqid: generateUUID(), text: text, text_type: "plain", operation: "query" }
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`请求拦截 (状态码: ${response.status})。\n反馈: ${errText}`);
+            } else {
+                // 🚨 智能抓取本地最优质的中文男声/女声，摆脱老外口音
+                u.lang = 'zh-CN';
+                if (voices.length > 0) {
+                    let bestVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Ting-Ting') || v.name.includes('Siri') || v.name.includes('Google')));
+                    if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('zh'));
+                    if (bestVoice) u.voice = bestVoice;
                 }
-                
-                const result = await response.json();
-                if (result.code !== 3000) throw new Error(`火山引擎拒绝: ${result.message}`);
-                
-                const audio = new Audio("data:audio/mp3;base64," + result.data);
-                audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                audio.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                audio.play();
-
-            } catch (err) {
-                // 打印出最真实的错误，方便您排查！
-                alert("语音系统诊断报告:\n\n" + err.message + "\n\n请确认 Vercel 代理配置 (vercel.json) 已生效。");
-                btn.innerHTML = originalContent; btn.disabled = false;
             }
+
+            u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+            u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+            window.speechSynthesis.speak(u);
         }
 
         // ==========================================
-        // 🎯 LUM 靶向分析与 打分补差价
+        // 🎯 LUM 靶向分析与 阶梯打分机制
         // ==========================================
         function analyzeMistakes(target, captured) {
             const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
@@ -518,7 +479,7 @@
 
                 if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                 
-                // 🚨 阶梯算法：0=0, 1=60+, 2=70+, 3=80+, 4=90+, 5=100
+                // 根据实际录音分计算当前基础档位
                 let tier = 0;
                 if (score >= 100) tier = 5;
                 else if (score >= 90) tier = 4;
@@ -526,28 +487,35 @@
                 else if (score >= 70) tier = 2;
                 else if (score >= 60) tier = 1;
 
-                // 最终取实际得分档位与广告提升档位的最高值
+                // 计算结算：对比（录音基础档次）与（看广告累积的档次），取最高值作为最终发奖档次
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
-                
-                // 计算当前档次与之前获得档次金额的“差价”进行补发
                 const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
 
                 if (diff > 0) {
-                    setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
+                    setAppState('REWARDING'); 
+                    state.cloudBalance += diff; 
+                    state.earnedMap[rawT] = rewardStages[finalTier];
                     
-                    // 🚨 修正2：立刻在界面上同步句子的返现额度！
                     document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2);
                     document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump');
+                    setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     
                     playSfx('success');
                     if (oasisCloud.auth.user()) {
                         oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', oasisCloud.auth.user().id).then();
                     }
                 }
+                
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">HEARD: "${fmtC}"</span>`;
                 saveData(); syncPhraseState();
-                setTimeout(() => { isEvaluating = false; if (diff > 0) window.fetchNewPhrase(); else setAppState('READY'); }, 2200);
+                
+                // 只有在用户赚了钱（补了差价）的时候才自动切下一题，否则停留在当前页让用户看结果/点广告
+                setTimeout(() => { 
+                    isEvaluating = false; 
+                    if (diff > 0) window.fetchNewPhrase(); 
+                    else setAppState('READY'); 
+                }, 2200);
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
@@ -564,7 +532,7 @@
 
         window.buyLUM = () => {
             playSfx('click');
-            if (state.cloudBalance >= 10) {
+            if (state.cloudBalance >= 10) { 
                 state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar();
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0');
                 playSfx('success');
@@ -616,14 +584,13 @@
         }
 
         // ==========================================
-        // 📺 弹窗控制逻辑 (含退出补时间 & 提分逻辑)
+        // 📺 退出的时间广告与助力控制
         // ==========================================
         window.promptExit = () => {
             playSfx('click');
             const left = Math.ceil(state.targetTime - state.currentTime);
             const content = document.getElementById('exit-content');
             
-            // 🚨 修正3：恢复 V46 退出的时间广告机制！
             if (left <= 0) { 
                 content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">Target Met!</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">EXIT</button>`; 
             } else { 
@@ -639,7 +606,6 @@
                 document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
                 window.openModal('rescue-modal'); return;
             }
-            // 这里调用广告，看完后给当前句子升阶补差价
             window.watchAd('boost');
         }
 
@@ -649,21 +615,25 @@
             window.AdManager.showAd(() => {
                 if (type === 'time') { 
                     state.currentTime += 5; updateTopBar(); 
+                    saveData();
+                    playSfx('success');
                 }
                 else if (type === 'boost') { 
                     state.adLimit--; 
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                     
-                    // 🚨 核心修复：提升一个档位 (最高第5档)
+                    // 🚨 核心修复：看完广告立刻记录升档，并重新走一遍算分逻辑来发钱！
                     const currentBoost = state.adBoostMap[t] || 0;
-                    state.adBoostMap[t] = Math.min(5, currentBoost + 1);
+                    state.adBoostMap[t] = Math.min(5, currentBoost + 1); // 最高升到第5档 (100分级)
                     
-                    // 手动触发一次计分与返现流程（不带语音识别，纯结算差价）
+                    // 传入空字符串，让系统纯靠刚加的 boost 档位去提额
                     window.processAndScore(""); 
                 }
-                else if (type === 'refill') { state.adLimit = 6; updateTopBar(); }
-                saveData();
-                playSfx('success');
+                else if (type === 'refill') { 
+                    state.adLimit = 6; updateTopBar(); 
+                    saveData();
+                    playSfx('success');
+                }
             }, () => setAppState('READY'));
         }
 
