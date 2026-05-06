@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V49 - 纯净无痕与精准反馈版</title>
+    <title>Oasis Bridge V50 - 纯净引擎与完美反馈版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -15,10 +15,8 @@
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 
     <style>
-        /* 🚨 核心修复 2：彻底抹杀所有浏览器的默认滚动条，保持原生 App 的极简纯净 */
         ::-webkit-scrollbar { display: none; }
         * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
-        
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         input { -webkit-user-select: auto; user-select: auto; background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
         input:focus { border-color: #fbbf24; }
@@ -59,7 +57,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V49</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V50</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -290,6 +288,9 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
+        // ==========================================
+        // 🚨 一体化纯净脚本核心
+        // ==========================================
         const i18n = {
             en: { 
                 lbl_wallet: "WALLET", lbl_session: "SESSION", lbl_limit: "LIMIT",
@@ -387,11 +388,12 @@
             }
         }
 
-        // 🚨 核心修复 1：细化分数段反馈，不到60分只鼓励不喊 GOOD
+        // 🚨 核心逻辑修复：绝对精准的分数段 UI 渲染
         function triggerGameFeedback(score, diff) {
             const feedbackBox = document.getElementById('game-feedback');
             const textEl = document.getElementById('feedback-text');
             const subEl = document.getElementById('feedback-sub');
+            
             feedbackBox.classList.remove('animate-pop-in');
             void feedbackBox.offsetWidth; 
             
@@ -405,6 +407,7 @@
                 textEl.innerText = "GOOD! 👍"; 
                 textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; 
             } else {
+                // 低于 60 分展现出鼓励的姿态 💪🎯
                 textEl.innerText = "KEEP GOING! 💪"; 
                 textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; 
             }
@@ -450,13 +453,13 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v49_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v49_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v49_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v49_missed') || '{}'),
-            lumUnlocked: localStorage.getItem('ob_v49_lum') === 'true',
-            adLimit: localStorage.getItem('ob_v49_adlim') !== null ? parseInt(localStorage.getItem('ob_v49_adlim')) : 6,
-            isBlindMode: localStorage.getItem('ob_v49_blind') === 'true',
+            scores: JSON.parse(localStorage.getItem('ob_v50_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v50_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v50_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v50_missed') || '{}'),
+            lumUnlocked: localStorage.getItem('ob_v50_lum') === 'true',
+            adLimit: localStorage.getItem('ob_v50_adlim') !== null ? parseInt(localStorage.getItem('ob_v50_adlim')) : 6,
+            isBlindMode: localStorage.getItem('ob_v50_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -464,13 +467,13 @@
         let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v49_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v49_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v49_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v49_adlim', state.adLimit);
-            localStorage.setItem('ob_v49_lum', state.lumUnlocked);
-            localStorage.setItem('ob_v49_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v49_blind', state.isBlindMode);
+            localStorage.setItem('ob_v50_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v50_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v50_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v50_adlim', state.adLimit);
+            localStorage.setItem('ob_v50_lum', state.lumUnlocked);
+            localStorage.setItem('ob_v50_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v50_blind', state.isBlindMode);
         }
 
         async function syncWalletToCloud() {
@@ -478,8 +481,8 @@
         }
 
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v49_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v49_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v50_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v50_refreshtime', now); saveData(); }
         }
 
         window.toggleAuthMode = function() {
@@ -771,7 +774,6 @@
                     playSfx('success'); syncWalletToCloud(); 
                 }
                 
-                // 🚨 调用精准的基于分数的特效分发
                 if(txt !== "") { triggerGameFeedback(score, diff); }
 
                 const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
