@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V54 - 经济风控与防刷版</title>
+    <title>Oasis Bridge V55 - 雷达图国际化修复版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -57,7 +57,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V54</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V55</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -283,8 +283,9 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
+        // 🚨 核心修复：I18N 雷达副标题语种翻转逻辑
         const i18n = {
-            en: { 
+            en: { // 这是当用户选择 "学习中文(cn)" 时加载的纯英文UI
                 lbl_wallet: "WALLET", lbl_session: "SESSION", lbl_limit: "LIMIT",
                 lbl_best: "BEST", lbl_earned: "EARNED",
                 lbl_quit: "⏏ QUIT", lbl_lum: "📊 LUM",
@@ -297,7 +298,8 @@
                 exit_weak_title: "End Targeted Practice?", exit_weak_sub: "Return to normal scenarios", exit_weak_y: "Yes, Return", exit_weak_n: "Keep Practicing",
                 store_title: "Financial Center", store_bal: "Balance:", store_with: "Withdrawal",
                 store_min: "Min 50 AED", store_cash: "Cash Out",
-                lum_title: "LUM Analytics", lum_sub: "English Capability Mapping",
+                lum_title: "LUM Analytics", 
+                lum_sub: "Chinese Capability Mapping", // 修复：学中文时副标题应该指示正在测绘中文能力
                 lum_weak: "Weak Words Vault", lum_target: "TARGETED",
                 lum_btn_target: "Start Targeted Practice",
                 lum_no_weak: "No weak words found yet. Keep practicing!",
@@ -305,7 +307,7 @@
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel",
                 rescue_max_title: "DAILY LIMIT REACHED", rescue_max_sub: "Please come back tomorrow.", rescue_max_btn: "MAXED OUT"
             },
-            cn: { 
+            cn: { // 这是当用户选择 "我要学英语(en)" 时加载的纯中文UI
                 lbl_wallet: "钱包余额", lbl_session: "学习时长", lbl_limit: "求助额度",
                 lbl_best: "历史最高", lbl_earned: "本句赚取",
                 lbl_quit: "⏏ 退出", lbl_lum: "📊 能力透视",
@@ -318,7 +320,8 @@
                 exit_weak_title: "结束专攻特训？", exit_weak_sub: "返回常规剧情练习", exit_weak_y: "确认返回", exit_weak_n: "继续特训",
                 store_title: "财务中心", store_bal: "当前余额:", store_with: "余额提现",
                 store_min: "满 50 AED 可提", store_cash: "立即提现",
-                lum_title: "LUM 能力透视仪", lum_sub: "中文能力多维雷达",
+                lum_title: "LUM 能力透视仪", 
+                lum_sub: "英文能力多维雷达", // 修复：学英文时副标题应该指示正在测绘英文能力
                 lum_weak: "薄弱生词库", lum_target: "专项特训",
                 lum_btn_target: "开始生词特训",
                 lum_no_weak: "暂无生词记录，请先完成更多练习。",
@@ -412,14 +415,14 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v54_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v54_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v54_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v54_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v55_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v55_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v55_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v55_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v54_adlim') !== null ? parseInt(localStorage.getItem('ob_v54_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v54_refillcount') || '0'), // 🚨 新增：单日补给次数记录
-            isBlindMode: localStorage.getItem('ob_v54_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v55_adlim') !== null ? parseInt(localStorage.getItem('ob_v55_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v55_refillcount') || '0'), 
+            isBlindMode: localStorage.getItem('ob_v55_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -427,13 +430,13 @@
         let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v54_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v54_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v54_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v54_adlim', state.adLimit);
-            localStorage.setItem('ob_v54_refillcount', state.refillCount); // 保存补给次数
-            localStorage.setItem('ob_v54_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v54_blind', state.isBlindMode);
+            localStorage.setItem('ob_v55_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v55_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v55_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v55_adlim', state.adLimit);
+            localStorage.setItem('ob_v55_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v55_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v55_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -671,12 +674,20 @@
             } else { alert(state.path === 'en' ? "AED 余额不足 10.00，快去练习吧！" : "Not enough AED balance (10.00 req). Keep practicing!"); }
         }
 
+        // 🚨 核心修复：根据 path 判断雷达图的语言和标签
         function renderLUMChart() {
-            const ctx = document.getElementById('lumRadarChart').getContext('2d'); const isEn = state.path === 'en';
+            const ctx = document.getElementById('lumRadarChart').getContext('2d'); 
+            const isEn = state.path === 'en'; // isEn = true 表示正在学习英语（界面是中文）
+            
+            // 过滤分数：学英语(en)过滤英文字符，学中文(cn)过滤中文字符
             const relevantScores = Object.entries(state.scores).filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text)).map(([_, score]) => score);
-            const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0; const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
+            const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0; 
+            const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
+            
             if (lumChart) lumChart.destroy();
-            const labels = isEn ? ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'] : ['发音', '流利度', '语境', '词汇量', '准确度'];
+            // 修复：如果学英语（界面中文），显示中文标签；如果学中文（界面英文），显示英文标签
+            const labels = isEn ? ['发音', '流利度', '语境', '词汇量', '准确度'] : ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'];
+            
             lumChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ data: [avg, (avg * 0.9) + 5, mastery, avg * 0.95, avg * 0.85], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)', pointBackgroundColor: '#fbbf24', pointBorderColor: '#ffffff', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: 'rgba(255, 255, 255, 0.08)', circular: true }, angleLines: { color: 'rgba(255, 255, 255, 0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family: "'Space Grotesk', sans-serif" } } } }, plugins: { legend: { display: false } } } });
         }
 
@@ -693,25 +704,17 @@
 
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); window.fetchNewPhrase(); }
         
-        // 🚨 核心风控修复：每日补给上限物理熔断机制
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v54_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { 
-                state.adLimit = 6; 
-                state.refillCount = 0; // 每天重置补给次数
-                localStorage.setItem('ob_v54_refreshtime', now); 
-                saveData(); 
-            }
+            const now = Date.now(); const last = localStorage.getItem('ob_v55_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v55_refreshtime', now); saveData(); }
         }
 
         window.requestRescue = function() { 
             playSfx('click'); checkAdRefresh(); 
             if (appState === 'REWARDING') return; 
-            
             if (state.adLimit <= 0) { 
                 const ui = getUI();
                 if (state.refillCount >= 2) { 
-                    // 🚨 熔断：超过 2 次补给，按钮变灰，拒绝拉起广告
                     document.getElementById('rescue-title').innerText = ui.rescue_max_title; 
                     document.getElementById('rescue-desc').innerText = ui.rescue_max_sub; 
                     const btn = document.getElementById('rescue-action-btn');
@@ -744,9 +747,7 @@
                     state.adBoostMap[t] = Math.min(5, currentBoost + 1); 
                     window.processAndScore("[AD_BOOST]"); 
                 } else if (type === 'refill') { 
-                    state.adLimit = 6; 
-                    state.refillCount++; // 🚨 成功补给后增加计数
-                    updateTopBar(); saveData(); playSfx('success'); 
+                    state.adLimit = 6; state.refillCount++; updateTopBar(); saveData(); playSfx('success'); 
                 } 
             }, () => setAppState('READY')); 
         }
