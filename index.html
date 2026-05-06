@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V53 - 广告引擎修复版</title>
+    <title>Oasis Bridge V54 - 经济风控与防刷版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -57,7 +57,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V53</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V54</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -275,7 +275,7 @@
         <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95">
             <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">Limit Reached</h3>
             <p id="rescue-desc" class="text-slate-300 text-xs mb-6">System Support</p>
-            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase">Get Sponsored</button>
+            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300">Get Sponsored</button>
             <button id="rescue-cancel-btn" onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button>
         </div>
     </div>
@@ -297,13 +297,13 @@
                 exit_weak_title: "End Targeted Practice?", exit_weak_sub: "Return to normal scenarios", exit_weak_y: "Yes, Return", exit_weak_n: "Keep Practicing",
                 store_title: "Financial Center", store_bal: "Balance:", store_with: "Withdrawal",
                 store_min: "Min 50 AED", store_cash: "Cash Out",
-                lum_title: "LUM Analytics", 
-                lum_sub: "English Capability Mapping",
+                lum_title: "LUM Analytics", lum_sub: "English Capability Mapping",
                 lum_weak: "Weak Words Vault", lum_target: "TARGETED",
                 lum_btn_target: "Start Targeted Practice",
                 lum_no_weak: "No weak words found yet. Keep practicing!",
                 lum_lock_title: "LUM Analytics", lum_lock_sub: "Unlock multi-dimensional radar and targeted weak words practice.", lum_lock_btn: "10.00 AED Unlock",
-                rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel"
+                rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel",
+                rescue_max_title: "DAILY LIMIT REACHED", rescue_max_sub: "Please come back tomorrow.", rescue_max_btn: "MAXED OUT"
             },
             cn: { 
                 lbl_wallet: "钱包余额", lbl_session: "学习时长", lbl_limit: "求助额度",
@@ -318,13 +318,13 @@
                 exit_weak_title: "结束专攻特训？", exit_weak_sub: "返回常规剧情练习", exit_weak_y: "确认返回", exit_weak_n: "继续特训",
                 store_title: "财务中心", store_bal: "当前余额:", store_with: "余额提现",
                 store_min: "满 50 AED 可提", store_cash: "立即提现",
-                lum_title: "LUM 能力透视仪", 
-                lum_sub: "中文能力多维雷达",
+                lum_title: "LUM 能力透视仪", lum_sub: "中文能力多维雷达",
                 lum_weak: "薄弱生词库", lum_target: "专项特训",
                 lum_btn_target: "开始生词特训",
                 lum_no_weak: "暂无生词记录，请先完成更多练习。",
                 lum_lock_title: "LUM 智慧透视仪", lum_lock_sub: "基于大模型，解锁多维度能力雷达与薄弱生词专攻库。", lum_lock_btn: "10.00 AED 解锁",
-                rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消"
+                rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消",
+                rescue_max_title: "今日额度耗尽", rescue_max_sub: "请明天再来获取助力", rescue_max_btn: "已达上限"
             }
         };
 
@@ -339,27 +339,19 @@
             document.getElementById('lbl-earned').innerText = ui.lbl_earned;
             document.getElementById('lbl-quit').innerText = ui.lbl_quit;
             document.getElementById('lbl-lum').innerText = ui.lbl_lum;
-            
             document.getElementById('lum-title').innerText = ui.lum_title;
             document.getElementById('lum-sub').innerText = ui.lum_sub;
             document.getElementById('lum-weak').innerText = ui.lum_weak;
             document.getElementById('lum-target').innerText = ui.lum_target;
             document.getElementById('lum-btn-target').innerText = ui.lum_btn_target;
-            
             document.getElementById('lum-lock-title').innerText = ui.lum_lock_title;
             document.getElementById('lum-lock-sub').innerText = ui.lum_lock_sub;
             document.getElementById('lum-lock-btn').innerText = ui.lum_lock_btn;
-
             document.getElementById('store-title').innerText = ui.store_title;
             document.getElementById('store-bal-lbl').innerText = ui.store_bal;
             document.getElementById('store-with-lbl').innerHTML = `🏦 ${ui.store_with} <span id="store-min-lbl" class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">${ui.store_min}</span>`;
             document.getElementById('store-cash-btn').innerText = ui.store_cash;
-
-            document.getElementById('rescue-title').innerText = ui.rescue_title;
-            document.getElementById('rescue-desc').innerText = ui.rescue_sub;
-            document.getElementById('rescue-action-btn').innerText = ui.rescue_btn;
             document.getElementById('rescue-cancel-btn').innerText = ui.rescue_cancel;
-            
             initBlindModeUI();
         }
 
@@ -415,19 +407,19 @@
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v53_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v53_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v53_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v53_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v54_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v54_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v54_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v54_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v53_adlim') !== null ? parseInt(localStorage.getItem('ob_v53_adlim')) : 6,
-            isBlindMode: localStorage.getItem('ob_v53_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v54_adlim') !== null ? parseInt(localStorage.getItem('ob_v54_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v54_refillcount') || '0'), // 🚨 新增：单日补给次数记录
+            isBlindMode: localStorage.getItem('ob_v54_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -435,12 +427,13 @@
         let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v53_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v53_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v53_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v53_adlim', state.adLimit);
-            localStorage.setItem('ob_v53_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v53_blind', state.isBlindMode);
+            localStorage.setItem('ob_v54_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v54_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v54_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v54_adlim', state.adLimit);
+            localStorage.setItem('ob_v54_refillcount', state.refillCount); // 保存补给次数
+            localStorage.setItem('ob_v54_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v54_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -459,14 +452,11 @@
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
                 if (!prof) {
                     await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false });
-                    state.cloudBalance = 0.00;
-                    state.lumUnlocked = false;
+                    state.cloudBalance = 0.00; state.lumUnlocked = false;
                 } else {
-                    state.cloudBalance = Number(prof.wallet_balance) || 0.00;
-                    state.lumUnlocked = prof.lum_unlocked === true;
+                    state.cloudBalance = Number(prof.wallet_balance) || 0.00; state.lumUnlocked = prof.lum_unlocked === true;
                 }
-                saveData(); 
-                document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+                saveData(); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                 document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
                 playSfx('success');
             } catch (err) { document.getElementById('auth-msg').innerText = "❌ " + err.message; }
@@ -483,155 +473,92 @@
 
         window.enterMainApp = function() {
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
-            applyI18N(); 
-            window.fetchNewPhrase();
-            
+            applyI18N(); window.fetchNewPhrase();
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { 
-                const now = Date.now();
-                const diffMin = (now - lastTimeTick) / 60000;
-                lastTimeTick = now;
-                if (state.currentTime < state.targetTime) {
-                    state.currentTime += diffMin;
-                    updateTopBar();
-                }
+                const now = Date.now(); const diffMin = (now - lastTimeTick) / 60000; lastTimeTick = now;
+                if (state.currentTime < state.targetTime) { state.currentTime += diffMin; updateTopBar(); }
             }, 1000);
         }
 
         function initBlindModeUI() {
-            const btn = document.getElementById('blind-toggle-btn');
-            const ui = getUI();
-            if (state.isBlindMode) { 
-                btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); 
-                btn.innerText = ui.lbl_shadow_on; 
-            } else {
-                btn.innerText = ui.lbl_shadow_off; 
-            }
+            const btn = document.getElementById('blind-toggle-btn'); const ui = getUI();
+            if (state.isBlindMode) { btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); btn.innerText = ui.lbl_shadow_on; } 
+            else { btn.innerText = ui.lbl_shadow_off; }
         }
 
         window.toggleBlindMode = function() {
-            playSfx('click');
-            state.isBlindMode = !state.isBlindMode;
-            saveData();
-            const btn = document.getElementById('blind-toggle-btn');
-            const ui = getUI();
-            if(state.isBlindMode) {
-                btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); 
-                btn.innerText = ui.lbl_shadow_on;
-            } else {
-                btn.classList.replace('text-amber-400', 'text-indigo-300'); btn.classList.replace('border-amber-500/30', 'border-indigo-500/30'); btn.classList.replace('bg-amber-500/20', 'bg-indigo-500/20'); 
-                btn.innerText = ui.lbl_shadow_off;
-            }
+            playSfx('click'); state.isBlindMode = !state.isBlindMode; saveData();
+            const btn = document.getElementById('blind-toggle-btn'); const ui = getUI();
+            if(state.isBlindMode) { btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); btn.innerText = ui.lbl_shadow_on; } 
+            else { btn.classList.replace('text-amber-400', 'text-indigo-300'); btn.classList.replace('border-amber-500/30', 'border-indigo-500/30'); btn.classList.replace('bg-amber-500/20', 'bg-indigo-500/20'); btn.innerText = ui.lbl_shadow_off; }
             renderTextDisplay(); 
         }
 
-        window.revealBlindText = function() {
-            if(state.isBlindMode && document.getElementById('text-container').classList.contains('blind-mode-active')) {
-                playSfx('click');
-                document.getElementById('text-container').classList.remove('blind-mode-active');
-            }
-        }
+        window.revealBlindText = function() { if(state.isBlindMode && document.getElementById('text-container').classList.contains('blind-mode-active')) { playSfx('click'); document.getElementById('text-container').classList.remove('blind-mode-active'); } }
 
         function generateLiaisonHints(text) {
             if (state.path !== 'en') return `<span>${text}</span>`; 
-            const words = text.split(' ');
-            let html = '';
+            const words = text.split(' '); let html = '';
             for(let i=0; i<words.length; i++) {
-                let w = words[i];
-                html += `<span>${w}</span>`;
+                let w = words[i]; html += `<span>${w}</span>`;
                 if(i < words.length - 1) {
-                    let nextW = words[i+1];
-                    let cleanW = w.replace(/[^a-zA-Z]/g, '').toLowerCase();
-                    let cleanNext = nextW.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                    let nextW = words[i+1]; let cleanW = w.replace(/[^a-zA-Z]/g, '').toLowerCase(); let cleanNext = nextW.replace(/[^a-zA-Z]/g, '').toLowerCase();
                     if(cleanW.length > 0 && cleanNext.length > 0) {
-                        let endsWithConsonant = /[^aeiou]$/.test(cleanW);
-                        let startsWithVowel = /^[aeiou]/.test(cleanNext);
+                        let endsWithConsonant = /[^aeiou]$/.test(cleanW); let startsWithVowel = /^[aeiou]/.test(cleanNext);
                         if (cleanW.endsWith('e') && cleanW.length > 2) endsWithConsonant = true; 
-                        if(endsWithConsonant && startsWithVowel) {
-                            html += `<span class="text-amber-500 opacity-70 -mx-1 translate-y-1 scale-150">‿</span>`;
-                        } else { html += ` `; }
+                        if(endsWithConsonant && startsWithVowel) { html += `<span class="text-amber-500 opacity-70 -mx-1 translate-y-1 scale-150">‿</span>`; } 
+                        else { html += ` `; }
                     } else { html += ` `; }
                 }
-            }
-            return html;
+            } return html;
         }
 
         function renderTextDisplay() {
             if (!currentPhrase) return;
-            const tEl = document.getElementById('target-text'); 
-            const zhEl = document.getElementById('target-zh');
-            const container = document.getElementById('text-container');
-            const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            
-            tEl.innerHTML = `"${generateLiaisonHints(txt)}"`;
-            zhEl.innerText = sub;
-            
+            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh'); const container = document.getElementById('text-container');
+            const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            tEl.innerHTML = `"${generateLiaisonHints(txt)}"`; zhEl.innerText = sub;
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
         }
 
-        window.handleRefresh = function() {
-            if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); 
-            else window.fetchNewPhrase(); 
-        }
+        window.handleRefresh = function() { if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); else window.fetchNewPhrase(); }
 
         window.translateWord = async function(word, isEn) {
-            try {
-                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${isEn ? 'en|zh-CN' : 'zh-CN|en'}`);
-                const data = await res.json(); return data.responseData.translatedText;
-            } catch (e) { return isEn ? '暂无释义' : 'Translation unavailable'; }
+            try { const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${isEn ? 'en|zh-CN' : 'zh-CN|en'}`); const data = await res.json(); return data.responseData.translatedText; } 
+            catch (e) { return isEn ? '暂无释义' : 'Translation unavailable'; }
         }
 
         window.practiceWeakLang = async () => {
-            playSfx('click'); 
-            const isCn = (state.path === 'cn'); 
-            const words = Object.entries(state.missedWords);
+            playSfx('click'); const isCn = (state.path === 'cn'); const words = Object.entries(state.missedWords);
             let filtered = words.filter(([word, count]) => { return isCn ? /[\u4e00-\u9fa5]/.test(word) : /[a-zA-Z]/.test(word); });
-            
             const ui = getUI();
             if (filtered.length === 0) { alert(ui.lum_no_weak); return; }
-            
-            filtered.sort((a,b) => b[1] - a[1]);
-            const pickedWord = filtered[Math.floor(Math.random() * Math.min(5, filtered.length))][0];
-            
+            filtered.sort((a,b) => b[1] - a[1]); const pickedWord = filtered[Math.floor(Math.random() * Math.min(5, filtered.length))][0];
             window.closeModal('lum-modal');
             document.getElementById('target-text').innerText = ui.txt_translating; document.getElementById('target-zh').innerText = ""; document.getElementById('scene-display').innerText = ui.txt_scene + "WEAK WORD";
-            
             const translation = await window.translateWord(pickedWord, !isCn);
             currentPhrase = { id: 'weak_' + pickedWord, text_en: isCn ? translation : pickedWord, text_zh: isCn ? pickedWord : translation, scenario: 'WEAK WORD' };
-            
-            renderTextDisplay();
-            document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
+            renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
         }
 
         window.fetchNewPhrase = async function() {
-            playSfx('click');
-            const ui = getUI();
+            playSfx('click'); const ui = getUI();
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
-            
-            let pool = [];
-            try { const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel); if (data && data.length > 0) pool = data; } catch (e) {}
+            let pool = []; try { const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel); if (data && data.length > 0) pool = data; } catch (e) {}
             if (pool.length === 0) pool = LOCAL_CACHE;
-            
             let newPhrase; do { newPhrase = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
             currentPhrase = newPhrase;
-
             document.getElementById('scene-display').innerText = ui.txt_scene + (currentPhrase.scenario || "WORK").toUpperCase();
-            
-            renderTextDisplay();
-            syncPhraseState(); setAppState('READY');
-
+            renderTextDisplay(); syncPhraseState(); setAppState('READY');
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
         }
 
         function updateTopBar() {
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
             document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
-            
-            const ui = getUI();
-            document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? (state.path === 'en' ? "点击求助" : "REFILL") : `🆘 ${state.adLimit}/6`;
-            
+            const ui = getUI(); document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? (state.path === 'en' ? "点击求助" : "REFILL") : `🆘 ${state.adLimit}/6`;
             const flame = document.getElementById('streak-flame');
             if(state.streak > 1) { flame.classList.remove('opacity-0'); document.getElementById('streak-count').innerText = state.streak; } else { flame.classList.add('opacity-0'); }
         }
@@ -639,13 +566,11 @@
         function syncPhraseState() {
             const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             document.getElementById('item-best-score').innerText = state.scores[t] || 0;
-            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2);
-            updateTopBar();
+            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
         }
 
         function setAppState(s) {
-            const ui = getUI();
-            appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
+            const ui = getUI(); appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
             switch(s) {
                 case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">${ui.sys_ready}</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
                 case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_rec}</p>`; btn.classList.add('recording-active'); document.getElementById('refresh-btn').disabled = true; break;
@@ -658,122 +583,59 @@
             if(!isAuto) playSfx('click');
             const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             if (!text || text === getUI().txt_conn) return;
-
-            const btn = document.querySelector('button[onclick="window.playAudio()"]');
-            const originalContent = btn.innerHTML;
+            const btn = document.querySelector('button[onclick="window.playAudio()"]'); const originalContent = btn.innerHTML;
             btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
             btn.disabled = true;
-
-            const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; 
-            let voices = window.speechSynthesis.getVoices();
-
-            if (state.path === 'en') {
-                u.lang = 'en-US';
-                let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google')));
-                if (bestVoice) u.voice = bestVoice;
-            } else {
-                u.lang = 'zh-CN';
-                let bestVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Ting-Ting') || v.name.includes('Siri') || v.name.includes('Google')));
-                if (bestVoice) u.voice = bestVoice;
-            }
-
-            u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-            u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+            const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; let voices = window.speechSynthesis.getVoices();
+            if (state.path === 'en') { u.lang = 'en-US'; let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; } 
+            else { u.lang = 'zh-CN'; let bestVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Ting-Ting') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; }
+            u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; }; u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
             window.speechSynthesis.speak(u);
         }
 
         function analyzeMistakes(target, captured) {
             let tWords = []; let cWords = [];
-            
-            if (state.path === 'en') {
-                tWords = target.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
-                cWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
-            } else {
-                if (window.Intl && Intl.Segmenter) {
-                    const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' });
-                    tWords = Array.from(segmenter.segment(target.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment);
-                    cWords = Array.from(segmenter.segment(captured.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment);
-                } else {
-                    tWords = target.replace(/[^\u4e00-\u9fa5]/g,"").split('');
-                    cWords = captured.replace(/[^\u4e00-\u9fa5]/g,"").split('');
-                }
-            }
-            
-            const missed = tWords.filter(w => w && !cWords.includes(w));
-            missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; });
-            return missed;
+            if (state.path === 'en') { tWords = target.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/); cWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/); } 
+            else { if (window.Intl && Intl.Segmenter) { const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' }); tWords = Array.from(segmenter.segment(target.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment); cWords = Array.from(segmenter.segment(captured.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment); } else { tWords = target.replace(/[^\u4e00-\u9fa5]/g,"").split(''); cWords = captured.replace(/[^\u4e00-\u9fa5]/g,"").split(''); } }
+            const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
-        // 🚨 核心修复：精准识别广告助力行为
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
                 document.getElementById('text-container').classList.remove('blind-mode-active');
-
-                const isAdBoost = (txt === "[AD_BOOST]");
-                const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                
+                const isAdBoost = (txt === "[AD_BOOST]"); const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 let safeTxt = isAdBoost ? "" : (txt || "");
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
-                
                 let score = 0;
                 
                 if (!isAdBoost) {
                     analyzeMistakes(rawT, safeTxt);
-                    let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
-                    let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
-                    if (state.path === 'cn') { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); } 
-                    else { fmtC = fmtC.replace(/\s+/g, " ").trim(); fmtT = fmtT.replace(/\s+/g, " ").trim(); }
-
+                    let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                    if (state.path === 'cn') { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); } else { fmtC = fmtC.replace(/\s+/g, " ").trim(); fmtT = fmtT.replace(/\s+/g, " ").trim(); }
                     const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
-                    for (let i = 1; i <= fmtT.length; i++) {
-                        let prev = dp[0]; dp[0] = i;
-                        for (let j = 1; j <= fmtC.length; j++) {
-                            let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp;
-                        }
-                    }
-                    
+                    for (let i = 1; i <= fmtT.length; i++) { let prev = dp[0]; dp[0] = i; for (let j = 1; j <= fmtC.length; j++) { let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp; } }
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
-                    if (rawRatio >= 0.85) score = 100; 
-                    else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio-0.7)*60);
-                    else if (rawRatio >= 0.50) score = 75 + Math.floor((rawRatio-0.5)*75);
-                    else score = Math.max(0, Math.round(rawRatio * 100));
-
+                    if (rawRatio >= 0.85) score = 100; else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio-0.7)*60); else if (rawRatio >= 0.50) score = 75 + Math.floor((rawRatio-0.5)*75); else score = Math.max(0, Math.round(rawRatio * 100));
                     if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                     if (score >= 80) state.streak += 1; else state.streak = 0;
-                } else {
-                    state.streak += 1; // 广告助力也算作连击保持
-                }
+                } else { state.streak += 1; }
                 
-                let tier = 0;
-                if (score >= 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1;
-
-                const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
-                const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
+                let tier = 0; if (score >= 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1;
+                const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0); const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
 
                 if (diff > 0) {
                     setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
-                    document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2);
-                    document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                    document.getElementById('total-earned').classList.add('money-jump');
-                    setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
-                    playSfx('success');
-                    try { 
-                        const { data: { user } } = await oasisCloud.auth.getUser(); 
-                        if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } 
-                    } catch (e) {}
+                    document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+                    document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); playSfx('success');
+                    try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
                 }
                 
-                // 🚨 修复广告特效：如果是广告助力，弹窗 SPONSORED!
-                const feedbackBox = document.getElementById('game-feedback');
-                const textEl = document.getElementById('feedback-text');
-                const subEl = document.getElementById('feedback-sub');
-                feedbackBox.classList.remove('animate-pop-in');
-                void feedbackBox.offsetWidth; 
+                const feedbackBox = document.getElementById('game-feedback'); const textEl = document.getElementById('feedback-text'); const subEl = document.getElementById('feedback-sub');
+                feedbackBox.classList.remove('animate-pop-in'); void feedbackBox.offsetWidth; 
                 
                 if (isAdBoost) {
-                    textEl.innerText = "SPONSORED! 🚀"; 
-                    textEl.className = "text-4xl font-black italic tracking-tighter text-blue-400 drop-shadow-md"; 
+                    textEl.innerText = "SPONSORED! 🚀"; textEl.className = "text-4xl font-black italic tracking-tighter text-blue-400 drop-shadow-md"; 
                     subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : 'MAX BOOSTED';
                 } else if (txt !== "") {
                     if (score >= 100) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
@@ -784,21 +646,11 @@
                 }
                 if (isAdBoost || txt !== "") { feedbackBox.classList.add('animate-pop-in'); }
 
-                if (isAdBoost) {
-                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`;
-                } else {
-                    const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
-                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`;
-                }
+                if (isAdBoost) { document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; } 
+                else { const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`; }
                 
                 saveData(); syncPhraseState();
-                
-                setTimeout(() => { 
-                    isEvaluating = false; 
-                    // 🚨 强制智能流转：无论语音得钱还是广告得钱，统统自动切下一题
-                    if ((diff > 0 && !isAdBoost) || isAdBoost) window.handleRefresh(); 
-                    else setAppState('READY'); 
-                }, 2500); 
+                setTimeout(() => { isEvaluating = false; if ((diff > 0 && !isAdBoost) || isAdBoost) window.handleRefresh(); else setAppState('READY'); }, 2500); 
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
@@ -813,29 +665,23 @@
             playSfx('click');
             if (state.cloudBalance >= 10) { 
                 state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar(); 
-                try { 
-                    const { data: { user } } = await oasisCloud.auth.getUser(); 
-                    if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance, lum_unlocked: true }).eq('id', user.id); } 
-                } catch (e) {}
+                try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance, lum_unlocked: true }).eq('id', user.id); } } catch (e) {}
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0'); playSfx('success');
                 setTimeout(() => { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); }, 500);
             } else { alert(state.path === 'en' ? "AED 余额不足 10.00，快去练习吧！" : "Not enough AED balance (10.00 req). Keep practicing!"); }
         }
 
         function renderLUMChart() {
-            const ctx = document.getElementById('lumRadarChart').getContext('2d');
-            const isEn = state.path === 'en';
+            const ctx = document.getElementById('lumRadarChart').getContext('2d'); const isEn = state.path === 'en';
             const relevantScores = Object.entries(state.scores).filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text)).map(([_, score]) => score);
-            const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0;
-            const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
+            const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0; const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
             if (lumChart) lumChart.destroy();
             const labels = isEn ? ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'] : ['发音', '流利度', '语境', '词汇量', '准确度'];
             lumChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ data: [avg, (avg * 0.9) + 5, mastery, avg * 0.95, avg * 0.85], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)', pointBackgroundColor: '#fbbf24', pointBorderColor: '#ffffff', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: 'rgba(255, 255, 255, 0.08)', circular: true }, angleLines: { color: 'rgba(255, 255, 255, 0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family: "'Space Grotesk', sans-serif" } } } }, plugins: { legend: { display: false } } } });
         }
 
         window.promptExit = () => {
-            playSfx('click'); const left = Math.ceil(state.targetTime - state.currentTime); const content = document.getElementById('exit-content');
-            const ui = getUI();
+            playSfx('click'); const left = Math.ceil(state.targetTime - state.currentTime); const content = document.getElementById('exit-content'); const ui = getUI();
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
                 content.innerHTML = `<h3 class="text-2xl font-black text-amber-400 mb-2">${ui.exit_weak_title}</h3><p class="text-slate-300 text-sm mb-6">${ui.exit_weak_sub}</p><button onclick="window.exitWeakMode()" class="w-full py-4 bg-amber-600 text-white font-black rounded-xl mb-3 shadow-lg">${ui.exit_weak_y}</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">${ui.exit_weak_n}</button>`;
                 window.openModal('exit-modal'); return;
@@ -847,19 +693,39 @@
 
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); window.fetchNewPhrase(); }
         
-        // 🚨 触发广告：点击广告限制按钮逻辑
+        // 🚨 核心风控修复：每日补给上限物理熔断机制
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v53_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v53_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v54_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { 
+                state.adLimit = 6; 
+                state.refillCount = 0; // 每天重置补给次数
+                localStorage.setItem('ob_v54_refreshtime', now); 
+                saveData(); 
+            }
         }
 
         window.requestRescue = function() { 
             playSfx('click'); checkAdRefresh(); 
             if (appState === 'REWARDING') return; 
+            
             if (state.adLimit <= 0) { 
-                document.getElementById('rescue-title').innerText = getUI().rescue_title; 
-                document.getElementById('rescue-desc').innerText = getUI().rescue_sub; 
-                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
+                const ui = getUI();
+                if (state.refillCount >= 2) { 
+                    // 🚨 熔断：超过 2 次补给，按钮变灰，拒绝拉起广告
+                    document.getElementById('rescue-title').innerText = ui.rescue_max_title; 
+                    document.getElementById('rescue-desc').innerText = ui.rescue_max_sub; 
+                    const btn = document.getElementById('rescue-action-btn');
+                    btn.innerText = ui.rescue_max_btn;
+                    btn.className = "w-full py-4 bg-gray-700 text-gray-500 font-black text-sm mb-4 rounded-[16px] uppercase cursor-not-allowed transition-all duration-300";
+                    btn.onclick = null; 
+                } else {
+                    document.getElementById('rescue-title').innerText = ui.rescue_title; 
+                    document.getElementById('rescue-desc').innerText = ui.rescue_sub + ` (${2 - state.refillCount} Left)`; 
+                    const btn = document.getElementById('rescue-action-btn');
+                    btn.innerText = ui.rescue_btn;
+                    btn.className = "w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300";
+                    btn.onclick = () => window.watchAd('refill'); 
+                }
                 window.openModal('rescue-modal'); 
                 return; 
             } 
@@ -876,9 +742,11 @@
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; 
                     const currentBoost = state.adBoostMap[t] || 0; 
                     state.adBoostMap[t] = Math.min(5, currentBoost + 1); 
-                    window.processAndScore("[AD_BOOST]"); // 传递广告标识
+                    window.processAndScore("[AD_BOOST]"); 
                 } else if (type === 'refill') { 
-                    state.adLimit = 6; updateTopBar(); saveData(); playSfx('success'); 
+                    state.adLimit = 6; 
+                    state.refillCount++; // 🚨 成功补给后增加计数
+                    updateTopBar(); saveData(); playSfx('success'); 
                 } 
             }, () => setAppState('READY')); 
         }
