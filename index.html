@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V52 - 云端内购状态绑定版</title>
+    <title>Oasis Bridge V53 - 广告引擎修复版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -57,7 +57,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V52</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V53</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -384,33 +384,6 @@
             }
         }
 
-        // 🚨 核心逻辑：精准的分数反馈
-        function triggerGameFeedback(score, diff) {
-            const feedbackBox = document.getElementById('game-feedback');
-            const textEl = document.getElementById('feedback-text');
-            const subEl = document.getElementById('feedback-sub');
-            
-            feedbackBox.classList.remove('animate-pop-in');
-            void feedbackBox.offsetWidth; 
-            
-            if (score >= 100) { 
-                textEl.innerText = "PERFECT! 🔥"; 
-                textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; 
-            } else if (score >= 80) { 
-                textEl.innerText = "EXCELLENT! ✨"; 
-                textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; 
-            } else if (score >= 60) { 
-                textEl.innerText = "GOOD! 👍"; 
-                textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; 
-            } else {
-                textEl.innerText = "KEEP GOING! 💪"; 
-                textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; 
-            }
-            
-            subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : (score < 60 ? 'Almost there' : 'COMBO!');
-            feedbackBox.classList.add('animate-pop-in');
-        }
-
         window.AdManager = {
             adUnitId: 'ca-app-pub-5083945196856634/5740020253', isNativeAdMob: false, isAdLoaded: false,
             init: async function() {
@@ -448,13 +421,13 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v52_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v52_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v52_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v52_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v53_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v53_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v53_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v53_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v52_adlim') !== null ? parseInt(localStorage.getItem('ob_v52_adlim')) : 6,
-            isBlindMode: localStorage.getItem('ob_v52_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v53_adlim') !== null ? parseInt(localStorage.getItem('ob_v53_adlim')) : 6,
+            isBlindMode: localStorage.getItem('ob_v53_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -462,12 +435,12 @@
         let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v52_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v52_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v52_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v52_adlim', state.adLimit);
-            localStorage.setItem('ob_v52_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v52_blind', state.isBlindMode);
+            localStorage.setItem('ob_v53_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v53_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v53_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v53_adlim', state.adLimit);
+            localStorage.setItem('ob_v53_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v53_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -476,7 +449,6 @@
             else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; }
         }
 
-        // 🚨 核心修复：登录时同步云端 LUM 解锁状态
         window.executeAuth = async function() {
             const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('auth-action-btn'); btn.disabled = true; btn.innerText = "AUTHENTICATING...";
@@ -732,44 +704,49 @@
             return missed;
         }
 
+        // 🚨 核心修复：精准识别广告助力行为
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
                 document.getElementById('text-container').classList.remove('blind-mode-active');
 
+                const isAdBoost = (txt === "[AD_BOOST]");
                 const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                let safeTxt = txt || "";
+                
+                let safeTxt = isAdBoost ? "" : (txt || "");
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
                 
-                analyzeMistakes(rawT, safeTxt);
-
-                let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
-                let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
-                
-                if (state.path === 'cn') { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); } 
-                else { fmtC = fmtC.replace(/\s+/g, " ").trim(); fmtT = fmtT.replace(/\s+/g, " ").trim(); }
-
-                const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
-                for (let i = 1; i <= fmtT.length; i++) {
-                    let prev = dp[0]; dp[0] = i;
-                    for (let j = 1; j <= fmtC.length; j++) {
-                        let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp;
-                    }
-                }
-                
-                let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
                 let score = 0;
-                if (rawRatio >= 0.85) score = 100; 
-                else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio-0.7)*60);
-                else if (rawRatio >= 0.50) score = 75 + Math.floor((rawRatio-0.5)*75);
-                else score = Math.max(0, Math.round(rawRatio * 100));
+                
+                if (!isAdBoost) {
+                    analyzeMistakes(rawT, safeTxt);
+                    let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                    let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                    if (state.path === 'cn') { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); } 
+                    else { fmtC = fmtC.replace(/\s+/g, " ").trim(); fmtT = fmtT.replace(/\s+/g, " ").trim(); }
 
-                if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
+                    const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
+                    for (let i = 1; i <= fmtT.length; i++) {
+                        let prev = dp[0]; dp[0] = i;
+                        for (let j = 1; j <= fmtC.length; j++) {
+                            let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp;
+                        }
+                    }
+                    
+                    let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
+                    if (rawRatio >= 0.85) score = 100; 
+                    else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio-0.7)*60);
+                    else if (rawRatio >= 0.50) score = 75 + Math.floor((rawRatio-0.5)*75);
+                    else score = Math.max(0, Math.round(rawRatio * 100));
+
+                    if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
+                    if (score >= 80) state.streak += 1; else state.streak = 0;
+                } else {
+                    state.streak += 1; // 广告助力也算作连击保持
+                }
                 
                 let tier = 0;
                 if (score >= 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1;
-
-                if(score >= 80) state.streak += 1; else state.streak = 0;
 
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0);
                 const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
@@ -781,24 +758,45 @@
                     document.getElementById('total-earned').classList.add('money-jump');
                     setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
                     playSfx('success');
-                    
-                    // 🚨 立刻将钱包余额写回云端，保证不错过任何一笔钱！
                     try { 
                         const { data: { user } } = await oasisCloud.auth.getUser(); 
                         if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } 
                     } catch (e) {}
                 }
                 
-                if(txt !== "") { triggerGameFeedback(score, diff); }
+                // 🚨 修复广告特效：如果是广告助力，弹窗 SPONSORED!
+                const feedbackBox = document.getElementById('game-feedback');
+                const textEl = document.getElementById('feedback-text');
+                const subEl = document.getElementById('feedback-sub');
+                feedbackBox.classList.remove('animate-pop-in');
+                void feedbackBox.offsetWidth; 
+                
+                if (isAdBoost) {
+                    textEl.innerText = "SPONSORED! 🚀"; 
+                    textEl.className = "text-4xl font-black italic tracking-tighter text-blue-400 drop-shadow-md"; 
+                    subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : 'MAX BOOSTED';
+                } else if (txt !== "") {
+                    if (score >= 100) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
+                    else if (score >= 80) { textEl.innerText = "EXCELLENT! ✨"; textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; } 
+                    else if (score >= 60) { textEl.innerText = "GOOD! 👍"; textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; } 
+                    else { textEl.innerText = "KEEP GOING! 💪"; textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; }
+                    subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : (score < 60 ? 'Almost there' : 'COMBO!');
+                }
+                if (isAdBoost || txt !== "") { feedbackBox.classList.add('animate-pop-in'); }
 
-                const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
-                document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`;
+                if (isAdBoost) {
+                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`;
+                } else {
+                    const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
+                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`;
+                }
                 
                 saveData(); syncPhraseState();
                 
                 setTimeout(() => { 
                     isEvaluating = false; 
-                    if (diff > 0 && txt !== "") window.handleRefresh(); 
+                    // 🚨 强制智能流转：无论语音得钱还是广告得钱，统统自动切下一题
+                    if ((diff > 0 && !isAdBoost) || isAdBoost) window.handleRefresh(); 
                     else setAppState('READY'); 
                 }, 2500); 
             } catch (e) { setAppState('READY'); isEvaluating = false; }
@@ -811,17 +809,14 @@
             window.openModal('lum-modal');
         }
 
-        // 🚨 核心修复：购买 LUM 时同步到 Supabase 云端
         window.buyLUM = async () => {
             playSfx('click');
             if (state.cloudBalance >= 10) { 
                 state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar(); 
-                
                 try { 
                     const { data: { user } } = await oasisCloud.auth.getUser(); 
                     if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance, lum_unlocked: true }).eq('id', user.id); } 
                 } catch (e) {}
-
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0'); playSfx('success');
                 setTimeout(() => { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); }, 500);
             } else { alert(state.path === 'en' ? "AED 余额不足 10.00，快去练习吧！" : "Not enough AED balance (10.00 req). Keep practicing!"); }
@@ -830,24 +825,17 @@
         function renderLUMChart() {
             const ctx = document.getElementById('lumRadarChart').getContext('2d');
             const isEn = state.path === 'en';
-            
-            const relevantScores = Object.entries(state.scores)
-                .filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text))
-                .map(([_, score]) => score);
-                
+            const relevantScores = Object.entries(state.scores).filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text)).map(([_, score]) => score);
             const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0;
             const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
-            
             if (lumChart) lumChart.destroy();
             const labels = isEn ? ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'] : ['发音', '流利度', '语境', '词汇量', '准确度'];
-            
             lumChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ data: [avg, (avg * 0.9) + 5, mastery, avg * 0.95, avg * 0.85], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)', pointBackgroundColor: '#fbbf24', pointBorderColor: '#ffffff', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: 'rgba(255, 255, 255, 0.08)', circular: true }, angleLines: { color: 'rgba(255, 255, 255, 0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family: "'Space Grotesk', sans-serif" } } } }, plugins: { legend: { display: false } } } });
         }
 
         window.promptExit = () => {
             playSfx('click'); const left = Math.ceil(state.targetTime - state.currentTime); const content = document.getElementById('exit-content');
             const ui = getUI();
-            
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
                 content.innerHTML = `<h3 class="text-2xl font-black text-amber-400 mb-2">${ui.exit_weak_title}</h3><p class="text-slate-300 text-sm mb-6">${ui.exit_weak_sub}</p><button onclick="window.exitWeakMode()" class="w-full py-4 bg-amber-600 text-white font-black rounded-xl mb-3 shadow-lg">${ui.exit_weak_y}</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">${ui.exit_weak_n}</button>`;
                 window.openModal('exit-modal'); return;
@@ -858,8 +846,43 @@
         }
 
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); window.fetchNewPhrase(); }
-        window.requestRescue = function() { playSfx('click'); checkAdRefresh(); if (appState === 'REWARDING') return; if (state.adLimit <= 0) { document.getElementById('rescue-title').innerText = getUI().rescue_title; document.getElementById('rescue-desc').innerText = getUI().rescue_sub; document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); window.openModal('rescue-modal'); return; } window.watchAd('boost'); }
-        window.watchAd = (type) => { playSfx('click'); window.closeModal('rescue-modal'); window.closeModal('exit-modal'); window.AdManager.showAd(() => { if (type === 'time') { state.currentTime += 5; updateTopBar(); saveData(); playSfx('success'); } else if (type === 'boost') { state.adLimit--; const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; const currentBoost = state.adBoostMap[t] || 0; state.adBoostMap[t] = Math.min(5, currentBoost + 1); window.processAndScore(""); } else if (type === 'refill') { state.adLimit = 6; updateTopBar(); saveData(); playSfx('success'); } }, () => setAppState('READY')); }
+        
+        // 🚨 触发广告：点击广告限制按钮逻辑
+        function checkAdRefresh() {
+            const now = Date.now(); const last = localStorage.getItem('ob_v53_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v53_refreshtime', now); saveData(); }
+        }
+
+        window.requestRescue = function() { 
+            playSfx('click'); checkAdRefresh(); 
+            if (appState === 'REWARDING') return; 
+            if (state.adLimit <= 0) { 
+                document.getElementById('rescue-title').innerText = getUI().rescue_title; 
+                document.getElementById('rescue-desc').innerText = getUI().rescue_sub; 
+                document.getElementById('rescue-action-btn').onclick = () => window.watchAd('refill'); 
+                window.openModal('rescue-modal'); 
+                return; 
+            } 
+            window.watchAd('boost'); 
+        }
+
+        window.watchAd = (type) => { 
+            playSfx('click'); window.closeModal('rescue-modal'); window.closeModal('exit-modal'); 
+            window.AdManager.showAd(() => { 
+                if (type === 'time') { 
+                    state.currentTime += 5; updateTopBar(); saveData(); playSfx('success'); 
+                } else if (type === 'boost') { 
+                    state.adLimit--; 
+                    const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; 
+                    const currentBoost = state.adBoostMap[t] || 0; 
+                    state.adBoostMap[t] = Math.min(5, currentBoost + 1); 
+                    window.processAndScore("[AD_BOOST]"); // 传递广告标识
+                } else if (type === 'refill') { 
+                    state.adLimit = 6; updateTopBar(); saveData(); playSfx('success'); 
+                } 
+            }, () => setAppState('READY')); 
+        }
+        
         window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
         window.submitWithdrawal = async function() { alert(state.path === 'en' ? "提现处理中 (3-5个工作日)" : "Processing Withdrawal (3-5 Days)"); }
