@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V50 - 纯净引擎与完美反馈版</title>
+    <title>Oasis Bridge V51 - 智能分词与语种隔离版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -57,7 +57,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V50</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V51</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -219,7 +219,7 @@
                 <button id="lum-lock-btn" onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 AED Unlock</button>
             </div>
             <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
-                <div><h3 id="lum-title" class="text-2xl font-black text-blue-400">LUM Analytics</h3><p id="lum-sub" class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Real-time Capability Mapping</p></div>
+                <div><h3 id="lum-title" class="text-2xl font-black text-blue-400">LUM Analytics</h3><p id="lum-sub" class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Capability Mapping</p></div>
                 <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-10 relative z-10">
@@ -232,13 +232,8 @@
                         <span id="lum-target" class="text-[9px] text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">TARGETED</span>
                     </h4>
                     <div class="flex gap-3 px-1">
-                        <button onclick="window.practiceWeakLang('cn')" class="flex-1 py-4 bg-gradient-to-br from-red-500/10 to-red-600/20 border border-red-500/30 rounded-2xl flex flex-col items-center justify-center active:scale-95 transition-transform shadow-lg shadow-red-900/20">
-                            <span class="text-3xl mb-2 drop-shadow-md">🇨🇳</span>
-                            <span id="lum-btn-cn-txt" class="text-red-100 font-bold text-xs tracking-wider">Practice Chinese</span>
-                        </button>
-                        <button onclick="window.practiceWeakLang('en')" class="flex-1 py-4 bg-gradient-to-br from-blue-500/10 to-blue-600/20 border border-blue-500/30 rounded-2xl flex flex-col items-center justify-center active:scale-95 transition-transform shadow-lg shadow-blue-900/20">
-                            <span class="text-3xl mb-2 drop-shadow-md">🇦🇪</span>
-                            <span id="lum-btn-en-txt" class="text-blue-100 font-bold text-xs tracking-wider">Practice English</span>
+                        <button onclick="window.practiceWeakLang()" class="w-full py-4 bg-gradient-to-br from-indigo-500/10 to-indigo-600/20 border border-indigo-500/30 rounded-2xl flex flex-col items-center justify-center active:scale-95 transition-transform shadow-lg">
+                            <span id="lum-btn-target" class="text-indigo-100 font-bold text-sm tracking-wider">Start Targeted Practice</span>
                         </button>
                     </div>
                 </div>
@@ -289,7 +284,7 @@
 
     <script>
         // ==========================================
-        // 🚨 一体化纯净脚本核心
+        // 🚨 核心字典更新：动态雷达子标题 & 特训按钮
         // ==========================================
         const i18n = {
             en: { 
@@ -305,9 +300,11 @@
                 exit_weak_title: "End Targeted Practice?", exit_weak_sub: "Return to normal scenarios", exit_weak_y: "Yes, Return", exit_weak_n: "Keep Practicing",
                 store_title: "Financial Center", store_bal: "Balance:", store_with: "Withdrawal",
                 store_min: "Min 50 AED", store_cash: "Cash Out",
-                lum_title: "LUM Analytics", lum_sub: "Real-time Capability Mapping",
+                lum_title: "LUM Analytics", 
+                lum_sub: "English Capability Mapping", // 英文专属
                 lum_weak: "Weak Words Vault", lum_target: "TARGETED",
-                lum_btn_cn: "Practice Chinese", lum_btn_en: "Practice English",
+                lum_btn_target: "Start Targeted Practice", // 单一按钮
+                lum_no_weak: "No weak words found yet. Keep practicing!",
                 lum_lock_title: "LUM Analytics", lum_lock_sub: "Unlock multi-dimensional radar and targeted weak words practice.", lum_lock_btn: "10.00 AED Unlock",
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel"
             },
@@ -324,9 +321,11 @@
                 exit_weak_title: "结束专攻特训？", exit_weak_sub: "返回常规剧情练习", exit_weak_y: "确认返回", exit_weak_n: "继续特训",
                 store_title: "财务中心", store_bal: "当前余额:", store_with: "余额提现",
                 store_min: "满 50 AED 可提", store_cash: "立即提现",
-                lum_title: "LUM 能力透视仪", lum_sub: "实时多维能力雷达",
+                lum_title: "LUM 能力透视仪", 
+                lum_sub: "中文能力多维雷达", // 中文专属
                 lum_weak: "薄弱生词库", lum_target: "专项特训",
-                lum_btn_cn: "练中文生词", lum_btn_en: "练英文单词",
+                lum_btn_target: "开始生词特训", // 单一按钮
+                lum_no_weak: "暂无生词记录，请先完成更多练习。",
                 lum_lock_title: "LUM 智慧透视仪", lum_lock_sub: "基于大模型，解锁多维度能力雷达与薄弱生词专攻库。", lum_lock_btn: "10.00 AED 解锁",
                 rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消"
             }
@@ -348,8 +347,8 @@
             document.getElementById('lum-sub').innerText = ui.lum_sub;
             document.getElementById('lum-weak').innerText = ui.lum_weak;
             document.getElementById('lum-target').innerText = ui.lum_target;
-            document.getElementById('lum-btn-cn-txt').innerText = ui.lum_btn_cn;
-            document.getElementById('lum-btn-en-txt').innerText = ui.lum_btn_en;
+            document.getElementById('lum-btn-target').innerText = ui.lum_btn_target; // 统一特训按钮
+            
             document.getElementById('lum-lock-title').innerText = ui.lum_lock_title;
             document.getElementById('lum-lock-sub').innerText = ui.lum_lock_sub;
             document.getElementById('lum-lock-btn').innerText = ui.lum_lock_btn;
@@ -388,7 +387,6 @@
             }
         }
 
-        // 🚨 核心逻辑修复：绝对精准的分数段 UI 渲染
         function triggerGameFeedback(score, diff) {
             const feedbackBox = document.getElementById('game-feedback');
             const textEl = document.getElementById('feedback-text');
@@ -407,7 +405,6 @@
                 textEl.innerText = "GOOD! 👍"; 
                 textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; 
             } else {
-                // 低于 60 分展现出鼓励的姿态 💪🎯
                 textEl.innerText = "KEEP GOING! 💪"; 
                 textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; 
             }
@@ -453,13 +450,13 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v50_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v50_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v50_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v50_missed') || '{}'),
-            lumUnlocked: localStorage.getItem('ob_v50_lum') === 'true',
-            adLimit: localStorage.getItem('ob_v50_adlim') !== null ? parseInt(localStorage.getItem('ob_v50_adlim')) : 6,
-            isBlindMode: localStorage.getItem('ob_v50_blind') === 'true',
+            scores: JSON.parse(localStorage.getItem('ob_v51_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v51_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v51_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v51_missed') || '{}'),
+            lumUnlocked: localStorage.getItem('ob_v51_lum') === 'true',
+            adLimit: localStorage.getItem('ob_v51_adlim') !== null ? parseInt(localStorage.getItem('ob_v51_adlim')) : 6,
+            isBlindMode: localStorage.getItem('ob_v51_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -467,13 +464,13 @@
         let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v50_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v50_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v50_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v50_adlim', state.adLimit);
-            localStorage.setItem('ob_v50_lum', state.lumUnlocked);
-            localStorage.setItem('ob_v50_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v50_blind', state.isBlindMode);
+            localStorage.setItem('ob_v51_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v51_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v51_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v51_adlim', state.adLimit);
+            localStorage.setItem('ob_v51_lum', state.lumUnlocked);
+            localStorage.setItem('ob_v51_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v51_blind', state.isBlindMode);
         }
 
         async function syncWalletToCloud() {
@@ -481,8 +478,8 @@
         }
 
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v50_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v50_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v51_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v51_refreshtime', now); saveData(); }
         }
 
         window.toggleAuthMode = function() {
@@ -607,7 +604,7 @@
         }
 
         window.handleRefresh = function() {
-            if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(state.path); 
+            if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); 
             else window.fetchNewPhrase(); 
         }
 
@@ -618,17 +615,20 @@
             } catch (e) { return isEn ? '暂无释义' : 'Translation unavailable'; }
         }
 
-        window.practiceWeakLang = async (lang) => {
-            playSfx('click'); const isCn = (lang === 'cn'); const words = Object.entries(state.missedWords);
+        // 🚨 核心修复：按语种隔离特训池
+        window.practiceWeakLang = async () => {
+            playSfx('click'); 
+            const isCn = (state.path === 'cn'); 
+            const words = Object.entries(state.missedWords);
             let filtered = words.filter(([word, count]) => { return isCn ? /[\u4e00-\u9fa5]/.test(word) : /[a-zA-Z]/.test(word); });
-            if (filtered.length === 0) { alert(isCn ? "暂无中文生词，请先完成更多练习。" : "No English weak words yet. Keep practicing!"); return; }
+            
+            const ui = getUI();
+            if (filtered.length === 0) { alert(ui.lum_no_weak); return; }
             
             filtered.sort((a,b) => b[1] - a[1]);
             const pickedWord = filtered[Math.floor(Math.random() * Math.min(5, filtered.length))][0];
             
-            window.closeModal('lum-modal'); state.path = lang;
-            const ui = getUI();
-            
+            window.closeModal('lum-modal');
             document.getElementById('target-text').innerText = ui.txt_translating; document.getElementById('target-zh').innerText = ""; document.getElementById('scene-display').innerText = ui.txt_scene + "WEAK WORD";
             
             const translation = await window.translateWord(pickedWord, !isCn);
@@ -715,9 +715,24 @@
             window.speechSynthesis.speak(u);
         }
 
+        // 🚨 核心修复：原生中文切词能力 (Intl.Segmenter)
         function analyzeMistakes(target, captured) {
-            const tWords = target.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
-            const cWords = captured.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"").split(state.path==='en'?' ':'');
+            let tWords = []; let cWords = [];
+            
+            if (state.path === 'en') {
+                tWords = target.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
+                cWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
+            } else {
+                if (window.Intl && Intl.Segmenter) {
+                    const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' });
+                    tWords = Array.from(segmenter.segment(target.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment);
+                    cWords = Array.from(segmenter.segment(captured.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment);
+                } else {
+                    tWords = target.replace(/[^\u4e00-\u9fa5]/g,"").split('');
+                    cWords = captured.replace(/[^\u4e00-\u9fa5]/g,"").split('');
+                }
+            }
+            
             const missed = tWords.filter(w => w && !cWords.includes(w));
             missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; });
             return missed;
@@ -732,13 +747,13 @@
                 let safeTxt = txt || "";
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
                 
+                analyzeMistakes(rawT, safeTxt);
+
                 let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                 let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                 
                 if (state.path === 'cn') { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); } 
                 else { fmtC = fmtC.replace(/\s+/g, " ").trim(); fmtT = fmtT.replace(/\s+/g, " ").trim(); }
-                
-                analyzeMistakes(fmtT, fmtC);
 
                 const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
                 for (let i = 1; i <= fmtT.length; i++) {
@@ -805,13 +820,21 @@
             } else { alert(state.path === 'en' ? "AED 余额不足 10.00，快去练习吧！" : "Not enough AED balance (10.00 req). Keep practicing!"); }
         }
 
+        // 🚨 核心修复：雷达图按当前语种绝对隔离数据计算
         function renderLUMChart() {
             const ctx = document.getElementById('lumRadarChart').getContext('2d');
-            const scoresArr = Object.values(state.scores);
-            const avg = scoresArr.length ? scoresArr.reduce((a,b)=>a+b,0)/scoresArr.length : 0;
-            const mastery = Math.min(100, (scoresArr.length / 50) * 100);
+            const isEn = state.path === 'en';
+            
+            const relevantScores = Object.entries(state.scores)
+                .filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text))
+                .map(([_, score]) => score);
+                
+            const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0;
+            const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
+            
             if (lumChart) lumChart.destroy();
-            const labels = state.path === 'en' ? ['发音', '流利度', '语境', '词汇量', '准确度'] : ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'];
+            const labels = isEn ? ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'] : ['发音', '流利度', '语境', '词汇量', '准确度'];
+            
             lumChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ data: [avg, (avg * 0.9) + 5, mastery, avg * 0.95, avg * 0.85], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)', pointBackgroundColor: '#fbbf24', pointBorderColor: '#ffffff', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: 'rgba(255, 255, 255, 0.08)', circular: true }, angleLines: { color: 'rgba(255, 255, 255, 0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family: "'Space Grotesk', sans-serif" } } } }, plugins: { legend: { display: false } } } });
         }
 
