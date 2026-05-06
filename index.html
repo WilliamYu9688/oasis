@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V51 - 智能分词与语种隔离版</title>
+    <title>Oasis Bridge V52 - 云端内购状态绑定版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -57,7 +57,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V51</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V52</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -283,9 +283,6 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
-        // ==========================================
-        // 🚨 核心字典更新：动态雷达子标题 & 特训按钮
-        // ==========================================
         const i18n = {
             en: { 
                 lbl_wallet: "WALLET", lbl_session: "SESSION", lbl_limit: "LIMIT",
@@ -301,9 +298,9 @@
                 store_title: "Financial Center", store_bal: "Balance:", store_with: "Withdrawal",
                 store_min: "Min 50 AED", store_cash: "Cash Out",
                 lum_title: "LUM Analytics", 
-                lum_sub: "English Capability Mapping", // 英文专属
+                lum_sub: "English Capability Mapping",
                 lum_weak: "Weak Words Vault", lum_target: "TARGETED",
-                lum_btn_target: "Start Targeted Practice", // 单一按钮
+                lum_btn_target: "Start Targeted Practice",
                 lum_no_weak: "No weak words found yet. Keep practicing!",
                 lum_lock_title: "LUM Analytics", lum_lock_sub: "Unlock multi-dimensional radar and targeted weak words practice.", lum_lock_btn: "10.00 AED Unlock",
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel"
@@ -322,9 +319,9 @@
                 store_title: "财务中心", store_bal: "当前余额:", store_with: "余额提现",
                 store_min: "满 50 AED 可提", store_cash: "立即提现",
                 lum_title: "LUM 能力透视仪", 
-                lum_sub: "中文能力多维雷达", // 中文专属
+                lum_sub: "中文能力多维雷达",
                 lum_weak: "薄弱生词库", lum_target: "专项特训",
-                lum_btn_target: "开始生词特训", // 单一按钮
+                lum_btn_target: "开始生词特训",
                 lum_no_weak: "暂无生词记录，请先完成更多练习。",
                 lum_lock_title: "LUM 智慧透视仪", lum_lock_sub: "基于大模型，解锁多维度能力雷达与薄弱生词专攻库。", lum_lock_btn: "10.00 AED 解锁",
                 rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消"
@@ -347,7 +344,7 @@
             document.getElementById('lum-sub').innerText = ui.lum_sub;
             document.getElementById('lum-weak').innerText = ui.lum_weak;
             document.getElementById('lum-target').innerText = ui.lum_target;
-            document.getElementById('lum-btn-target').innerText = ui.lum_btn_target; // 统一特训按钮
+            document.getElementById('lum-btn-target').innerText = ui.lum_btn_target;
             
             document.getElementById('lum-lock-title').innerText = ui.lum_lock_title;
             document.getElementById('lum-lock-sub').innerText = ui.lum_lock_sub;
@@ -387,6 +384,7 @@
             }
         }
 
+        // 🚨 核心逻辑：精准的分数反馈
         function triggerGameFeedback(score, diff) {
             const feedbackBox = document.getElementById('game-feedback');
             const textEl = document.getElementById('feedback-text');
@@ -450,13 +448,13 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v51_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v51_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v51_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v51_missed') || '{}'),
-            lumUnlocked: localStorage.getItem('ob_v51_lum') === 'true',
-            adLimit: localStorage.getItem('ob_v51_adlim') !== null ? parseInt(localStorage.getItem('ob_v51_adlim')) : 6,
-            isBlindMode: localStorage.getItem('ob_v51_blind') === 'true',
+            scores: JSON.parse(localStorage.getItem('ob_v52_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v52_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v52_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v52_missed') || '{}'),
+            lumUnlocked: false,
+            adLimit: localStorage.getItem('ob_v52_adlim') !== null ? parseInt(localStorage.getItem('ob_v52_adlim')) : 6,
+            isBlindMode: localStorage.getItem('ob_v52_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
@@ -464,22 +462,12 @@
         let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v51_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v51_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v51_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v51_adlim', state.adLimit);
-            localStorage.setItem('ob_v51_lum', state.lumUnlocked);
-            localStorage.setItem('ob_v51_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v51_blind', state.isBlindMode);
-        }
-
-        async function syncWalletToCloud() {
-            try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
-        }
-
-        function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v51_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v51_refreshtime', now); saveData(); }
+            localStorage.setItem('ob_v52_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v52_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v52_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v52_adlim', state.adLimit);
+            localStorage.setItem('ob_v52_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v52_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -488,6 +476,7 @@
             else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; }
         }
 
+        // 🚨 核心修复：登录时同步云端 LUM 解锁状态
         window.executeAuth = async function() {
             const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('auth-action-btn'); btn.disabled = true; btn.innerText = "AUTHENTICATING...";
@@ -496,8 +485,15 @@
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
-                if (!prof) await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0 });
-                state.cloudBalance = Number(prof?.wallet_balance) || 0.00;
+                if (!prof) {
+                    await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false });
+                    state.cloudBalance = 0.00;
+                    state.lumUnlocked = false;
+                } else {
+                    state.cloudBalance = Number(prof.wallet_balance) || 0.00;
+                    state.lumUnlocked = prof.lum_unlocked === true;
+                }
+                saveData(); 
                 document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                 document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
                 playSfx('success');
@@ -615,7 +611,6 @@
             } catch (e) { return isEn ? '暂无释义' : 'Translation unavailable'; }
         }
 
-        // 🚨 核心修复：按语种隔离特训池
         window.practiceWeakLang = async () => {
             playSfx('click'); 
             const isCn = (state.path === 'cn'); 
@@ -715,7 +710,6 @@
             window.speechSynthesis.speak(u);
         }
 
-        // 🚨 核心修复：原生中文切词能力 (Intl.Segmenter)
         function analyzeMistakes(target, captured) {
             let tWords = []; let cWords = [];
             
@@ -786,7 +780,13 @@
                     document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump');
                     setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500);
-                    playSfx('success'); syncWalletToCloud(); 
+                    playSfx('success');
+                    
+                    // 🚨 立刻将钱包余额写回云端，保证不错过任何一笔钱！
+                    try { 
+                        const { data: { user } } = await oasisCloud.auth.getUser(); 
+                        if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } 
+                    } catch (e) {}
                 }
                 
                 if(txt !== "") { triggerGameFeedback(score, diff); }
@@ -811,16 +811,22 @@
             window.openModal('lum-modal');
         }
 
-        window.buyLUM = () => {
+        // 🚨 核心修复：购买 LUM 时同步到 Supabase 云端
+        window.buyLUM = async () => {
             playSfx('click');
             if (state.cloudBalance >= 10) { 
-                state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar(); syncWalletToCloud(); 
+                state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar(); 
+                
+                try { 
+                    const { data: { user } } = await oasisCloud.auth.getUser(); 
+                    if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance, lum_unlocked: true }).eq('id', user.id); } 
+                } catch (e) {}
+
                 document.getElementById('lum-locked-overlay').classList.add('opacity-0'); playSfx('success');
                 setTimeout(() => { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); }, 500);
             } else { alert(state.path === 'en' ? "AED 余额不足 10.00，快去练习吧！" : "Not enough AED balance (10.00 req). Keep practicing!"); }
         }
 
-        // 🚨 核心修复：雷达图按当前语种绝对隔离数据计算
         function renderLUMChart() {
             const ctx = document.getElementById('lumRadarChart').getContext('2d');
             const isEn = state.path === 'en';
