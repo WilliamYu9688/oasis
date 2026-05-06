@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V48 - 精准计时与国际化沉浸版</title>
+    <title>Oasis Bridge V49 - 纯净无痕与精准反馈版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -15,10 +15,14 @@
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 
     <style>
-        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; }
+        /* 🚨 核心修复 2：彻底抹杀所有浏览器的默认滚动条，保持原生 App 的极简纯净 */
+        ::-webkit-scrollbar { display: none; }
+        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
+        
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         input { -webkit-user-select: auto; user-select: auto; background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
         input:focus { border-color: #fbbf24; }
+        
         .app-screen { background: radial-gradient(circle at top right, #1e293b, #020617 85%); color: #f3f4f6; width: 100vw; height: 100vh; height: 100dvh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .glass-panel { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
         .glass-btn { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -34,8 +38,10 @@
         
         .animate-pop-in { animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes popIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-10deg); } 40% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(5deg); } 60% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2) translateY(-20px); } }
+        
         .combo-text-perfect { background: linear-gradient(to bottom, #fde047, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(245, 158, 11, 0.6); }
         .combo-text-excellent { background: linear-gradient(to bottom, #93c5fd, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(59, 130, 246, 0.6); }
+        .combo-text-encouraging { color: #cbd5e1; text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2); }
 
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
@@ -53,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V48</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V49</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -284,11 +290,8 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
-        // ==========================================
-        // 🚨 核心：I18N 国际化字典引擎
-        // ==========================================
         const i18n = {
-            en: { // 当 path==='cn' (学习中文) 时，界面用纯英文
+            en: { 
                 lbl_wallet: "WALLET", lbl_session: "SESSION", lbl_limit: "LIMIT",
                 lbl_best: "BEST", lbl_earned: "EARNED",
                 lbl_quit: "⏏ QUIT", lbl_lum: "📊 LUM",
@@ -307,7 +310,7 @@
                 lum_lock_title: "LUM Analytics", lum_lock_sub: "Unlock multi-dimensional radar and targeted weak words practice.", lum_lock_btn: "10.00 AED Unlock",
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel"
             },
-            cn: { // 当 path==='en' (学习英语) 时，界面用纯中文
+            cn: { 
                 lbl_wallet: "钱包余额", lbl_session: "学习时长", lbl_limit: "求助额度",
                 lbl_best: "历史最高", lbl_earned: "本句赚取",
                 lbl_quit: "⏏ 退出", lbl_lum: "📊 能力透视",
@@ -384,16 +387,29 @@
             }
         }
 
-        function triggerGameFeedback(tier, diff) {
+        // 🚨 核心修复 1：细化分数段反馈，不到60分只鼓励不喊 GOOD
+        function triggerGameFeedback(score, diff) {
             const feedbackBox = document.getElementById('game-feedback');
             const textEl = document.getElementById('feedback-text');
             const subEl = document.getElementById('feedback-sub');
             feedbackBox.classList.remove('animate-pop-in');
             void feedbackBox.offsetWidth; 
-            if(tier >= 5) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
-            else if(tier >= 3) { textEl.innerText = "EXCELLENT! ✨"; textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; } 
-            else { textEl.innerText = "GOOD! 👍"; textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; }
-            subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : 'COMBO!';
+            
+            if (score >= 100) { 
+                textEl.innerText = "PERFECT! 🔥"; 
+                textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; 
+            } else if (score >= 80) { 
+                textEl.innerText = "EXCELLENT! ✨"; 
+                textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; 
+            } else if (score >= 60) { 
+                textEl.innerText = "GOOD! 👍"; 
+                textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; 
+            } else {
+                textEl.innerText = "KEEP GOING! 💪"; 
+                textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; 
+            }
+            
+            subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : (score < 60 ? 'Almost there' : 'COMBO!');
             feedbackBox.classList.add('animate-pop-in');
         }
 
@@ -434,27 +450,27 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v48_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v48_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v48_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v48_missed') || '{}'),
-            lumUnlocked: localStorage.getItem('ob_v48_lum') === 'true',
-            adLimit: localStorage.getItem('ob_v48_adlim') !== null ? parseInt(localStorage.getItem('ob_v48_adlim')) : 6,
-            isBlindMode: localStorage.getItem('ob_v48_blind') === 'true',
+            scores: JSON.parse(localStorage.getItem('ob_v49_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v49_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v49_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v49_missed') || '{}'),
+            lumUnlocked: localStorage.getItem('ob_v49_lum') === 'true',
+            adLimit: localStorage.getItem('ob_v49_adlim') !== null ? parseInt(localStorage.getItem('ob_v49_adlim')) : 6,
+            isBlindMode: localStorage.getItem('ob_v49_blind') === 'true',
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
-        let lastTimeTick = Date.now(); // 🚨 新增：精准时钟标记
+        let lastTimeTick = Date.now(); 
 
         function saveData() {
-            localStorage.setItem('ob_v48_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v48_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v48_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v48_adlim', state.adLimit);
-            localStorage.setItem('ob_v48_lum', state.lumUnlocked);
-            localStorage.setItem('ob_v48_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v48_blind', state.isBlindMode);
+            localStorage.setItem('ob_v49_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v49_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v49_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v49_adlim', state.adLimit);
+            localStorage.setItem('ob_v49_lum', state.lumUnlocked);
+            localStorage.setItem('ob_v49_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v49_blind', state.isBlindMode);
         }
 
         async function syncWalletToCloud() {
@@ -462,8 +478,8 @@
         }
 
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v48_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v48_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v49_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; localStorage.setItem('ob_v49_refreshtime', now); saveData(); }
         }
 
         window.toggleAuthMode = function() {
@@ -499,10 +515,9 @@
 
         window.enterMainApp = function() {
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
-            applyI18N(); // 🚨 核心：进入主界面时根据选择的语言应用正确的UI翻译
+            applyI18N(); 
             window.fetchNewPhrase();
             
-            // 🚨 核心修复：基于真实物理时钟的精准计时
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { 
@@ -756,7 +771,8 @@
                     playSfx('success'); syncWalletToCloud(); 
                 }
                 
-                if(txt !== "") { triggerGameFeedback(tier, diff); }
+                // 🚨 调用精准的基于分数的特效分发
+                if(txt !== "") { triggerGameFeedback(score, diff); }
 
                 const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
                 document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`;
