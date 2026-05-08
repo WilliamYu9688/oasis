@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V58 - 离线熔断与下拉菜单版</title>
+    <title>Oasis Bridge V59 - 极速缓存与全量汉化版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -51,7 +51,6 @@
         .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; position: relative; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
         
-        /* Dropdown custom styling */
         select option { background-color: #0f172a; color: #fff; }
     </style>
 </head>
@@ -60,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V58</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V59</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -194,6 +193,10 @@
                     </div>
                 </div>
                 
+                <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
+                    <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
+                </div>
+                
                 <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-4 rounded-2xl border border-white/5">
                     <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight min-h-[80px] gap-x-1 gap-y-2" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                     <p id="target-zh" class="text-xs text-slate-400 mb-2 min-h-[20px] px-2"></p>
@@ -310,7 +313,16 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
-        // 🚨 核心修复：完善的 I18N 字典，包括 FB 反馈按钮
+        // 🚨 V59 核心：全面的场景汉化字典
+        const scenarioMap = {
+            'Casual': '日常休闲', 'Work': '职场办公', 'E-commerce': '电商运营', 'Mental Health': '心理健康', 'Geopolitics': '地缘政治', 'Deep Tech': '前沿科技', 'Macroeconomics': '宏观经济', 'Legal': '法律合规', 'Finance': '财务理财', 'Real Estate': '房产置业', 'Academic': '学术科研', 'Conference': '行业会议', 'Data Privacy': '数据隐私', 'Sales': '商业销售', 'Housing': '住房物业', 'Healthcare': '医疗健康', 'Insurance': '保险理赔', 'Banking': '银行金融', 'Daily Life': '日常生活', 'Networking': '社交破冰', 'Remote Work': '远程办公', 'Digital Life': '数字生活', 'IT Support': 'IT运维', 'Security': '网络安全', 'Agile': '敏捷开发', 'Product': '产品管理', 'Marketing': '市场营销', 'UX/UI': '用户体验', 'Analytics': '数据分析', 'ESG': 'ESG治理', 'M&A': '投资并购', 'Supply Chain': '供应链', 'Risk': '风险风控', 'Compliance': '合规审查', 'Education': '教育求学', 'Public Services': '公共服务', 'Fitness': '运动健身', 'Personal Care': '个人护理', 'Interview': '求职面试', 'HR': '人力资源', 'Culture': '跨文化沟通', 'PR': '公关传播', 'VC': '风险投资', 'Negotiation': '商业谈判', 'Everyday Slang': '日常俚语', 'Internet Slang': '网络黑话', 'Workplace Slang': '职场黑话', 'Idiom': '习惯用语'
+        };
+
+        function getLocalizedScenario(s) {
+            if (state.path === 'cn') return s; // 老外学中文，场景保留原生英文
+            return scenarioMap[s] || s; // 国人学英文，场景显示中文
+        }
+
         const i18n = {
             en: { 
                 lbl_wallet: "WALLET", lbl_session: "SESSION", lbl_limit: "LIMIT",
@@ -318,7 +330,7 @@
                 lbl_quit: "⏏ QUIT", lbl_lum: "📊 LUM", lbl_fb: "💬 FB",
                 lbl_shadow_on: "🙈 SHADOWING", lbl_shadow_off: "👁️ SHADOWING",
                 sys_ready: "SYSTEM READY", sys_rec: "🎙️ RECORDING...", sys_ana: "🔄 ANALYZING...",
-                txt_conn: "Connecting...", txt_scene: "ALL SCENES", txt_translating: "Translating...",
+                txt_conn: "Connecting...", txt_scene: "ALL SCENES", txt_scene_badge: "SCENE: ", txt_translating: "Translating...",
                 exit_met_title: "Target Met!", exit_met_btn: "EXIT",
                 exit_not_title: "Goal Not Met", exit_not_rem: "mins remaining.",
                 exit_ad_btn: "Watch Ad (+5 Mins)", exit_quit_btn: "QUIT ANYWAY", exit_cont_btn: "CONTINUE",
@@ -341,7 +353,7 @@
                 lbl_quit: "⏏ 退出", lbl_lum: "📊 能力透视", lbl_fb: "💬 反馈",
                 lbl_shadow_on: "🙈 盲听模式", lbl_shadow_off: "👁️ 盲听模式",
                 sys_ready: "系统就绪", sys_rec: "🎙️ 录音中...", sys_ana: "🔄 评分中...",
-                txt_conn: "加载中...", txt_scene: "全部场景", txt_translating: "获取释义中...",
+                txt_conn: "加载中...", txt_scene: "全部场景", txt_scene_badge: "场景: ", txt_translating: "获取释义中...",
                 exit_met_title: "目标达成！", exit_met_btn: "退出学习",
                 exit_not_title: "目标未达成", exit_not_rem: "分钟剩余。",
                 exit_ad_btn: "看广告 (+5分钟)", exit_quit_btn: "强制退出", exit_cont_btn: "继续学习",
@@ -371,7 +383,7 @@
             document.getElementById('lbl-earned').innerText = ui.lbl_earned;
             document.getElementById('lbl-quit').innerText = ui.lbl_quit;
             document.getElementById('lbl-lum').innerText = ui.lbl_lum;
-            document.getElementById('lbl-fb').innerText = ui.lbl_fb; // 🚨 修复FB按钮
+            document.getElementById('lbl-fb').innerText = ui.lbl_fb; 
             document.getElementById('lum-title').innerText = ui.lum_title;
             document.getElementById('lum-sub').innerText = ui.lum_sub;
             document.getElementById('lum-weak').innerText = ui.lum_weak;
@@ -386,7 +398,6 @@
             document.getElementById('store-cash-btn').innerText = ui.store_cash;
             document.getElementById('rescue-cancel-btn').innerText = ui.rescue_cancel;
             
-            // Feedback UI
             document.getElementById('fb-title').innerText = ui.fb_title;
             document.getElementById('fb-sub').innerText = ui.fb_sub;
             document.getElementById('feedback-input').placeholder = ui.fb_holder;
@@ -463,26 +474,19 @@
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // 🚨 扩充本地缓存库，防止无网络时单句死循环
-        const LOCAL_CACHE = [
-            { id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' },
-            { id: 902, text_en: 'Let us touch base tomorrow.', text_zh: '我们明天碰个头吧。', scenario: 'Work' },
-            { id: 903, text_en: 'This is an absolute piece of cake.', text_zh: '这简直是小菜一碟。', scenario: 'Casual' },
-            { id: 904, text_en: 'Can you give me a hand?', text_zh: '你能帮我一下吗？', scenario: 'Casual' }
-        ];
+        const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v58_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v58_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v58_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v58_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v59_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v59_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v59_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v59_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v58_adlim') !== null ? parseInt(localStorage.getItem('ob_v58_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v58_refillcount') || '0'), 
-            isBlindMode: localStorage.getItem('ob_v58_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v59_adlim') !== null ? parseInt(localStorage.getItem('ob_v59_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v59_refillcount') || '0'), 
+            isBlindMode: localStorage.getItem('ob_v59_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -492,13 +496,13 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v58_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v58_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v58_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v58_adlim', state.adLimit);
-            localStorage.setItem('ob_v58_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v58_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v58_blind', state.isBlindMode);
+            localStorage.setItem('ob_v59_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v59_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v59_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v59_adlim', state.adLimit);
+            localStorage.setItem('ob_v59_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v59_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v59_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -608,7 +612,6 @@
             document.getElementById('target-text').innerText = ui.txt_translating; document.getElementById('target-zh').innerText = ""; 
             
             state.currentScene = 'WEAK WORD'; 
-            // 如果是在特训模式，隐藏下拉框里的内容或选中ALL
             document.getElementById('scene-select').value = 'ALL';
 
             const translation = await window.translateWord(pickedWord, !isCn);
@@ -616,17 +619,21 @@
             renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
         }
 
-        // 🚨 V58 升级：渲染下拉框 (Select) 选项
+        // 🚨 V59 核心升级：渲染汉化后的下拉框选项
         window.renderSceneFilters = function() {
             const selectEl = document.getElementById('scene-select');
             const ui = getUI();
-            let scenarios = [ui.txt_scene, ...new Set(globalPool.map(item => item.scenario))].filter(Boolean);
-            selectEl.innerHTML = scenarios.map(s => {
-                const isAll = s === ui.txt_scene;
-                const actualScene = isAll ? 'ALL' : s;
-                const isSelected = actualScene === state.currentScene ? 'selected' : '';
-                return `<option value="${actualScene}" ${isSelected}>${s}</option>`;
+            // 去重提取场景
+            let scenarios = [...new Set(globalPool.map(item => item.scenario))].filter(Boolean);
+            
+            let html = `<option value="ALL">${ui.txt_scene}</option>`;
+            html += scenarios.map(s => {
+                const isSelected = s === state.currentScene ? 'selected' : '';
+                const displayTitle = getLocalizedScenario(s); // 调用翻译字典
+                return `<option value="${s}" ${isSelected}>${displayTitle}</option>`;
             }).join('');
+            
+            selectEl.innerHTML = html;
         }
 
         window.setScene = function(scene) {
@@ -635,22 +642,42 @@
             window.fetchNewPhrase(); 
         }
 
+        // 🚨 V59 核心提取：云端静默拉取
+        async function fetchPoolFromCloud(level) {
+            try {
+                const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
+                if (data && data.length > 0) {
+                    localStorage.setItem(`ob_v59_pool_${level}`, JSON.stringify(data)); // 写入缓存
+                    return data;
+                }
+            } catch(e) { console.log("Cloud fetch failed", e); }
+            return null;
+        }
+
+        // 🚨 V59 核心升级：Stale-While-Revalidate 本地缓存拉取策略
         window.fetchNewPhrase = async function() {
             if (appState !== 'REWARDING') playSfx('click'); 
             const ui = getUI();
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
             
-            // 🚨 V58 核心修复：3秒极速熔断机制 (Promise.race) 防网络假死
             if (globalPool.length === 0) {
-                try { 
-                    const fetchPromise = oasisCloud.from('phrases').select('*').eq('difficulty', state.dbLevel);
-                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
-                    const res = await Promise.race([fetchPromise, timeoutPromise]);
-                    if (res.data && res.data.length > 0) globalPool = res.data; 
-                } catch (e) {
-                    console.log("Network timeout or error. Using local cache.");
+                // 先尝试从本地读取缓存
+                const cachedData = localStorage.getItem(`ob_v59_pool_${state.dbLevel}`);
+                if (cachedData) {
+                    globalPool = JSON.parse(cachedData);
+                    // 瞬间展示内容的同时，后台静默拉取最新数据覆盖缓存
+                    fetchPoolFromCloud(state.dbLevel).then(newData => {
+                        if(newData) {
+                            globalPool = newData;
+                            renderSceneFilters(); // 刷新下拉框
+                        }
+                    });
+                } else {
+                    // 如果连缓存都没有（第一次进该难度），必须等待云端
+                    const newData = await fetchPoolFromCloud(state.dbLevel);
+                    if (newData) globalPool = newData;
+                    else globalPool = LOCAL_CACHE; // 绝不让用户卡死
                 }
-                if (globalPool.length === 0) globalPool = LOCAL_CACHE;
                 
                 state.currentScene = 'ALL';
                 renderSceneFilters(); 
@@ -665,10 +692,12 @@
             let newPhrase; do { newPhrase = filteredPool[Math.floor(Math.random() * filteredPool.length)]; } while (filteredPool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
             currentPhrase = newPhrase;
             
-            // 修复：如果不在弱项特训中，确保下拉框和徽章显示正确
             if (state.currentScene !== 'WEAK WORD') {
                 document.getElementById('scene-select').value = state.currentScene;
             }
+            
+            // 🚨 同步徽章汉化
+            document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
             
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
@@ -737,11 +766,7 @@
                     for (let i = 1; i <= fmtT.length; i++) { let prev = dp[0]; dp[0] = i; for (let j = 1; j <= fmtC.length; j++) { let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp; } }
                     
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
-                    if (rawRatio >= 0.95) score = 100; 
-                    else if (rawRatio >= 0.85) score = 90 + Math.floor((rawRatio - 0.85) * 100); 
-                    else if (rawRatio >= 0.75) score = 80 + Math.floor((rawRatio - 0.75) * 100); 
-                    else if (rawRatio >= 0.60) score = 60 + Math.floor((rawRatio - 0.60) * 133); 
-                    else score = Math.max(0, Math.floor(rawRatio * 100)); 
+                    if (rawRatio >= 0.95) score = 100; else if (rawRatio >= 0.85) score = 90 + Math.floor((rawRatio - 0.85) * 100); else if (rawRatio >= 0.75) score = 80 + Math.floor((rawRatio - 0.75) * 100); else if (rawRatio >= 0.60) score = 60 + Math.floor((rawRatio - 0.60) * 133); else score = Math.max(0, Math.floor(rawRatio * 100)); 
                     if (fmtC.length < (fmtT.length * 0.5)) score = Math.min(score, 50);
 
                     if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
@@ -792,14 +817,12 @@
             btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V58' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V59' });
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) {
-                console.log(e);
-                // 即使断网也让用户感觉提交成功
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved.");
@@ -847,8 +870,8 @@
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); state.currentScene = 'ALL'; window.fetchNewPhrase(); }
         
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v58_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v58_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v59_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v59_refreshtime', now); saveData(); }
         }
 
         window.requestRescue = function() { 
