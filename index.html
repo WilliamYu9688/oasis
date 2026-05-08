@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V62 - 极简分类聚合版</title>
+    <title>Oasis Bridge V63 - 沉浸式助力无打扰版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -52,6 +52,7 @@
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
         
         select option { background-color: #0f172a; color: #fff; font-weight: bold; padding: 10px; }
+        select optgroup { background-color: #1e293b; color: #fbbf24; font-weight: 900; font-style: italic; }
     </style>
 </head>
 <body>
@@ -59,7 +60,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V62</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V63</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -313,7 +314,6 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
-        // 🚨 V62 核心重构：场景分类映射与下拉框 5 大分类聚合
         const scenarioMap = {
             'Casual': '日常休闲', 'Work': '职场办公', 'E-commerce': '电商运营', 'Mental Health': '心理健康', 
             'Geopolitics': '地缘政治', 'Deep Tech': '前沿科技', 'Macroeconomics': '宏观经济', 'Legal': '法律合规', 
@@ -337,7 +337,6 @@
             'TRANSPORT': '交通通勤', 'PARENTING': '亲子育儿'
         };
 
-        // 🚨 定义 5 大核心聚合类
         const SCENE_CATEGORIES = [
             { id: 'cat_life', en: '🏠 Life & Survival', cn: '🏠 生活与生存', items: ['Casual','Daily Life','Social','Networking','Parenting','Shopping','Dining','Travel','Hotel','Transport','Housing','Personal Care','Fitness','Healthcare','Medical','Public Services','Life','SOCIAL','LIFE','SHOPPING','HOTEL','TRAVEL','DINING','TRANSPORT','PARENTING','MEDICAL'] },
             { id: 'cat_work', en: '💼 Workplace & Team', cn: '💼 职场与协同', items: ['Work','Office','Task','Meeting','Project','Team','Collaboration','Communication','Email','Report','Notice','Admin','Approval','HR','Interview','Event','Agile','Product','UX/UI','Workplace','OFFICE','TASK','MEETING','PROJECT','TEAM','COLLABORATION','COMMUNICATION','EMAIL','REPORT','NOTICE','ADMIN','APPROVAL','EVENT'] },
@@ -456,6 +455,7 @@
             }
         }
 
+        // 🚨 核心逻辑修复：移除了火箭弹窗特效，只有静默底部提示
         function triggerGameFeedback(score, diff) {
             const feedbackBox = document.getElementById('game-feedback');
             const textEl = document.getElementById('feedback-text');
@@ -508,14 +508,14 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v62_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v62_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v62_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v62_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v63_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v63_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v63_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v63_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v62_adlim') !== null ? parseInt(localStorage.getItem('ob_v62_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v62_refillcount') || '0'), 
-            isBlindMode: localStorage.getItem('ob_v62_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v63_adlim') !== null ? parseInt(localStorage.getItem('ob_v63_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v63_refillcount') || '0'), 
+            isBlindMode: localStorage.getItem('ob_v63_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -525,13 +525,13 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v62_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v62_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v62_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v62_adlim', state.adLimit);
-            localStorage.setItem('ob_v62_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v62_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v62_blind', state.isBlindMode);
+            localStorage.setItem('ob_v63_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v63_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v63_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v63_adlim', state.adLimit);
+            localStorage.setItem('ob_v63_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v63_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v63_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -648,30 +648,43 @@
             renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
         }
 
-        // 🚨 V62 核心渲染：只渲染 5 大聚合分类的下拉框
         window.renderSceneFilters = function() {
             const selectEl = document.getElementById('scene-select');
             const ui = getUI();
-            const isEn = state.path === 'en'; // 中文界面用 cn
-            
+            const isEn = state.path === 'en'; 
+
+            let availableScenarios = [...new Set(globalPool.map(item => item.scenario))].filter(Boolean);
+
             let html = `<option value="ALL">${ui.txt_scene}</option>`;
-            
-            // 渲染预设大类
+
+            let mappedScenarios = new Set();
             SCENE_CATEGORIES.forEach(cat => {
-                const isSelected = cat.id === state.currentScene ? 'selected' : '';
-                const label = isEn ? cat.cn : cat.en;
-                html += `<option value="${cat.id}" ${isSelected}>${label}</option>`;
+                const groupItems = availableScenarios.filter(s => cat.items.map(i=>i.toLowerCase()).includes(s.toLowerCase()));
+                if(groupItems.length > 0) {
+                    const groupLabel = isEn ? cat.cn : cat.en;
+                    html += `<optgroup label="${groupLabel}">`;
+                    groupItems.forEach(s => {
+                        mappedScenarios.add(s);
+                        const isSelected = s === state.currentScene ? 'selected' : '';
+                        const displayTitle = getLocalizedScenario(s); 
+                        html += `<option value="${s}" ${isSelected}>- ${displayTitle}</option>`; 
+                    });
+                    html += `</optgroup>`;
+                }
             });
 
-            // 检查是否有未被覆盖的"孤儿"场景
-            let allMapped = SCENE_CATEGORIES.flatMap(c => c.items).map(i=>i.toLowerCase());
-            let hasOutliers = globalPool.some(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
-            if(hasOutliers) {
-                const isSelected = 'cat_others' === state.currentScene ? 'selected' : '';
-                const label = isEn ? '📦 其他分类' : '📦 Others';
-                html += `<option value="cat_others" ${isSelected}>${label}</option>`;
+            const outliers = availableScenarios.filter(s => !mappedScenarios.has(s));
+            if(outliers.length > 0) {
+                const groupLabel = isEn ? '📦 其他分类' : '📦 Others';
+                html += `<optgroup label="${groupLabel}">`;
+                outliers.forEach(s => {
+                    const isSelected = s === state.currentScene ? 'selected' : '';
+                    const displayTitle = getLocalizedScenario(s);
+                    html += `<option value="${s}" ${isSelected}>- ${displayTitle}</option>`;
+                });
+                html += `</optgroup>`;
             }
-            
+
             selectEl.innerHTML = html;
         }
 
@@ -685,7 +698,7 @@
             try {
                 const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
                 if (data && data.length > 0) {
-                    localStorage.setItem(`ob_v62_pool_${level}`, JSON.stringify(data)); 
+                    localStorage.setItem(`ob_v63_pool_${level}`, JSON.stringify(data)); 
                     return data;
                 }
             } catch(e) { console.log("Cloud fetch failed", e); }
@@ -698,27 +711,21 @@
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
             
             if (globalPool.length === 0) {
-                const cachedData = localStorage.getItem(`ob_v62_pool_${state.dbLevel}`);
+                const cachedData = localStorage.getItem(`ob_v63_pool_${state.dbLevel}`);
                 if (cachedData) {
                     globalPool = JSON.parse(cachedData);
                     fetchPoolFromCloud(state.dbLevel).then(newData => {
-                        if(newData) {
-                            globalPool = newData;
-                            renderSceneFilters(); 
-                        }
+                        if(newData) { globalPool = newData; renderSceneFilters(); }
                     });
                 } else {
                     const newData = await fetchPoolFromCloud(state.dbLevel);
                     if (newData) globalPool = newData;
                     else globalPool = LOCAL_CACHE; 
                 }
-                
-                state.currentScene = 'ALL';
-                renderSceneFilters(); 
+                state.currentScene = 'ALL'; renderSceneFilters(); 
             }
             
             let filteredPool = globalPool;
-            // 🚨 V62 核心修复：根据选中的“大类(Category)”过滤题库
             if (state.currentScene !== 'ALL' && state.currentScene !== 'WEAK WORD') {
                 if (state.currentScene === 'cat_others') {
                     let allMapped = SCENE_CATEGORIES.flatMap(c => c.items).map(i=>i.toLowerCase());
@@ -728,9 +735,11 @@
                     if (cat) {
                         let itemsLower = cat.items.map(i => i.toLowerCase());
                         filteredPool = globalPool.filter(p => p.scenario && itemsLower.includes(p.scenario.toLowerCase()));
+                    } else {
+                        filteredPool = globalPool.filter(p => p.scenario === state.currentScene);
                     }
                 }
-                if (filteredPool.length === 0) filteredPool = globalPool; // 兜底
+                if (filteredPool.length === 0) filteredPool = globalPool; 
             }
             
             let newPhrase; do { newPhrase = filteredPool[Math.floor(Math.random() * filteredPool.length)]; } while (filteredPool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
@@ -740,7 +749,6 @@
                 document.getElementById('scene-select').value = state.currentScene;
             }
             
-            // 🚨 徽章依然展示最精确的“子场景标签”，并汉化大写
             document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
             
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
@@ -834,23 +842,29 @@
                 const feedbackBox = document.getElementById('game-feedback'); const textEl = document.getElementById('feedback-text'); const subEl = document.getElementById('feedback-sub');
                 feedbackBox.classList.remove('animate-pop-in'); void feedbackBox.offsetWidth; 
                 
-                if (isAdBoost) {
-                    textEl.innerText = "SPONSORED! 🚀"; textEl.className = "text-4xl font-black italic tracking-tighter text-blue-400 drop-shadow-md"; 
-                    subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : 'MAX BOOSTED';
-                } else if (txt !== "") {
+                // 🚨 核心修复：移除火箭弹窗，如果是看广告则只静默结算加钱并立刻流转
+                if (!isAdBoost && txt !== "") {
                     if (score >= 100) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
                     else if (score >= 80) { textEl.innerText = "EXCELLENT! ✨"; textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; } 
                     else if (score >= 60) { textEl.innerText = "GOOD! 👍"; textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; } 
                     else { textEl.innerText = "KEEP GOING! 💪"; textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; }
+                    
                     subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : (score < 60 ? 'Almost there' : 'COMBO!');
+                    feedbackBox.classList.add('animate-pop-in');
                 }
-                if (isAdBoost || txt !== "") { feedbackBox.classList.add('animate-pop-in'); }
 
-                if (isAdBoost) { document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; } 
-                else { const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`; }
+                if (isAdBoost) { 
+                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
+                } else { 
+                    const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
+                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`; 
+                }
                 
                 saveData(); syncPhraseState();
-                setTimeout(() => { isEvaluating = false; if ((diff > 0 && !isAdBoost) || isAdBoost) window.handleRefresh(); else setAppState('READY'); }, 2500); 
+                
+                // 🚨 缩短广告助力的等待时间，更加丝滑
+                const delay = isAdBoost ? 1200 : 2500;
+                setTimeout(() => { isEvaluating = false; if ((diff > 0 && !isAdBoost) || isAdBoost) window.handleRefresh(); else setAppState('READY'); }, delay); 
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
@@ -865,7 +879,7 @@
             btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V62' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V63' });
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 playSfx('success');
@@ -918,8 +932,8 @@
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); state.currentScene = 'ALL'; window.fetchNewPhrase(); }
         
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v62_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v62_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v63_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v63_refreshtime', now); saveData(); }
         }
 
         window.requestRescue = function() { 
