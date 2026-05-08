@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V59 - 极速缓存与全量汉化版</title>
+    <title>Oasis Bridge V60 - 全场景完美汉化版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V59</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V60</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -313,14 +313,26 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
 
     <script>
-        // 🚨 V59 核心：全面的场景汉化字典
+        // 🚨 V60：包含所有 40+ 个新增场景的全量汉化字典
         const scenarioMap = {
-            'Casual': '日常休闲', 'Work': '职场办公', 'E-commerce': '电商运营', 'Mental Health': '心理健康', 'Geopolitics': '地缘政治', 'Deep Tech': '前沿科技', 'Macroeconomics': '宏观经济', 'Legal': '法律合规', 'Finance': '财务理财', 'Real Estate': '房产置业', 'Academic': '学术科研', 'Conference': '行业会议', 'Data Privacy': '数据隐私', 'Sales': '商业销售', 'Housing': '住房物业', 'Healthcare': '医疗健康', 'Insurance': '保险理赔', 'Banking': '银行金融', 'Daily Life': '日常生活', 'Networking': '社交破冰', 'Remote Work': '远程办公', 'Digital Life': '数字生活', 'IT Support': 'IT运维', 'Security': '网络安全', 'Agile': '敏捷开发', 'Product': '产品管理', 'Marketing': '市场营销', 'UX/UI': '用户体验', 'Analytics': '数据分析', 'ESG': 'ESG治理', 'M&A': '投资并购', 'Supply Chain': '供应链', 'Risk': '风险风控', 'Compliance': '合规审查', 'Education': '教育求学', 'Public Services': '公共服务', 'Fitness': '运动健身', 'Personal Care': '个人护理', 'Interview': '求职面试', 'HR': '人力资源', 'Culture': '跨文化沟通', 'PR': '公关传播', 'VC': '风险投资', 'Negotiation': '商业谈判', 'Everyday Slang': '日常俚语', 'Internet Slang': '网络黑话', 'Workplace Slang': '职场黑话', 'Idiom': '习惯用语'
+            'Casual': '日常休闲', 'Work': '职场办公', 'E-commerce': '电商运营', 'Mental Health': '心理健康', 
+            'Geopolitics': '地缘政治', 'Deep Tech': '前沿科技', 'Macroeconomics': '宏观经济', 'Legal': '法律合规', 
+            'Finance': '财务理财', 'Real Estate': '房产置业', 'Academic': '学术科研', 'Conference': '行业会议', 
+            'Data Privacy': '数据隐私', 'Sales': '商业销售', 'Housing': '住房物业', 'Healthcare': '医疗健康', 
+            'Insurance': '保险理赔', 'Banking': '银行金融', 'Daily Life': '日常生活', 'Networking': '社交破冰', 
+            'Remote Work': '远程办公', 'Digital Life': '数字生活', 'IT Support': 'IT运维', 'Security': '网络安全', 
+            'Agile': '敏捷开发', 'Product': '产品管理', 'Marketing': '市场营销', 'UX/UI': '用户体验', 
+            'Analytics': '数据分析', 'ESG': 'ESG治理', 'M&A': '投资并购', 'Supply Chain': '供应链', 
+            'Risk': '风险风控', 'Compliance': '合规审查', 'Education': '教育求学', 'Public Services': '公共服务', 
+            'Fitness': '运动健身', 'Personal Care': '个人护理', 'Interview': '求职面试', 'HR': '人力资源', 
+            'Culture': '跨文化沟通', 'PR': '公关传播', 'VC': '风险投资', 'Negotiation': '商业谈判', 
+            'Everyday Slang': '日常俚语', 'Internet Slang': '网络黑话', 'Workplace Slang': '职场黑话', 'Idiom': '习惯用语',
+            'Customer Service': '客户服务', 'Research': '研究调查', 'Workplace': '职场环境', 'WEAK WORD': '生词特训'
         };
 
         function getLocalizedScenario(s) {
-            if (state.path === 'cn') return s; // 老外学中文，场景保留原生英文
-            return scenarioMap[s] || s; // 国人学英文，场景显示中文
+            if (state.path === 'cn') return s; // 英文界面保留英文
+            return scenarioMap[s] || s; // 中文界面全量映射
         }
 
         const i18n = {
@@ -474,19 +486,25 @@
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
+        
+        const LOCAL_CACHE = [
+            { id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' },
+            { id: 902, text_en: 'Let us touch base tomorrow.', text_zh: '我们明天碰个头吧。', scenario: 'Work' },
+            { id: 903, text_en: 'This is an absolute piece of cake.', text_zh: '这简直是小菜一碟。', scenario: 'Casual' },
+            { id: 904, text_en: 'Can you give me a hand?', text_zh: '你能帮我一下吗？', scenario: 'Casual' }
+        ];
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v59_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v59_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v59_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v59_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v60_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v60_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v60_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v60_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v59_adlim') !== null ? parseInt(localStorage.getItem('ob_v59_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v59_refillcount') || '0'), 
-            isBlindMode: localStorage.getItem('ob_v59_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v60_adlim') !== null ? parseInt(localStorage.getItem('ob_v60_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v60_refillcount') || '0'), 
+            isBlindMode: localStorage.getItem('ob_v60_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -496,13 +514,13 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v59_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v59_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v59_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v59_adlim', state.adLimit);
-            localStorage.setItem('ob_v59_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v59_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v59_blind', state.isBlindMode);
+            localStorage.setItem('ob_v60_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v60_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v60_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v60_adlim', state.adLimit);
+            localStorage.setItem('ob_v60_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v60_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v60_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -619,17 +637,15 @@
             renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
         }
 
-        // 🚨 V59 核心升级：渲染汉化后的下拉框选项
         window.renderSceneFilters = function() {
             const selectEl = document.getElementById('scene-select');
             const ui = getUI();
-            // 去重提取场景
             let scenarios = [...new Set(globalPool.map(item => item.scenario))].filter(Boolean);
             
             let html = `<option value="ALL">${ui.txt_scene}</option>`;
             html += scenarios.map(s => {
                 const isSelected = s === state.currentScene ? 'selected' : '';
-                const displayTitle = getLocalizedScenario(s); // 调用翻译字典
+                const displayTitle = getLocalizedScenario(s); 
                 return `<option value="${s}" ${isSelected}>${displayTitle}</option>`;
             }).join('');
             
@@ -642,41 +658,36 @@
             window.fetchNewPhrase(); 
         }
 
-        // 🚨 V59 核心提取：云端静默拉取
         async function fetchPoolFromCloud(level) {
             try {
                 const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
                 if (data && data.length > 0) {
-                    localStorage.setItem(`ob_v59_pool_${level}`, JSON.stringify(data)); // 写入缓存
+                    localStorage.setItem(`ob_v60_pool_${level}`, JSON.stringify(data)); 
                     return data;
                 }
             } catch(e) { console.log("Cloud fetch failed", e); }
             return null;
         }
 
-        // 🚨 V59 核心升级：Stale-While-Revalidate 本地缓存拉取策略
         window.fetchNewPhrase = async function() {
             if (appState !== 'REWARDING') playSfx('click'); 
             const ui = getUI();
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
             
             if (globalPool.length === 0) {
-                // 先尝试从本地读取缓存
-                const cachedData = localStorage.getItem(`ob_v59_pool_${state.dbLevel}`);
+                const cachedData = localStorage.getItem(`ob_v60_pool_${state.dbLevel}`);
                 if (cachedData) {
                     globalPool = JSON.parse(cachedData);
-                    // 瞬间展示内容的同时，后台静默拉取最新数据覆盖缓存
                     fetchPoolFromCloud(state.dbLevel).then(newData => {
                         if(newData) {
                             globalPool = newData;
-                            renderSceneFilters(); // 刷新下拉框
+                            renderSceneFilters(); 
                         }
                     });
                 } else {
-                    // 如果连缓存都没有（第一次进该难度），必须等待云端
                     const newData = await fetchPoolFromCloud(state.dbLevel);
                     if (newData) globalPool = newData;
-                    else globalPool = LOCAL_CACHE; // 绝不让用户卡死
+                    else globalPool = LOCAL_CACHE; 
                 }
                 
                 state.currentScene = 'ALL';
@@ -696,7 +707,6 @@
                 document.getElementById('scene-select').value = state.currentScene;
             }
             
-            // 🚨 同步徽章汉化
             document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
             
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
@@ -766,7 +776,11 @@
                     for (let i = 1; i <= fmtT.length; i++) { let prev = dp[0]; dp[0] = i; for (let j = 1; j <= fmtC.length; j++) { let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp; } }
                     
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
-                    if (rawRatio >= 0.95) score = 100; else if (rawRatio >= 0.85) score = 90 + Math.floor((rawRatio - 0.85) * 100); else if (rawRatio >= 0.75) score = 80 + Math.floor((rawRatio - 0.75) * 100); else if (rawRatio >= 0.60) score = 60 + Math.floor((rawRatio - 0.60) * 133); else score = Math.max(0, Math.floor(rawRatio * 100)); 
+                    if (rawRatio >= 0.95) score = 100; 
+                    else if (rawRatio >= 0.85) score = 90 + Math.floor((rawRatio - 0.85) * 100); 
+                    else if (rawRatio >= 0.75) score = 80 + Math.floor((rawRatio - 0.75) * 100); 
+                    else if (rawRatio >= 0.60) score = 60 + Math.floor((rawRatio - 0.60) * 133); 
+                    else score = Math.max(0, Math.floor(rawRatio * 100)); 
                     if (fmtC.length < (fmtT.length * 0.5)) score = Math.min(score, 50);
 
                     if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
@@ -817,7 +831,7 @@
             btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V59' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V60' });
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 playSfx('success');
@@ -870,8 +884,8 @@
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); state.currentScene = 'ALL'; window.fetchNewPhrase(); }
         
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v59_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v59_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v60_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v60_refreshtime', now); saveData(); }
         }
 
         window.requestRescue = function() { 
