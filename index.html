@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V64 - 极简分类与纯净防回滚版</title>
+    <title>Oasis Bridge V65 - 彻底无弹窗沉浸版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -52,6 +52,7 @@
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
         
         select option { background-color: #0f172a; color: #fff; font-weight: bold; padding: 10px; }
+        select optgroup { background-color: #1e293b; color: #fbbf24; font-weight: 900; font-style: italic; }
     </style>
 </head>
 <body>
@@ -59,7 +60,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V64</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V65</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -336,7 +337,6 @@
             'TRANSPORT': '交通通勤', 'PARENTING': '亲子育儿'
         };
 
-        // 🚨 V64 核心修复：纯净的 5 大类定义 (直接以 option 形式渲染)
         const SCENE_CATEGORIES = [
             { id: 'cat_life', en: '🏠 Life & Survival', cn: '🏠 生活与生存', items: ['Casual','Daily Life','Social','Networking','Parenting','Shopping','Dining','Travel','Hotel','Transport','Housing','Personal Care','Fitness','Healthcare','Medical','Public Services','Life','SOCIAL','LIFE','SHOPPING','HOTEL','TRAVEL','DINING','TRANSPORT','PARENTING','MEDICAL'] },
             { id: 'cat_work', en: '💼 Workplace & Team', cn: '💼 职场与协同', items: ['Work','Office','Task','Meeting','Project','Team','Collaboration','Communication','Email','Report','Notice','Admin','Approval','HR','Interview','Event','Agile','Product','UX/UI','Workplace','OFFICE','TASK','MEETING','PROJECT','TEAM','COLLABORATION','COMMUNICATION','EMAIL','REPORT','NOTICE','ADMIN','APPROVAL','EVENT'] },
@@ -491,14 +491,14 @@
 
         let state = {
             path: 'en', targetTime: 0, currentTime: 0,
-            scores: JSON.parse(localStorage.getItem('ob_v64_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v64_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v64_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v64_missed') || '{}'),
+            scores: JSON.parse(localStorage.getItem('ob_v65_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v65_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v65_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v65_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v64_adlim') !== null ? parseInt(localStorage.getItem('ob_v64_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v64_refillcount') || '0'), 
-            isBlindMode: localStorage.getItem('ob_v64_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v65_adlim') !== null ? parseInt(localStorage.getItem('ob_v65_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v65_refillcount') || '0'), 
+            isBlindMode: localStorage.getItem('ob_v65_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -508,13 +508,13 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v64_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v64_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v64_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v64_adlim', state.adLimit);
-            localStorage.setItem('ob_v64_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v64_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v64_blind', state.isBlindMode);
+            localStorage.setItem('ob_v65_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v65_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v65_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v65_adlim', state.adLimit);
+            localStorage.setItem('ob_v65_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v65_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v65_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -631,11 +631,10 @@
             renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
         }
 
-        // 🚨 V64 核心修复：纯净的大类列表（彻底防回滚）
         window.renderSceneFilters = function() {
             const selectEl = document.getElementById('scene-select');
             const ui = getUI();
-            const isEn = state.path === 'en'; // 界面UI语言（en->中文界面, cn->英文界面）
+            const isEn = state.path === 'en'; 
             
             let html = `<option value="ALL">${ui.txt_scene}</option>`;
             
@@ -666,7 +665,7 @@
             try {
                 const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
                 if (data && data.length > 0) {
-                    localStorage.setItem(`ob_v64_pool_${level}`, JSON.stringify(data)); 
+                    localStorage.setItem(`ob_v65_pool_${level}`, JSON.stringify(data)); 
                     return data;
                 }
             } catch(e) { console.log("Cloud fetch failed", e); }
@@ -679,7 +678,7 @@
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
             
             if (globalPool.length === 0) {
-                const cachedData = localStorage.getItem(`ob_v64_pool_${state.dbLevel}`);
+                const cachedData = localStorage.getItem(`ob_v65_pool_${state.dbLevel}`);
                 if (cachedData) {
                     globalPool = JSON.parse(cachedData);
                     fetchPoolFromCloud(state.dbLevel).then(newData => {
@@ -815,20 +814,24 @@
                 const feedbackBox = document.getElementById('game-feedback'); const textEl = document.getElementById('feedback-text'); const subEl = document.getElementById('feedback-sub');
                 feedbackBox.classList.remove('animate-pop-in'); void feedbackBox.offsetWidth; 
                 
-                if (isAdBoost) {
-                    textEl.innerText = "SPONSORED! 🚀"; textEl.className = "text-4xl font-black italic tracking-tighter text-blue-400 drop-shadow-md"; 
-                    subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : 'MAX BOOSTED';
-                } else if (txt !== "") {
+                // 🚨 V65: 物理删除火箭弹窗代码。只有真正朗读（txt不为空）且不是看广告时，才触发屏幕中央动画。
+                if (!isAdBoost && txt !== "") {
                     if (score >= 100) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
                     else if (score >= 80) { textEl.innerText = "EXCELLENT! ✨"; textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; } 
                     else if (score >= 60) { textEl.innerText = "GOOD! 👍"; textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; } 
                     else { textEl.innerText = "KEEP GOING! 💪"; textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; }
+                    
                     subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : (score < 60 ? 'Almost there' : 'COMBO!');
+                    feedbackBox.classList.add('animate-pop-in');
                 }
-                if (isAdBoost || txt !== "") { feedbackBox.classList.add('animate-pop-in'); }
 
-                if (isAdBoost) { document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; } 
-                else { const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`; }
+                // 底部计分板的静默展示逻辑
+                if (isAdBoost) { 
+                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
+                } else { 
+                    const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
+                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`; 
+                }
                 
                 saveData(); syncPhraseState();
                 const delay = isAdBoost ? 1200 : 2500;
@@ -847,7 +850,7 @@
             btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V64' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V65' });
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 playSfx('success');
@@ -900,8 +903,8 @@
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); state.currentScene = 'ALL'; window.fetchNewPhrase(); }
         
         function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v64_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v64_refreshtime', now); saveData(); }
+            const now = Date.now(); const last = localStorage.getItem('ob_v65_refreshtime') || 0;
+            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v65_refreshtime', now); saveData(); }
         }
 
         window.requestRescue = function() { 
