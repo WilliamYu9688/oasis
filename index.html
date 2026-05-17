@@ -751,44 +751,59 @@
             }
         }
 
-// 🚨 V66 智能双语云端音频播放内核
-window.playAudio = async (isAuto = false) => {
-    if(!isAuto) playSfx('click');
-    
-    // 1. 根据当前语言路径（学英文 en 还是学中文 zh），动态抓取对应的云端音频链接
-    const audioUrl = state.path === 'en' ? currentPhrase?.audio_url : currentPhrase?.audio_zh_url;
-    
-    if (audioUrl) {
-        // 2. 管道畅通：调用 HTML5 最高保真 Audio 对象进行播放
-        const btn = document.getElementById('play-btn');
-        const originalContent = btn.innerHTML;
-        
-        // 播放时按钮切换为优雅的加载动画
-        btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-        
-        const audio = new Audio(audioUrl);
-        
-        audio.onended = () => btn.innerHTML = originalContent; // 播放完毕恢复按钮
-        audio.onerror = () => { 
-            btn.innerHTML = originalContent; 
-            window.fallbackTTS(); // 🛑 保命兜底：万一云端链路闪断，0.1秒切回本地合成，绝不卡死
-        };
-        
-        audio.play();
-    } else {
-        // 3. 针对那几条报错没合成成功的遗留句子，自动走本地合成兜底
-        window.fallbackTTS();
-    }
-}
+// ==========================================
+// 🎙️ TTS 引擎 (V66 纯净静态 MP3 商业播放版)
+// ==========================================
+window.playAudio = async () => {
+    window.playSfx('click');
+    const text = document.getElementById('target-text').innerText.replace(/"/g, "");
+    if (!text || text === "Connecting...") return;
 
-// 🏛️ 本地兜底引擎
-window.fallbackTTS = () => {
-    const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.85; 
-    u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-    window.speechSynthesis.speak(u);
-}
+    const btn = event.currentTarget || document.querySelector('button[onclick="window.playAudio()"]');
+    const originalContent = btn.innerHTML;
+    // 触发呼吸加载动画
+    btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
+    btn.disabled = true;
+
+    try {
+        // 🚀 核心修改：直接从 Supabase 拉取预先合成好的静态 MP3
+        const audioUrl = window.currentPhrase.audio_url;
+
+        if (audioUrl) {
+            // 如果数据库里已经挂载了 MP3 链接，直接极速播放！0 API消耗！
+            const audio = new Audio(audioUrl);
+            audio.onended = () => { 
+                btn.innerHTML = originalContent; 
+                btn.disabled = false; 
+            };
+            audio.onerror = () => { 
+                throw new Error("云端 MP3 加载失败或未找到"); 
+            };
+            audio.play();
+        } else {
+            // 如果该句子的音频还没合成完（audio_url 为空），触发兜底
+            throw new Error("当前句子无静态 MP3 资源");
+        }
+    } catch (err) {
+        console.warn(err.message + "，已切换至系统原生保底发音。");
+        // 🛡️ 智能保底机制：如果没网或者刚好这句没合成，无缝使用手机自带语音
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = window.state.path === 'en' ? 'en-US' : 'zh-CN';
+        
+        // 嗅探设备上的高级声带
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            const langPrefix = window.state.path === 'en' ? 'en' : 'zh';
+            let bestVoice = voices.find(v => v.lang.includes(langPrefix) && (v.name.includes('Premium') || v.name.includes('Siri') || v.name.includes('Google')));
+            if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(langPrefix));
+            if (bestVoice) u.voice = bestVoice;
+        }
+        
+        u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+        u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+        window.speechSynthesis.speak(u);
+    }
+};
 
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
