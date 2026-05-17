@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V66</title>
+    <title>Oasis Bridge V65 - 彻底无弹窗沉浸版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -553,6 +553,11 @@
         window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
 
         window.enterMainApp = function() {
+            // 🚨 强行清除旧版无语音的本地缓存，逼迫 App 去云端拉取最新的 MP3 链接数据
+            localStorage.removeItem('ob_v65_pool_1');
+            localStorage.removeItem('ob_v65_pool_2');
+            localStorage.removeItem('ob_v65_pool_3');
+
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); 
             globalPool = []; 
@@ -751,7 +756,7 @@
             }
         }
 
-        // 🚨 唯一修改点：智能云端高保真播放 + 优雅本地兜底
+        // 🚨 唯一的播放器替换逻辑
         window.playAudio = async (isAuto = false) => {
             if(!isAuto) playSfx('click');
             const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
@@ -764,11 +769,19 @@
             const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
 
             if (audioUrl) {
+                console.log("🔊 正在播放云端高保真音频: ", audioUrl);
                 const audio = new Audio(audioUrl);
                 audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                audio.onerror = () => { window.fallbackTTS(btn, originalContent, text); };
-                audio.play().catch(() => { window.fallbackTTS(btn, originalContent, text); });
+                audio.onerror = () => { 
+                    console.warn("⚠️ 云端音频加载失败，自动降级到本地TTS兜底");
+                    window.fallbackTTS(btn, originalContent, text); 
+                };
+                audio.play().catch((e) => { 
+                    console.warn("⚠️ 浏览器拦截自动播放，降级到本地TTS", e);
+                    window.fallbackTTS(btn, originalContent, text); 
+                });
             } else {
+                console.log("⚠️ 数据库中尚未录入该句的MP3，触发本地TTS兜底");
                 window.fallbackTTS(btn, originalContent, text);
             }
         };
