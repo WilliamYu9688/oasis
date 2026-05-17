@@ -751,59 +751,43 @@
             }
         }
 
-// ==========================================
-// 🎙️ TTS 引擎 (V66 纯净静态 MP3 商业播放版)
-// ==========================================
-window.playAudio = async () => {
-    window.playSfx('click');
-    const text = document.getElementById('target-text').innerText.replace(/"/g, "");
-    if (!text || text === "Connecting...") return;
+        // 🚨 唯一修改点：智能云端高保真播放 + 优雅本地兜底
+        window.playAudio = async (isAuto = false) => {
+            if(!isAuto) playSfx('click');
+            const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            if (!text || text === getUI().txt_conn) return;
+            const btn = document.querySelector('button[onclick="window.playAudio()"]'); 
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            btn.disabled = true;
 
-    const btn = event.currentTarget || document.querySelector('button[onclick="window.playAudio()"]');
-    const originalContent = btn.innerHTML;
-    // 触发呼吸加载动画
-    btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
-    btn.disabled = true;
+            const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
 
-    try {
-        // 🚀 核心修改：直接从 Supabase 拉取预先合成好的静态 MP3
-        const audioUrl = window.currentPhrase.audio_url;
+            if (audioUrl) {
+                const audio = new Audio(audioUrl);
+                audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+                audio.onerror = () => { window.fallbackTTS(btn, originalContent, text); };
+                audio.play().catch(() => { window.fallbackTTS(btn, originalContent, text); });
+            } else {
+                window.fallbackTTS(btn, originalContent, text);
+            }
+        };
 
-        if (audioUrl) {
-            // 如果数据库里已经挂载了 MP3 链接，直接极速播放！0 API消耗！
-            const audio = new Audio(audioUrl);
-            audio.onended = () => { 
-                btn.innerHTML = originalContent; 
-                btn.disabled = false; 
-            };
-            audio.onerror = () => { 
-                throw new Error("云端 MP3 加载失败或未找到"); 
-            };
-            audio.play();
-        } else {
-            // 如果该句子的音频还没合成完（audio_url 为空），触发兜底
-            throw new Error("当前句子无静态 MP3 资源");
+        // 原装 V65 TTS 逻辑迁移至独立函数，供云端播放失败时兜底使用
+        window.fallbackTTS = (btn, originalContent, text) => {
+            const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; let voices = window.speechSynthesis.getVoices();
+            if (state.path === 'en') { u.lang = 'en-US'; let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; } 
+            else { u.lang = 'zh-CN'; let bestVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Ting-Ting') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; }
+            u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; }; u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
+            window.speechSynthesis.speak(u);
         }
-    } catch (err) {
-        console.warn(err.message + "，已切换至系统原生保底发音。");
-        // 🛡️ 智能保底机制：如果没网或者刚好这句没合成，无缝使用手机自带语音
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = window.state.path === 'en' ? 'en-US' : 'zh-CN';
-        
-        // 嗅探设备上的高级声带
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-            const langPrefix = window.state.path === 'en' ? 'en' : 'zh';
-            let bestVoice = voices.find(v => v.lang.includes(langPrefix) && (v.name.includes('Premium') || v.name.includes('Siri') || v.name.includes('Google')));
-            if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(langPrefix));
-            if (bestVoice) u.voice = bestVoice;
+
+        function analyzeMistakes(target, captured) {
+            let tWords = []; let cWords = [];
+            if (state.path === 'en') { tWords = target.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/); cWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/); } 
+            else { if (window.Intl && Intl.Segmenter) { const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' }); tWords = Array.from(segmenter.segment(target.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment); cWords = Array.from(segmenter.segment(captured.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment); } else { tWords = target.replace(/[^\u4e00-\u9fa5]/g,"").split(''); cWords = captured.replace(/[^\u4e00-\u9fa5]/g,"").split(''); } }
+            const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
-        
-        u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-        u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-        window.speechSynthesis.speak(u);
-    }
-};
 
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
