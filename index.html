@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V65 - 彻底无弹窗沉浸版</title>
+    <title>Oasis Bridge V65 - 体验升阶版 (UX)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -34,13 +34,9 @@
         .blind-mode-active { filter: blur(8px) opacity(0.8); transition: filter 0.4s ease, opacity 0.4s ease; cursor: pointer; }
         .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
         
-        .animate-pop-in { animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-10deg); } 40% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(5deg); } 60% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2) translateY(-20px); } }
+        .animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
         
-        .combo-text-perfect { background: linear-gradient(to bottom, #fde047, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(245, 158, 11, 0.6); }
-        .combo-text-excellent { background: linear-gradient(to bottom, #93c5fd, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(59, 130, 246, 0.6); }
-        .combo-text-encouraging { color: #cbd5e1; text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2); }
-
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -60,7 +56,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V65</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V65 (UX)</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -168,11 +164,6 @@
         </div>
 
         <div class="main-content-area px-4 sm:px-6">
-            <div id="game-feedback" class="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 z-[100] text-center w-full">
-                <h1 id="feedback-text" class="text-5xl font-black italic tracking-tighter">PERFECT!</h1>
-                <p id="feedback-sub" class="text-white font-bold text-sm bg-black/50 inline-block px-3 py-1 rounded-full mt-2 border border-white/20">+0.50 AED</p>
-            </div>
-
             <div class="max-w-md mx-auto w-full text-center">
                 <div class="flex justify-between items-center mb-4 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
@@ -498,7 +489,7 @@
             lumUnlocked: false,
             adLimit: localStorage.getItem('ob_v65_adlim') !== null ? parseInt(localStorage.getItem('ob_v65_adlim')) : 6,
             refillCount: parseInt(localStorage.getItem('ob_v65_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v65_usedslots') || '{}'), // 🚨 新增：防刷钱专属锁
+            usedSlots: JSON.parse(localStorage.getItem('ob_v65_usedslots') || '{}'), 
             isBlindMode: localStorage.getItem('ob_v65_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
@@ -514,7 +505,7 @@
             localStorage.setItem('ob_v65_boost', JSON.stringify(state.adBoostMap)); 
             localStorage.setItem('ob_v65_adlim', state.adLimit);
             localStorage.setItem('ob_v65_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v65_usedslots', JSON.stringify(state.usedSlots)); // 🚨 同步存储防刷锁
+            localStorage.setItem('ob_v65_usedslots', JSON.stringify(state.usedSlots));
             localStorage.setItem('ob_v65_missed', JSON.stringify(state.missedWords));
             localStorage.setItem('ob_v65_blind', state.isBlindMode);
         }
@@ -552,43 +543,31 @@
 
         window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         
-        // 🚨 精确按“自然日”跨天检测
         function checkAdRefresh() {
             const now = Date.now(); 
             const lastStr = localStorage.getItem('ob_v65_refreshtime');
             const last = lastStr ? parseInt(lastStr, 10) : 0;
-            
-            // 只要日子变了（凌晨0点后），就重置所有锁
             const isNewDay = !lastStr || new Date(now).toDateString() !== new Date(last).toDateString();
-            
             if (isNewDay) { 
                 state.adLimit = 6; 
                 state.refillCount = 0; 
-                state.usedSlots = {}; // 跨天重置所有档位的点击记录
+                state.usedSlots = {}; 
                 localStorage.setItem('ob_v65_refreshtime', now); 
                 saveData(); 
             }
         }
 
-        // 🚨 防刷钱与激活动力核心
         window.handleStepTime = (t) => { 
             playSfx('click'); 
             state.targetTime = t; 
-            
-            checkAdRefresh(); // 选择前先查一下是不是新的一天
-            
+            checkAdRefresh(); 
             if (!state.usedSlots[t]) {
-                // 如果今天第一次点这个时长，送 6 次免费容错
                 state.adLimit = 6;
                 state.refillCount = 0;
                 state.usedSlots[t] = true;
                 saveData();
                 alert(state.path === 'en' ? `🎁 成功开启 ${t} 分钟专属学习舱！\n系统已为您下发 6 次本局免费容错额度。` : `🎁 Unlocked ${t}-min session!\n6 free chances granted for this slot.`);
-            } else {
-                // 已经被白嫖过了，直接复用当前剩余额度，防止无限刷
-                console.log(`防刷机制拦截：今天已经点过 ${t} 分钟档位了，不赠送额外次数。`);
             }
-            
             hideAll(); 
             document.getElementById('step-2').classList.remove('hidden-screen'); 
         }
@@ -599,8 +578,7 @@
             localStorage.removeItem('ob_v65_pool_1');
             localStorage.removeItem('ob_v65_pool_2');
             localStorage.removeItem('ob_v65_pool_3');
-
-            checkAdRefresh(); // 保险起见，进入主界面再检测一次
+            checkAdRefresh(); 
 
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); 
@@ -654,6 +632,13 @@
             const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             tEl.innerHTML = `"${generateLiaisonHints(txt)}"`; zhEl.innerText = sub;
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
+        }
+
+        // 🚨 升级新增的“跳过本题”辅助方法
+        window.skipToNext = function() {
+            playSfx('click');
+            isEvaluating = false; 
+            window.handleRefresh();
         }
 
         window.handleRefresh = function() { if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); else window.fetchNewPhrase(); }
@@ -836,6 +821,7 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
+        // 🚨 升级修复的核心逻辑：放宽评分容忍度 + 人性化底部提示
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -847,19 +833,32 @@
                 
                 if (!isAdBoost) {
                     analyzeMistakes(rawT, safeTxt);
-                    let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
-                    if (state.path === 'cn') { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); } else { fmtC = fmtC.replace(/\s+/g, " ").trim(); fmtT = fmtT.replace(/\s+/g, " ").trim(); }
+                    let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); 
+                    let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+
+                    // 🔥 新增：前端高容错算法（过滤英文连读虚词，降低对比严苛度）
+                    if (state.path === 'en') {
+                        const stops = ['a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'is', 'are', 'am'];
+                        fmtC = fmtC.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim();
+                        fmtT = fmtT.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim();
+                    } else {
+                        fmtC = fmtC.replace(/\s+/g, ""); 
+                        fmtT = fmtT.replace(/\s+/g, ""); 
+                    }
                     
                     const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
                     for (let i = 1; i <= fmtT.length; i++) { let prev = dp[0]; dp[0] = i; for (let j = 1; j <= fmtC.length; j++) { let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp; } }
                     
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
-                    if (rawRatio >= 0.95) score = 100; 
-                    else if (rawRatio >= 0.85) score = 90 + Math.floor((rawRatio - 0.85) * 100); 
-                    else if (rawRatio >= 0.75) score = 80 + Math.floor((rawRatio - 0.75) * 100); 
-                    else if (rawRatio >= 0.60) score = 60 + Math.floor((rawRatio - 0.60) * 133); 
+                    
+                    // 🔥 新增：曲线放水。达到85%命中就算完美，达到50%命中就算合格。
+                    if (rawRatio >= 0.85) score = 100; 
+                    else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio - 0.70) * 66); 
+                    else if (rawRatio >= 0.50) score = 80 + Math.floor((rawRatio - 0.50) * 50); 
+                    else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 100); 
                     else score = Math.max(0, Math.floor(rawRatio * 100)); 
-                    if (fmtC.length < (fmtT.length * 0.5)) score = Math.min(score, 50);
+                    
+                    if (fmtC.length < (fmtT.length * 0.4)) score = Math.min(score, 50);
 
                     if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                     if (score >= 80) state.streak += 1; else state.streak = 0;
@@ -875,29 +874,44 @@
                     try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
                 }
                 
-                const feedbackBox = document.getElementById('game-feedback'); const textEl = document.getElementById('feedback-text'); const subEl = document.getElementById('feedback-sub');
-                feedbackBox.classList.remove('animate-pop-in'); void feedbackBox.offsetWidth; 
+                // 🔥 新增：彻底废弃中间的巨型弹窗，转用底部人性化反馈
+                const scoreDisp = document.getElementById('score-display');
                 
-                if (!isAdBoost && txt !== "") {
-                    if (score >= 100) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
-                    else if (score >= 80) { textEl.innerText = "EXCELLENT! ✨"; textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; } 
-                    else if (score >= 60) { textEl.innerText = "GOOD! 👍"; textEl.className = "text-4xl font-black italic tracking-tighter text-white drop-shadow-md"; } 
-                    else { textEl.innerText = "KEEP GOING! 💪"; textEl.className = "text-3xl font-black italic tracking-tighter combo-text-encouraging"; }
-                    
-                    subEl.innerText = diff > 0 ? `+${diff.toFixed(2)} AED` : (score < 60 ? 'Almost there' : 'COMBO!');
-                    feedbackBox.classList.add('animate-pop-in');
-                }
-
                 if (isAdBoost) { 
-                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
+                    scoreDisp.innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
+                    setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 1200);
                 } else { 
-                    const heardText = safeTxt ? (state.path==='en' ? `系统听到了: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
-                    document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black ${score>=80?'text-emerald-400':'text-amber-400'}">${score}</span><br><span class="text-[10px] text-gray-400 block px-4">${heardText}</span>`; 
+                    const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
+                    
+                    if (score >= 80) {
+                        // 完美通过，展示绝美底部反馈，并自动切题
+                        scoreDisp.innerHTML = `
+                            <div class="flex flex-col items-center animate-pop-in">
+                                <span class="text-3xl font-black text-emerald-400 drop-shadow-md">${score} PTS - PERFECT!</span>
+                                <span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-3 py-1 rounded-full mt-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>
+                            </div>
+                        `;
+                        saveData(); syncPhraseState();
+                        setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 2000); 
+                    } else {
+                        // 分数不高，系统悬停，允许复盘
+                        scoreDisp.innerHTML = `
+                            <div class="flex flex-col items-center w-full px-4 animate-pop-in">
+                                <div class="text-center w-full mb-1">
+                                    <span class="text-xl font-black ${score >= 60 ? 'text-amber-400' : 'text-red-400'}">${score} PTS - TRY AGAIN</span>
+                                    <p class="text-[9px] text-gray-400 truncate w-full mt-0.5">${heardText}</p>
+                                </div>
+                                <div class="flex gap-3 mt-1.5 w-full max-w-[200px]">
+                                    <button onclick="window.playAudio()" class="flex-1 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400 font-bold text-[10px] active:scale-95 shadow-sm">▶️ ${state.path==='en'?'听原音':'Listen'}</button>
+                                    <button onclick="window.skipToNext()" class="flex-1 py-1.5 glass-btn rounded-lg text-slate-300 font-bold text-[10px] active:scale-95 shadow-sm">⏭️ ${state.path==='en'?'跳过':'Skip'}</button>
+                                </div>
+                            </div>
+                        `;
+                        saveData(); syncPhraseState();
+                        // 解除锁定，不自动切题！用户可以按上方按钮重试或听原音
+                        isEvaluating = false; 
+                    }
                 }
-                
-                saveData(); syncPhraseState();
-                const delay = isAdBoost ? 1200 : 2500;
-                setTimeout(() => { isEvaluating = false; if ((diff > 0 && !isAdBoost) || isAdBoost) window.handleRefresh(); else setAppState('READY'); }, delay); 
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
