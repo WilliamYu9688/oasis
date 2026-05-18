@@ -195,7 +195,8 @@
                 </div>
 
                 <div id="lum-diagnosis" class="min-h-[10px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
-                <div id="score-display" class="h-24 flex flex-col items-center justify-center">
+                
+                <div id="score-display" class="h-24 flex flex-col items-center justify-center mt-2">
                     <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
                 </div>
             </div>
@@ -634,7 +635,6 @@
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
         }
 
-        // 🚨 升级新增的“跳过本题”辅助方法
         window.skipToNext = function() {
             playSfx('click');
             isEvaluating = false; 
@@ -821,7 +821,6 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
-        // 🚨 升级修复的核心逻辑：放宽评分容忍度 + 人性化底部提示
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -836,7 +835,6 @@
                     let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); 
                     let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
 
-                    // 🔥 新增：前端高容错算法（过滤英文连读虚词，降低对比严苛度）
                     if (state.path === 'en') {
                         const stops = ['a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'is', 'are', 'am'];
                         fmtC = fmtC.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim();
@@ -851,15 +849,15 @@
                     
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
                     
-                    // 🔥 新增：曲线放水。达到85%命中就算完美，达到50%命中就算合格。
-                    if (rawRatio >= 0.85) score = 100; 
-                    else if (rawRatio >= 0.70) score = 90 + Math.floor((rawRatio - 0.70) * 66); 
-                    else if (rawRatio >= 0.50) score = 80 + Math.floor((rawRatio - 0.50) * 50); 
-                    else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 100); 
-                    else score = Math.max(0, Math.floor(rawRatio * 100)); 
+                    // 🔥 精准打分曲线：捍卫100分的荣誉感，大幅放宽及格线保护积极性
+                    if (rawRatio >= 0.95) score = 100; // 极严：95%命中率才给满分
+                    else if (rawRatio >= 0.80) score = 90 + Math.floor((rawRatio - 0.80) * 66); // 80%~94% -> 90~99分
+                    else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); // 55%~79% -> 80~89分
+                    else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 80); // 30%~54% -> 60~79分 (极度放宽的及格线)
+                    else score = Math.min(59, Math.floor(rawRatio * 200)); // 随便读几个词也有二三十分
                     
-                    if (fmtC.length < (fmtT.length * 0.4)) score = Math.min(score, 50);
-
+                    if (score > 99 && rawRatio < 0.95) score = 99; // 防止极端进位
+                    
                     if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                     if (score >= 80) state.streak += 1; else state.streak = 0;
                 } else { state.streak += 1; }
@@ -874,7 +872,6 @@
                     try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
                 }
                 
-                // 🔥 新增：彻底废弃中间的巨型弹窗，转用底部人性化反馈
                 const scoreDisp = document.getElementById('score-display');
                 
                 if (isAdBoost) { 
@@ -884,17 +881,15 @@
                     const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
                     
                     if (score >= 80) {
-                        // 完美通过，展示绝美底部反馈，并自动切题
                         scoreDisp.innerHTML = `
                             <div class="flex flex-col items-center animate-pop-in">
-                                <span class="text-3xl font-black text-emerald-400 drop-shadow-md">${score} PTS - PERFECT!</span>
+                                <span class="text-3xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>
                                 <span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-3 py-1 rounded-full mt-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>
                             </div>
                         `;
                         saveData(); syncPhraseState();
                         setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 2000); 
                     } else {
-                        // 分数不高，系统悬停，允许复盘
                         scoreDisp.innerHTML = `
                             <div class="flex flex-col items-center w-full px-4 animate-pop-in">
                                 <div class="text-center w-full mb-1">
@@ -908,7 +903,6 @@
                             </div>
                         `;
                         saveData(); syncPhraseState();
-                        // 解除锁定，不自动切题！用户可以按上方按钮重试或听原音
                         isEvaluating = false; 
                     }
                 }
