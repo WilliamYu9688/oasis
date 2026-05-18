@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V69 - 导航升阶版 (History Stack)</title>
+    <title>Oasis Bridge V70 - 时光机导航版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V69</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V70 (Nav)</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -196,14 +196,16 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
                 
-                <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-4 rounded-2xl border border-white/5 min-h-[140px] flex flex-col justify-center cursor-pointer">
-                    <button id="play-audio-btn" onclick="event.stopPropagation(); window.playAudio()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center border border-white/10 active:scale-90 transition-all z-10">
-                        <svg class="w-4 h-4 text-amber-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                    </button>
-                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight gap-x-1 gap-y-2 transition-all duration-300" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
-                    <p id="target-zh" class="text-xs text-slate-400 mb-1 min-h-[20px] px-2"></p>
+                <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[160px] flex flex-col items-center justify-center cursor-pointer shadow-inner">
                     
-                    <div id="sentence-current-score" class="text-[11px] font-bold text-slate-500 tracking-wider transition-all duration-300 mt-2 min-h-[16px]"></div>
+                    <button id="play-audio-btn" onclick="event.stopPropagation(); window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                        <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                    </button>
+
+                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight gap-x-1 gap-y-2 transition-all duration-300 text-center" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
+                    <p id="target-zh" class="text-xs text-slate-400 mb-1 min-h-[20px] px-2 text-center"></p>
+                    
+                    <div id="sentence-current-score" class="text-[11px] font-bold text-slate-500 tracking-wider transition-all duration-300 mt-2 min-h-[16px] text-center"></div>
                 </div>
 
                 <div id="lum-diagnosis" class="min-h-[10px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
@@ -216,14 +218,16 @@
 
         <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-6 max-w-sm mx-auto px-4 w-full">
-                <button id="prev-btn" onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all">
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                <button id="prev-btn" onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all opacity-30 cursor-not-allowed" disabled>
+                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
+                
                 <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                     <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
+                
                 <button id="next-btn" onclick="window.goNextPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all">
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
         </div>
@@ -495,27 +499,29 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
+        
+        // 阶梯返现原则
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
         let currentPhraseAttempts = 0; 
         
-        // 🚨 V69 引擎升级：底层词句时光机记忆栈
+        // 🚨 V70: 建立底层“时光机记忆栈”
         let phraseHistory = [];
         let historyIndex = -1;
 
         let state = {
             path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v69_times') || '{"en":0, "cn":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v69_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v69_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v69_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v69_missed') || '{}'),
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v70_times') || '{"en":0, "cn":0}'),
+            scores: JSON.parse(localStorage.getItem('ob_v70_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v70_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v70_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v70_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v69_adlim') !== null ? parseInt(localStorage.getItem('ob_v69_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v69_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v69_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v69_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v70_adlim') !== null ? parseInt(localStorage.getItem('ob_v70_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v70_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v70_usedslots') || '{}'), 
+            isBlindMode: localStorage.getItem('ob_v70_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -524,15 +530,15 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v69_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v69_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v69_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v69_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v69_adlim', state.adLimit);
-            localStorage.setItem('ob_v69_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v69_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v69_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v69_blind', state.isBlindMode);
+            localStorage.setItem('ob_v70_times', JSON.stringify(state.sessionTimes)); 
+            localStorage.setItem('ob_v70_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v70_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v70_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v70_adlim', state.adLimit);
+            localStorage.setItem('ob_v70_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v70_usedslots', JSON.stringify(state.usedSlots));
+            localStorage.setItem('ob_v70_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v70_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -575,10 +581,10 @@
         function checkAdRefresh() {
             const now = Date.now(); 
             const todayStr = new Date(now).toDateString();
-            const lastStr = localStorage.getItem('ob_v69_refreshtime');
+            const lastStr = localStorage.getItem('ob_v70_refreshtime');
             if (!lastStr || lastStr !== todayStr) { 
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0 }; 
-                localStorage.setItem('ob_v69_refreshtime', todayStr); saveData(); 
+                localStorage.setItem('ob_v70_refreshtime', todayStr); saveData(); 
             }
         }
 
@@ -598,7 +604,6 @@
         window.enterMainApp = function() {
             checkAdRefresh(); 
             
-            // 🚨 重置记忆栈
             phraseHistory = [];
             historyIndex = -1;
 
@@ -613,7 +618,7 @@
 
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); globalPool = []; 
-            window.goNextPhrase(); // 首次启动
+            window.goNextPhrase(); // 进入时拉取第一题
             
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
@@ -649,8 +654,8 @@
             document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
         }
 
-        // 🚨 V69 独立出的渲染核心，供前后切换使用
-        function applyCurrentPhrase() {
+        // 🚨 抽出独立的刷新UI逻辑，供“上一句”、“下一句”共同调用
+        window.applyCurrentPhrase = function() {
             const ui = getUI(); 
             document.getElementById('lum-diagnosis').innerHTML = ""; 
             const sentenceScoreEl = document.getElementById('sentence-current-score'); 
@@ -662,53 +667,66 @@
             document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
             
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
+            updateNavButtons(); // 更新导航按钮状态
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
         }
-
-        // 🚨 V69 下一句（主推功能，支持从历史栈穿梭或拉取新题）
-        window.goNextPhrase = async function() {
-            if (appState !== 'REWARDING') playSfx('click');
-            currentPhraseAttempts = 0; 
-            isEvaluating = false;
-            
-            if (historyIndex < phraseHistory.length - 1) {
-                // 如果用户之前按了“上一句”，现在再按“下一句”，就从历史记录里往回走
-                historyIndex++;
-                currentPhrase = phraseHistory[historyIndex];
-                applyCurrentPhrase();
+        
+        window.updateNavButtons = function() {
+            const prevBtn = document.getElementById('prev-btn');
+            if (historyIndex > 0) {
+                prevBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+                prevBtn.disabled = false;
             } else {
-                // 真正拉取全新的一题
-                document.getElementById('target-text').innerText = getUI().txt_conn;
-                await fetchNewPhraseLogic();
-                // 放入历史栈
-                phraseHistory.push(currentPhrase);
-                if (phraseHistory.length > 50) phraseHistory.shift(); // 极简内存管理
-                else historyIndex++;
-                applyCurrentPhrase();
+                prevBtn.classList.add('opacity-30', 'cursor-not-allowed');
+                prevBtn.disabled = true;
             }
         }
 
-        // 🚨 V69 上一句
+        // 🚨 V70: 上一句 (从记忆栈回退)
         window.goPrevPhrase = function() {
+            if (appState === 'LISTENING') return;
             if (historyIndex > 0) {
                 playSfx('click');
                 currentPhraseAttempts = 0; 
                 isEvaluating = false;
                 historyIndex--;
                 currentPhrase = phraseHistory[historyIndex];
-                applyCurrentPhrase();
-            } else {
-                // 已经到顶了，给个震动反馈
-                const btn = document.getElementById('prev-btn');
-                btn.classList.add('opacity-30', 'scale-90');
-                setTimeout(() => btn.classList.remove('opacity-30', 'scale-90'), 200);
+                window.applyCurrentPhrase();
             }
         }
+
+        // 🚨 V70: 下一句 (如果栈里有就往前走，没有就拉新题)
+        window.goNextPhrase = async function() {
+            if (appState === 'LISTENING' || isEvaluating) return;
+            if (appState !== 'REWARDING') playSfx('click');
+            currentPhraseAttempts = 0; 
+            isEvaluating = false;
+            
+            if (historyIndex < phraseHistory.length - 1) {
+                historyIndex++;
+                currentPhrase = phraseHistory[historyIndex];
+                window.applyCurrentPhrase();
+            } else {
+                document.getElementById('target-text').innerText = getUI().txt_conn;
+                await fetchNewPhraseLogic();
+                
+                phraseHistory.push(currentPhrase);
+                if (phraseHistory.length > 50) {
+                    phraseHistory.shift(); 
+                } else {
+                    historyIndex++;
+                }
+                window.applyCurrentPhrase();
+            }
+        }
+
+        // 取代原本的 handleRefresh（现作为防卡死的备用按钮，依然指向 next）
+        window.handleRefresh = function() { window.goNextPhrase(); }
 
         async function fetchNewPhraseLogic() {
             try {
                 if (globalPool.length === 0) {
-                    const cachedData = localStorage.getItem(`ob_v69_pool_${state.dbLevel}`);
+                    const cachedData = localStorage.getItem(`ob_v70_pool_${state.dbLevel}`);
                     if (cachedData) {
                         globalPool = JSON.parse(cachedData);
                         window.renderSceneFilters();
@@ -838,8 +856,10 @@
             currentPhrase = { id: 'weak_' + pickedWord, text_en: isCn ? translation : pickedWord, text_zh: isCn ? pickedWord : translation, scenario: 'WEAK WORD' };
             currentPhraseAttempts = 0; 
             
-            phraseHistory = []; historyIndex = 0; phraseHistory.push(currentPhrase); // 弱词重置栈
-            applyCurrentPhrase();
+            phraseHistory.splice(historyIndex + 1); // 弱词特训作为新历史压入
+            phraseHistory.push(currentPhrase);
+            if (phraseHistory.length > 50) phraseHistory.shift(); else historyIndex++;
+            window.applyCurrentPhrase();
         }
 
         window.renderSceneFilters = function() {
@@ -854,21 +874,16 @@
         }
 
         window.setScene = function(scene) {
-            playSfx('click');
-            state.currentScene = scene;
-            phraseHistory = []; historyIndex = -1; // 切换分类重置时间栈
+            playSfx('click'); state.currentScene = scene;
+            phraseHistory = []; historyIndex = -1; // 切换分类强制清空历史栈
             window.goNextPhrase(); 
         }
 
         async function fetchPoolFromCloud(level) {
             try {
                 let res = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
-                if (res.error) {
-                    res = await oasisCloud.from('phrases').select('*');
-                }
-                if (res.data && res.data.length > 0) {
-                    return res.data;
-                }
+                if (res.error) { res = await oasisCloud.from('phrases').select('*'); }
+                if (res.data && res.data.length > 0) { return res.data; }
             } catch(e) { console.log("Cloud fetch failed", e); }
             return null;
         }
@@ -876,7 +891,7 @@
         function setAppState(s) {
             const ui = getUI(); appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
             switch(s) {
-                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">${ui.sys_ready}</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('prev-btn').disabled = false; document.getElementById('next-btn').disabled = false; break;
+                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">${ui.sys_ready}</p>`; btn.classList.remove('recording-active'); btn.disabled = false; window.updateNavButtons(); break;
                 case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_rec}</p>`; btn.classList.add('recording-active'); document.getElementById('prev-btn').disabled = true; document.getElementById('next-btn').disabled = true; break;
                 case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_ana}</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
                 case 'REWARDING': btn.disabled = true; break;
@@ -887,7 +902,7 @@
             if(!isAuto) playSfx('click'); const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             if (!text || text.includes('Connecting')) return;
             const btn = document.getElementById("play-audio-btn"); const originalContent = btn.innerHTML;
-            btn.innerHTML = `<svg class="w-4 h-4 text-emerald-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            btn.innerHTML = `<svg class="w-5 h-5 text-blue-400 animate-spin ml-1" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
             btn.disabled = true; const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
             if (audioUrl) {
                 const audio = new Audio(audioUrl); audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
@@ -920,13 +935,7 @@
                 
                 let currentEarned = state.earnedMap[rawT] || 0; 
                 let currentTier = 0;
-                if (currentEarned >= 0.50) currentTier = 5;
-                else if (currentEarned >= 0.45) currentTier = 4;
-                else if (currentEarned >= 0.40) currentTier = 3;
-                else if (currentEarned >= 0.35) currentTier = 2;
-                else if (currentEarned >= 0.30) currentTier = 1;
-                else currentTier = 0;
-
+                if (currentEarned >= 0.50) currentTier = 5; else if (currentEarned >= 0.45) currentTier = 4; else if (currentEarned >= 0.40) currentTier = 3; else if (currentEarned >= 0.35) currentTier = 2; else if (currentEarned >= 0.30) currentTier = 1; else currentTier = 0;
                 let tier = 0;
 
                 if (!isAdBoost) {
@@ -962,6 +971,7 @@
                     state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
                     document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); playSfx('success');
+                    try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
                 }
                 
                 const scoreDisp = document.getElementById('score-display');
@@ -979,24 +989,10 @@
                         sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="${badgeColor} font-black text-sm animate-pulse">${score} PTS</span>`;
                     }
                     
-                    const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
-                    
                     if (score >= 80) {
-                        scoreDisp.innerHTML = `
-                            <div class="flex flex-col items-center w-full px-4 animate-pop-in">
-                                <div class="text-center w-full mb-1">
-                                    <span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>
-                                    ${diff > 0 ? `<span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-2 py-0.5 rounded-full ml-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>` : ''}
-                                </div>
-                            </div>`;
+                        scoreDisp.innerHTML = `<span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>`;
                     } else {
-                        scoreDisp.innerHTML = `
-                            <div class="flex flex-col items-center w-full px-4 animate-pop-in">
-                                <div class="text-center w-full mb-1">
-                                    <span class="text-xl font-black ${score >= 60 ? 'text-amber-400' : 'text-red-400'}">${score} PTS - TRY AGAIN</span>
-                                    <p class="text-[9px] text-gray-400 truncate w-full mt-0.5">${heardText}</p>
-                                </div>
-                            </div>`;
+                        scoreDisp.innerHTML = `<span class="text-xl font-black ${score >= 60 ? 'text-amber-400' : 'text-red-400'}">${score} PTS - TRY AGAIN</span>`;
                     }
                     
                     if (isNewBest) {
@@ -1020,7 +1016,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V69' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V70' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
