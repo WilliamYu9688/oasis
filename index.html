@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V66</title>
+    <title>Oasis Bridge V65 - 彻底无弹窗沉浸版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -549,14 +549,44 @@
         window.openModal = function(id) { document.getElementById(id).classList.add('active'); playSfx('click'); }
 
         window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
-        window.handleStepTime = (t) => { playSfx('click'); state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        
+        // 🚨 升级修复点 1：每次选择时间（开启新局），满血恢复6次额度
+        window.handleStepTime = (t) => { 
+            playSfx('click'); 
+            state.targetTime = t; 
+            
+            // 🔥 重磅商业逻辑：选择时间意味着新开一局，直接重置免费容错额度与看广告限制
+            state.adLimit = 6;
+            state.refillCount = 0;
+            localStorage.setItem('ob_v65_refreshtime', Date.now()); 
+            saveData();
+            
+            hideAll(); 
+            document.getElementById('step-2').classList.remove('hidden-screen'); 
+        }
+        
         window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
 
+        // 🚨 升级修复点 2：跨天检测修复机制
+        function checkAdRefresh() {
+            const now = Date.now(); 
+            const lastStr = localStorage.getItem('ob_v65_refreshtime');
+            const last = lastStr ? parseInt(lastStr, 10) : 0;
+            if (now - last > 24 * 60 * 60 * 1000) { 
+                state.adLimit = 6; 
+                state.refillCount = 0; 
+                localStorage.setItem('ob_v65_refreshtime', now); 
+                saveData(); 
+            }
+        }
+
         window.enterMainApp = function() {
-            // 🚨 强行清除旧版无语音的本地缓存，逼迫 App 去云端拉取最新的 MP3 链接数据
             localStorage.removeItem('ob_v65_pool_1');
             localStorage.removeItem('ob_v65_pool_2');
             localStorage.removeItem('ob_v65_pool_3');
+
+            // 🔥 在这里强制进行一次检测，防止用户没经过选时间界面直接进入（比如刷新网页）导致过了一天额度还是5次
+            checkAdRefresh();
 
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); 
@@ -756,7 +786,6 @@
             }
         }
 
-        // 🚨 注入了“吐真剂”的排查播放内核
         window.playAudio = async (isAuto = false) => {
             if(!isAuto) playSfx('click');
             const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
@@ -769,27 +798,23 @@
             const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
 
             if (audioUrl) {
+                console.log("🔊 正在播放云端高保真音频: ", audioUrl);
                 const audio = new Audio(audioUrl);
                 audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                
-                // 🚨 吐真剂 1：如果存储桶是私有的，就会弹这个错
-                audio.onerror = (e) => { 
-                    alert("⚠️ 凶手抓到了！\n云端音频链接存在，但浏览器拒绝播放。\n\n大概率是因为您的 Supabase [phrase-audio] 存储桶没有打开 Public (公开) 开关！\n\n测试链接：" + audioUrl.substring(0, 50) + "...");
+                audio.onerror = () => { 
+                    console.warn("⚠️ 云端音频加载失败，自动降级到本地TTS兜底");
                     window.fallbackTTS(btn, originalContent, text); 
                 };
-                
                 audio.play().catch((e) => { 
-                    alert("⚠️ 凶手抓到了！\n播放被拦截，错误代码：" + e.message);
+                    console.warn("⚠️ 浏览器拦截自动播放，降级到本地TTS", e);
                     window.fallbackTTS(btn, originalContent, text); 
                 });
             } else {
-                // 🚨 吐真剂 2：如果数据库里压根就没拿过来音频链接
-                alert("⚠️ 凶手抓到了！\n数据库里没拿到当前这句话的 MP3 链接。\n\n可能是本地缓存没清干净（请尝试刷新页面），或者这条数据刚才真没合成出来！");
+                console.log("⚠️ 数据库中尚未录入该句的MP3，触发本地TTS兜底");
                 window.fallbackTTS(btn, originalContent, text);
             }
         };
 
-        // 原装 V65 TTS 逻辑迁移至独立函数，供云端播放失败时兜底使用
         window.fallbackTTS = (btn, originalContent, text) => {
             const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; let voices = window.speechSynthesis.getVoices();
             if (state.path === 'en') { u.lang = 'en-US'; let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; } 
@@ -847,7 +872,6 @@
                 const feedbackBox = document.getElementById('game-feedback'); const textEl = document.getElementById('feedback-text'); const subEl = document.getElementById('feedback-sub');
                 feedbackBox.classList.remove('animate-pop-in'); void feedbackBox.offsetWidth; 
                 
-                // 🚨 V65: 物理删除火箭弹窗代码。只有真正朗读（txt不为空）且不是看广告时，才触发屏幕中央动画。
                 if (!isAdBoost && txt !== "") {
                     if (score >= 100) { textEl.innerText = "PERFECT! 🔥"; textEl.className = "text-5xl font-black italic tracking-tighter combo-text-perfect"; } 
                     else if (score >= 80) { textEl.innerText = "EXCELLENT! ✨"; textEl.className = "text-4xl font-black italic tracking-tighter combo-text-excellent"; } 
@@ -858,7 +882,6 @@
                     feedbackBox.classList.add('animate-pop-in');
                 }
 
-                // 底部计分板的静默展示逻辑
                 if (isAdBoost) { 
                     document.getElementById('score-display').innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
                 } else { 
@@ -935,11 +958,6 @@
 
         window.exitWeakMode = () => { playSfx('click'); window.closeModal('exit-modal'); state.currentScene = 'ALL'; window.fetchNewPhrase(); }
         
-        function checkAdRefresh() {
-            const now = Date.now(); const last = localStorage.getItem('ob_v65_refreshtime') || 0;
-            if (now - last > 24 * 60 * 60 * 1000) { state.adLimit = 6; state.refillCount = 0; localStorage.setItem('ob_v65_refreshtime', now); saveData(); }
-        }
-
         window.requestRescue = function() { 
             playSfx('click'); checkAdRefresh(); 
             if (appState === 'REWARDING') return; 
