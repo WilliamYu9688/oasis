@@ -190,7 +190,7 @@
                 </div>
                 
                 <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-4 rounded-2xl border border-white/5">
-                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight min-h-[80px] gap-x-1 gap-y-2" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
+                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight min-h-[80px] gap-x-1 gap-y-2 transition-all duration-300" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                     <p id="target-zh" class="text-xs text-slate-400 mb-2 min-h-[20px] px-2"></p>
                 </div>
 
@@ -635,6 +635,41 @@
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
         }
 
+        // 🚨 核心新功能：词级高亮视觉反馈引擎（支持中英双语）
+        window.highlightSentence = function(target, captured) {
+            let coloredHTML = "";
+            if (state.path === 'en') {
+                const capWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
+                coloredHTML = target.replace(/\b([a-zA-Z']+)\b/g, (match) => {
+                    const cleanWord = match.toLowerCase().replace(/[^a-z]/g, "");
+                    const idx = capWords.indexOf(cleanWord);
+                    if (idx > -1) {
+                        capWords.splice(idx, 1);
+                        return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`;
+                    } else {
+                        // 错词：标红 + 虚线底边
+                        return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`;
+                    }
+                });
+            } else {
+                let capStr = captured.replace(/[^\u4e00-\u9fa5]/g, "");
+                for (let i = 0; i < target.length; i++) {
+                    const char = target[i];
+                    if (/[\u4e00-\u9fa5]/.test(char)) {
+                        if (capStr.includes(char)) {
+                            capStr = capStr.replace(char, ""); // 命中一次就消耗掉，防止重复字被误判
+                            coloredHTML += `<span class="text-emerald-400 transition-colors duration-300">${char}</span>`;
+                        } else {
+                            coloredHTML += `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${char}</span>`;
+                        }
+                    } else {
+                        coloredHTML += char;
+                    }
+                }
+            }
+            return `"${coloredHTML}"`;
+        }
+
         window.skipToNext = function() {
             playSfx('click');
             isEvaluating = false; 
@@ -849,14 +884,13 @@
                     
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
                     
-                    // 🔥 精准打分曲线：捍卫100分的荣誉感，大幅放宽及格线保护积极性
-                    if (rawRatio >= 0.95) score = 100; // 极严：95%命中率才给满分
-                    else if (rawRatio >= 0.80) score = 90 + Math.floor((rawRatio - 0.80) * 66); // 80%~94% -> 90~99分
-                    else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); // 55%~79% -> 80~89分
-                    else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 80); // 30%~54% -> 60~79分 (极度放宽的及格线)
-                    else score = Math.min(59, Math.floor(rawRatio * 200)); // 随便读几个词也有二三十分
+                    if (rawRatio >= 0.95) score = 100; 
+                    else if (rawRatio >= 0.80) score = 90 + Math.floor((rawRatio - 0.80) * 66); 
+                    else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); 
+                    else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 80); 
+                    else score = Math.min(59, Math.floor(rawRatio * 200)); 
                     
-                    if (score > 99 && rawRatio < 0.95) score = 99; // 防止极端进位
+                    if (score > 99 && rawRatio < 0.95) score = 99; 
                     
                     if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
                     if (score >= 80) state.streak += 1; else state.streak = 0;
@@ -879,6 +913,11 @@
                     setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 1200);
                 } else { 
                     const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
+                    
+                    // 🚨 核心改动：在显示分数前，将主句子进行绿/红高亮上色
+                    if (txt !== "") {
+                        document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt);
+                    }
                     
                     if (score >= 80) {
                         scoreDisp.innerHTML = `
