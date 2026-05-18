@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge - 纯净回滚版 (阶梯打赏)</title>
+    <title>Oasis Bridge V65 - 商业定稿纯净版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -31,7 +31,7 @@
         .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
         @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
         
-        /* 智能受挫呼吸灯特效 */
+        /* 受挫广告提醒呼吸灯 */
         @keyframes ad-glow { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.2); } 100% { box-shadow: 0 0 16px 4px rgba(59, 130, 246, 0.8); border-color: rgba(59, 130, 246, 0.7); background: rgba(59, 130, 246, 0.2) !important; } }
         .ad-glow-active { animation: ad-glow 1.2s infinite alternate !important; }
 
@@ -330,7 +330,7 @@
             'Culture': '跨文化沟通', 'PR': '公关传播', 'VC': '风险投资', 'Negotiation': '商业谈判', 
             'Everyday Slang': '日常俚语', 'Internet Slang': '网络黑话', 'Workplace Slang': '职场黑话', 'Idiom': '习惯用语',
             'Customer Service': '客户服务', 'Research': '研究调查', 'Workplace': '职场环境', 'WEAK WORD': '生词特训',
-            'OFFICE': '日常办公', 'SHOPPING': '购物消费', 'HOTEL': '酒店住宿', 'TRAVEL': '差旅出行', 
+            'OFFICE': '日常办公', 'SHOPPING': '购物消费', 'HOTEL': '住宿', 'TRAVEL': '差旅出行', 
             'SOCIAL': '社交交往', 'LIFE': '生活琐事', 'LOGISTICS': '物流运输', 'TASK': '任务管理', 
             'MEETING': '会议沟通', 'PROJECT': '项目管理', 'CLIENT': '客户对接', 'EMAIL': '邮件往来', 
             'TEAM': '团队协作', 'REPORT': '汇报总结', 'NOTICE': '通知公告', 'DATA': '数据洞察', 
@@ -427,12 +427,10 @@
             document.getElementById('store-with-lbl').innerHTML = `🏦 ${ui.store_with} <span id="store-min-lbl" class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">${ui.store_min}</span>`;
             document.getElementById('store-cash-btn').value = ui.store_cash;
             document.getElementById('rescue-cancel-btn').innerText = ui.rescue_cancel;
-            
             document.getElementById('fb-title').innerText = ui.fb_title;
             document.getElementById('fb-sub').innerText = ui.fb_sub;
             document.getElementById('feedback-input').placeholder = ui.fb_holder;
             document.getElementById('fb-submit-btn').innerText = ui.fb_submit;
-            
             initBlindModeUI();
         }
 
@@ -490,27 +488,28 @@
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
         
-        // 🚨 阶梯返现原则：单句最大不超过0.5
+        // 🚨 阶梯返现：从0到0.5的平滑过渡
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
         let currentPhraseAttempts = 0; 
 
-        // 🚨 退回完全安全的本地缓存防线，保证秒登入、不卡死
+        // 🚨 所有广告数据、状态存在本地，保证绝对能够登录
         let state = {
             path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v68_times') || '{"en":0, "cn":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v68_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v68_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v68_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v68_missed') || '{}'),
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v69_times') || '{"en":0, "cn":0}'),
+            scores: JSON.parse(localStorage.getItem('ob_v69_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v69_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v69_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v69_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v68_adlim') !== null ? parseInt(localStorage.getItem('ob_v68_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v68_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v68_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v68_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v69_adlim') !== null ? parseInt(localStorage.getItem('ob_v69_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v69_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v69_usedslots') || '{}'), 
+            isBlindMode: localStorage.getItem('ob_v69_blind') === 'true',
             currentScene: 'ALL', 
-            streak: 0, dbLevel: 1, cloudBalance: 0.00
+            streak: 0, dbLevel: 1, cloudBalance: 0.00,
+            dbUserId: null
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
@@ -518,15 +517,27 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v68_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v68_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v68_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v68_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v68_adlim', state.adLimit);
-            localStorage.setItem('ob_v68_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v68_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v68_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v68_blind', state.isBlindMode);
+            localStorage.setItem('ob_v69_times', JSON.stringify(state.sessionTimes)); 
+            localStorage.setItem('ob_v69_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v69_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v69_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v69_adlim', state.adLimit);
+            localStorage.setItem('ob_v69_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v69_usedslots', JSON.stringify(state.usedSlots));
+            localStorage.setItem('ob_v69_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v69_blind', state.isBlindMode);
+        }
+
+        // 🚨 安全地向云端同步云备份，即使出错也不阻断运行
+        window.syncAdToDB = async function() {
+            if (!state.dbUserId) return;
+            try {
+                await oasisCloud.from('profiles').update({
+                    ad_limit: state.adLimit,
+                    refill_count: state.refillCount,
+                    last_ad_refresh: new Date().toDateString()
+                }).eq('id', state.dbUserId);
+            } catch(e) { console.log("DB sync passed (fallback to local)."); }
         }
 
         window.toggleAuthMode = function() {
@@ -543,18 +554,27 @@
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 
-                // 🚨 恢复原始纯净拉取，不要求数据库存在广告字段，绝不报错
+                state.dbUserId = data.user.id;
+                
+                // 🚨 获取数据，不做任何会引起崩溃的强制写入操作
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+                const todayStr = new Date().toDateString();
                 
                 if (!prof) {
-                    await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false });
+                    try { await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false }); } catch(e) {}
                     state.cloudBalance = 0.00; state.lumUnlocked = false;
                 } else {
                     state.cloudBalance = Number(prof.wallet_balance) || 0.00; 
                     state.lumUnlocked = prof.lum_unlocked === true;
+                    
+                    // 跨设备读取，如果云端有值则覆盖本地，防止换手机白嫖
+                    if (prof.last_ad_refresh === todayStr && prof.ad_limit !== undefined) {
+                        state.adLimit = parseInt(prof.ad_limit);
+                        state.refillCount = parseInt(prof.refill_count || 0);
+                    }
                 }
                 
-                document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+                saveData(); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                 document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
                 playSfx('success');
             } catch (err) { document.getElementById('auth-msg').innerText = "❌ " + err.message; }
@@ -567,25 +587,23 @@
 
         window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         
-        // 🚨 纯本地严密防白嫖检测（按自然日）
+        // 🚨 只在每天自然日凌晨重置一次广告机会
         function checkAdRefresh() {
-            const now = Date.now(); 
-            const todayStr = new Date(now).toDateString();
-            const lastStr = localStorage.getItem('ob_v68_refreshtime');
-            const isNewDay = !lastStr || lastStr !== todayStr;
-            if (isNewDay) { 
+            const todayStr = new Date().toDateString();
+            const lastStr = localStorage.getItem('ob_v69_refreshtime');
+            if (!lastStr || lastStr !== todayStr) { 
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0 }; 
-                localStorage.setItem('ob_v68_refreshtime', todayStr); saveData(); 
+                localStorage.setItem('ob_v69_refreshtime', todayStr); saveData(); 
+                window.syncAdToDB();
             }
         }
 
         window.handleStepTime = (t) => { 
             playSfx('click'); state.targetTime = t; checkAdRefresh(); 
-            
-            // 如果此档位当天未被激活过，才发6次
+            // 选时间去重：当天选过的不再送
             if (!state.usedSlots[t]) {
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots[t] = true; 
-                saveData(); 
+                saveData(); window.syncAdToDB();
                 alert(state.path === 'en' ? `🎁 成功开启 ${t} 分钟专属学习舱！\n系统已为您发放 6 次本局免费容错额度。` : `🎁 Unlocked ${t}-min session!\n6 free chances granted for this slot.`);
             }
             hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); 
@@ -594,7 +612,6 @@
         window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
 
         window.enterMainApp = function() {
-            localStorage.removeItem('ob_v68_pool_1'); localStorage.removeItem('ob_v68_pool_2'); localStorage.removeItem('ob_v68_pool_3');
             checkAdRefresh(); 
 
             if (!window.idleListenerSetup) {
@@ -643,6 +660,54 @@
             document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
         }
 
+        // 🚨 绝对无崩溃加载逻辑
+        async function fetchPoolFromCloud(level) {
+            try {
+                // 安全降级拉取全库后本地筛选，绝不引发 Supabase 缺失字段的错误
+                let res = await oasisCloud.from('phrases').select('*');
+                if (res.data && res.data.length > 0) {
+                    let filtered = res.data.filter(p => p.difficulty == level);
+                    if(filtered.length > 0) {
+                        localStorage.setItem(`ob_v69_pool_${level}`, JSON.stringify(filtered));
+                        return filtered;
+                    }
+                    return res.data;
+                }
+            } catch(e) { console.log(e); }
+            return null;
+        }
+
+        // 🚨 用兼容所有旧浏览器的老旧写法，不准用 flatMap
+        window.renderSceneFilters = function() {
+            const selectEl = document.getElementById('scene-select'); const ui = getUI(); const isEn = state.path === 'en'; 
+            let html = `<option value="ALL">${ui.txt_scene}</option>`;
+            
+            for (let i = 0; i < SCENE_CATEGORIES.length; i++) {
+                let cat = SCENE_CATEGORIES[i];
+                const isSelected = cat.id === state.currentScene ? 'selected' : ''; 
+                html += `<option value="${cat.id}" ${isSelected}>${isEn ? cat.cn : cat.en}</option>`;
+            }
+
+            let allMapped = [];
+            for (let i = 0; i < SCENE_CATEGORIES.length; i++) {
+                if (SCENE_CATEGORIES[i].items) {
+                    for (let j = 0; j < SCENE_CATEGORIES[i].items.length; j++) {
+                        allMapped.push(SCENE_CATEGORIES[i].items[j].toLowerCase());
+                    }
+                }
+            }
+            
+            let hasOutliers = false;
+            for (let i = 0; i < globalPool.length; i++) {
+                if (globalPool[i].scenario && !allMapped.includes(globalPool[i].scenario.toLowerCase())) {
+                    hasOutliers = true; break;
+                }
+            }
+
+            if(hasOutliers) { const isSelected = 'cat_others' === state.currentScene ? 'selected' : ''; html += `<option value="cat_others" ${isSelected}>${isEn ? '📦 其他分类' : '📦 Others'}</option>`; }
+            selectEl.innerHTML = html;
+        }
+
         window.fetchNewPhrase = async function() {
             try {
                 currentPhraseAttempts = 0; 
@@ -654,11 +719,9 @@
                 if (sentenceScoreEl) sentenceScoreEl.innerText = "";
 
                 if (globalPool.length === 0) {
-                    const cachedData = localStorage.getItem(`ob_v68_pool_${state.dbLevel}`);
+                    const cachedData = localStorage.getItem(`ob_v69_pool_${state.dbLevel}`);
                     if (cachedData) {
-                        globalPool = JSON.parse(cachedData);
-                        window.renderSceneFilters();
-                        fetchPoolFromCloud(state.dbLevel).then(newData => { if(newData && newData.length > 0) { globalPool = newData; window.renderSceneFilters(); } });
+                        globalPool = JSON.parse(cachedData); window.renderSceneFilters();
                     } else {
                         const newData = await fetchPoolFromCloud(state.dbLevel); 
                         if (newData && newData.length > 0) globalPool = newData; 
@@ -670,11 +733,12 @@
                 let filteredPool = globalPool;
                 if (state.currentScene !== 'ALL' && state.currentScene !== 'WEAK WORD') {
                     if (state.currentScene === 'cat_others') {
-                        // 🚨 剔除高级语法 flatMap，保护旧手机不白屏卡死
-                        let allMapped = []; SCENE_CATEGORIES.forEach(c => { if(c.items) c.items.forEach(i => allMapped.push(i.toLowerCase())); });
+                        let allMapped = []; 
+                        for (let c of SCENE_CATEGORIES) { if(c.items) { for(let i of c.items) allMapped.push(i.toLowerCase()); } }
                         filteredPool = globalPool.filter(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
                     } else {
-                        let cat = SCENE_CATEGORIES.find(c => c.id === state.currentScene);
+                        let cat = null;
+                        for(let c of SCENE_CATEGORIES) { if(c.id === state.currentScene) { cat = c; break; } }
                         if (cat) {
                             let itemsLower = cat.items.map(i => i.toLowerCase());
                             filteredPool = globalPool.filter(p => p.scenario && itemsLower.includes(p.scenario.toLowerCase()));
@@ -688,16 +752,143 @@
                 
                 if (state.currentScene !== 'WEAK WORD') { document.getElementById('scene-select').value = state.currentScene; }
                 document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
+                
                 renderTextDisplay(); syncPhraseState(); setAppState('READY');
                 if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
             } catch (err) {
-                console.error(err); document.getElementById('target-text').innerText = "加载异常，请刷新 / Connection Error"; setAppState('READY');
+                console.error("fetchNewPhrase Errored out:", err); 
+                document.getElementById('target-text').innerText = "网络超时，请点击下方刷新按钮重试"; 
+                setAppState('READY');
+            }
+        }
+
+        function initBlindModeUI() {
+            const btn = document.getElementById('blind-toggle-btn'); const ui = getUI();
+            if (state.isBlindMode) { btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); btn.innerText = ui.lbl_shadow_on; } 
+            else { btn.innerText = ui.lbl_shadow_off; }
+        }
+
+        window.toggleBlindMode = function() {
+            playSfx('click'); state.isBlindMode = !state.isBlindMode; saveData();
+            const btn = document.getElementById('blind-toggle-btn'); const ui = getUI();
+            if(state.isBlindMode) { btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); btn.innerText = ui.lbl_shadow_on; } 
+            else { btn.classList.replace('text-amber-400', 'text-indigo-300'); btn.classList.replace('border-amber-500/30', 'border-indigo-500/30'); btn.classList.replace('bg-amber-500/20', 'bg-indigo-500/20'); btn.innerText = ui.lbl_shadow_off; }
+            renderTextDisplay(); 
+        }
+
+        window.revealBlindText = function() { if(state.isBlindMode && document.getElementById('text-container').classList.contains('blind-mode-active')) { playSfx('click'); document.getElementById('text-container').classList.remove('blind-mode-active'); } }
+
+        function generateLiaisonHints(text) {
+            if (state.path !== 'en') return `<span>${text}</span>`; 
+            const words = text.split(' '); let html = '';
+            for(let i=0; i<words.length; i++) {
+                let w = words[i]; html += `<span>${w}</span>`;
+                if(i < words.length - 1) {
+                    let nextW = words[i+1]; let cleanW = w.replace(/[^a-zA-Z]/g, '').toLowerCase(); let cleanNext = nextW.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                    if(cleanW.length > 0 && cleanNext.length > 0) {
+                        let endsWithConsonant = /[^aeiou]$/.test(cleanW); let startsWithVowel = /^[aeiou]/.test(cleanNext);
+                        if (cleanW.endsWith('e') && cleanW.length > 2) endsWithConsonant = true; 
+                        if(endsWithConsonant && startsWithVowel) { html += `<span class="text-amber-500 opacity-70 -mx-1 translate-y-1 scale-150">‿</span>`; } 
+                        else { html += ` `; }
+                    } else { html += ` `; }
+                }
+            } return html;
+        }
+
+        function renderTextDisplay() {
+            if (!currentPhrase) return;
+            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh'); const container = document.getElementById('text-container');
+            const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            tEl.innerHTML = `"${generateLiaisonHints(txt)}"`; zhEl.innerText = sub;
+            if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
+        }
+
+        // 🚨 读对标绿读错标红
+        window.highlightSentence = function(target, captured) {
+            let coloredHTML = "";
+            if (state.path === 'en') {
+                const capWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
+                coloredHTML = target.replace(/\b([a-zA-Z']+)\b/g, (match) => {
+                    const cleanWord = match.toLowerCase().replace(/[^a-z]/g, "");
+                    const idx = capWords.indexOf(cleanWord);
+                    if (idx > -1) {
+                        capWords.splice(idx, 1);
+                        return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`;
+                    } else {
+                        return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`;
+                    }
+                });
+            } else {
+                let capStr = captured.replace(/[^\u4e00-\u9fa5]/g, "");
+                for (let i = 0; i < target.length; i++) {
+                    const char = target[i];
+                    if (/[\u4e00-\u9fa5]/.test(char)) {
+                        if (capStr.includes(char)) {
+                            capStr = capStr.replace(char, ""); 
+                            coloredHTML += `<span class="text-emerald-400 transition-colors duration-300">${char}</span>`;
+                        } else {
+                            coloredHTML += `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${char}</span>`;
+                        }
+                    } else {
+                        coloredHTML += char;
+                    }
+                }
+            }
+            return `"${coloredHTML}"`;
+        }
+
+        window.skipToNext = function() {
+            playSfx('click');
+            isEvaluating = false; 
+            window.handleRefresh();
+        }
+
+        window.handleRefresh = function() { 
+            document.getElementById('limit-box').classList.remove('ad-glow-active');
+            document.getElementById('ad-help-label').classList.add('hidden');
+            if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); 
+            else window.fetchNewPhrase(); 
+        }
+
+        window.translateWord = async function(word, isEn) {
+            try { const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${isEn ? 'en|zh-CN' : 'zh-CN|en'}`); const data = await res.json(); return data.responseData.translatedText; } 
+            catch (e) { return isEn ? '暂无释义' : 'Translation unavailable'; }
+        }
+
+        window.practiceWeakLang = async () => {
+            playSfx('click'); const isCn = (state.path === 'cn'); const words = Object.entries(state.missedWords);
+            let filtered = [];
+            for (let i=0; i<words.length; i++) {
+                if(isCn ? /[\u4e00-\u9fa5]/.test(words[i][0]) : /[a-zA-Z]/.test(words[i][0])) filtered.push(words[i]);
+            }
+            const ui = getUI();
+            if (filtered.length === 0) { alert(ui.lum_no_weak); return; }
+            filtered.sort((a,b) => b[1] - a[1]); const pickedWord = filtered[Math.floor(Math.random() * Math.min(5, filtered.length))][0];
+            window.closeModal('lum-modal');
+            document.getElementById('target-text').innerText = ui.txt_translating; document.getElementById('target-zh').innerText = ""; 
+            
+            state.currentScene = 'WEAK WORD'; document.getElementById('scene-select').value = 'ALL';
+            const translation = await window.translateWord(pickedWord, !isCn);
+            currentPhrase = { id: 'weak_' + pickedWord, text_en: isCn ? translation : pickedWord, text_zh: isCn ? pickedWord : translation, scenario: 'WEAK WORD' };
+            currentPhraseAttempts = 0; 
+            renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
+        }
+
+        window.setScene = function(scene) { playSfx('click'); state.currentScene = scene; window.fetchNewPhrase(); }
+
+        function setAppState(s) {
+            const ui = getUI(); appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
+            switch(s) {
+                case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">${ui.sys_ready}</p>`; btn.classList.remove('recording-active'); btn.disabled = false; document.getElementById('refresh-btn').disabled = false; break;
+                case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_rec}</p>`; btn.classList.add('recording-active'); document.getElementById('refresh-btn').disabled = true; break;
+                case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_ana}</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
+                case 'REWARDING': btn.disabled = true; break;
             }
         }
 
         window.playAudio = async (isAuto = false) => {
             if(!isAuto) playSfx('click'); const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            if (!text || text.includes('Connecting')) return;
+            if (!text || text.includes('Connecting') || text.includes('Error')) return;
             const btn = document.querySelector('button[onclick="window.playAudio()"]'); const originalContent = btn.innerHTML;
             btn.innerHTML = `<svg class="w-5 h-5 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
             btn.disabled = true; const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
@@ -721,6 +912,7 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
+        // 🚨 阶梯打赏核心算法
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -730,10 +922,7 @@
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
                 let score = 0; let isNewBest = false;
                 
-                // 🚨 阶梯返现：获取此句历史已提款阶段
                 let currentEarned = state.earnedMap[rawT] || 0; 
-                
-                // 确保浮点数比较精确，找到当前处于哪个阶梯 [0, 0.30, 0.35, 0.40, 0.45, 0.50]
                 let currentTier = 0;
                 if (currentEarned >= 0.50) currentTier = 5;
                 else if (currentEarned >= 0.45) currentTier = 4;
@@ -761,7 +950,6 @@
                     else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); 
                     else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 80); 
                     else score = Math.min(59, Math.floor(rawRatio * 200));
-                    
                     if (score > 99 && rawRatio < 0.95) score = 99;
                     if (score > (state.scores[rawT] || 0)) { state.scores[rawT] = score; isNewBest = true; }
                     if (score >= 80) state.streak += 1; else state.streak = 0;
@@ -770,7 +958,7 @@
                     tier = Math.max(tier, currentTier);
                 } else {
                     state.streak += 1; score = 100; 
-                    // 🚨 核心指令：看广告返现根据已经获得的分数向上提一档
+                    // 🚨 阶梯提档：看广告后，不论当前多少金额，向上一档
                     tier = Math.min(5, currentTier + 1); 
                 }
                 
@@ -790,13 +978,11 @@
                     setTimeout(() => { isEvaluating = false; setAppState('READY'); window.handleRefresh(); }, 1200);
                 } else {
                     if (txt !== "") { document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt); }
-                    
                     const sentenceScoreEl = document.getElementById('sentence-current-score');
                     if (sentenceScoreEl) {
                         let badgeColor = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-red-400');
                         sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="${badgeColor} font-black text-sm animate-pulse">${score} PTS</span>`;
                     }
-                    
                     const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED");
                     
                     if (score >= 80) {
@@ -824,6 +1010,10 @@
                                 </div>
                             </div>`;
                     }
+                    if (isNewBest) {
+                        const bestEl = document.getElementById('item-best-score'); bestEl.classList.add('text-emerald-400', 'scale-125');
+                        setTimeout(() => bestEl.classList.remove('text-emerald-400', 'scale-125'), 500);
+                    }
                     saveData(); syncPhraseState(); isEvaluating = false; setAppState('READY'); 
 
                     if (currentPhraseAttempts >= 3 && (!isNewBest || score < 60)) {
@@ -839,7 +1029,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V68' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V69' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
@@ -866,7 +1056,9 @@
         function renderLUMChart() {
             const ctx = document.getElementById('lumRadarChart').getContext('2d'); const isEn = state.path === 'en';
             const relevantScores = Object.entries(state.scores).filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text)).map(([_, score]) => score);
-            const avg = relevantScores.length ? relevantScores.reduce((a, b) => a + b, 0) / relevantScores.length : 0; 
+            // 🚨 修正写法，避免语法崩盘
+            let sum = 0; for(let s of relevantScores) sum+=s;
+            const avg = relevantScores.length ? sum / relevantScores.length : 0; 
             const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
             if (lumChart) lumChart.destroy();
             const labels = isEn ? ['发音', '流利度', '语境', '词汇量', '准确度'] : ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'];
@@ -918,7 +1110,7 @@
                 } else if (type === 'boost') { 
                     state.adLimit--; saveData(); window.processAndScore("[AD_BOOST]"); 
                 } else if (type === 'refill') { 
-                    state.adLimit = 6; state.refillCount++; updateTopBar(); saveData(); playSfx('success'); 
+                    state.adLimit = 6; state.refillCount++; updateTopBar(); saveData(); playSfx('success'); window.syncAdToDB();
                 } 
             }, () => setAppState('READY')); 
         }
@@ -926,30 +1118,6 @@
         window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
         window.submitWithdrawal = async function() { alert(state.path === 'en' ? "提现处理中 (3-5个工作日)" : "Processing Withdrawal (3-5 Days)"); }
-
-        async function fetchPoolFromCloud(level) {
-            try {
-                let res = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
-                if (res.error) {
-                    res = await oasisCloud.from('phrases').select('*');
-                }
-                if (res.data && res.data.length > 0) {
-                    return res.data;
-                }
-            } catch(e) { console.log("Cloud fetch failed", e); }
-            return null;
-        }
-
-        window.renderSceneFilters = function() {
-            const selectEl = document.getElementById('scene-select'); const ui = getUI(); const isEn = state.path === 'en'; 
-            let html = `<option value="ALL">${ui.txt_scene}</option>`;
-            SCENE_CATEGORIES.forEach(cat => { const isSelected = cat.id === state.currentScene ? 'selected' : ''; html += `<option value="${cat.id}" ${isSelected}>${isEn ? cat.cn : cat.en}</option>`; });
-
-            let allMapped = []; SCENE_CATEGORIES.forEach(c => { if(c.items) c.items.forEach(i => allMapped.push(i.toLowerCase())); });
-            let hasOutliers = globalPool.some(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
-            if(hasOutliers) { const isSelected = 'cat_others' === state.currentScene ? 'selected' : ''; html += `<option value="cat_others" ${isSelected}>${isEn ? '📦 其他分类' : '📦 Others'}</option>`; }
-            selectEl.innerHTML = html;
-        }
     </script>
 
     <script type="module">
@@ -958,8 +1126,13 @@
 
         window.initWhisper = async function() {
             const bar = document.getElementById('loading-progress-bar');
-            try { window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } } }); window.enterMainApp(); } 
-            catch (e) { alert("AI Load Error"); }
+            try { 
+                window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } } }); 
+                window.enterMainApp(); 
+            } catch (e) { 
+                console.error("Pipeline Init Error:", e);
+                alert("AI 模型加载失败 / AI Load Error:\n" + (e.message || "Network Timeout")); 
+            }
         }
 
         window.toggleRecord = async function() {
