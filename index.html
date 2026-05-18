@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V65 - 体验升阶版 (UX)</title>
+    <title>Oasis Bridge V66.1 (UX)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -150,9 +150,9 @@
                         </h1>
                     </div>
                 </div>
-                <div class="text-center flex-1 border-x border-white/10 mx-1">
+                <div class="text-center flex-1 border-x border-white/10 mx-1 transition-all duration-300" id="session-display-container">
                     <p id="lbl-session" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Session</p>
-                    <h1 id="time-display" class="text-base font-black text-white">0/30m</h1>
+                    <h1 id="time-display" class="text-base font-black text-white transition-colors duration-300">0/30m</h1>
                 </div>
                 <div class="text-center cursor-pointer flex-1" onclick="window.requestRescue()">
                     <div class="bg-blue-500/10 rounded-xl py-1.5 mx-1 border border-blue-500/20">
@@ -481,8 +481,13 @@
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
+        // 🚨 记录全局活跃时间（防挂机探针）
+        let globalLastActionTime = Date.now();
+
         let state = {
-            path: 'en', targetTime: 0, currentTime: 0,
+            path: 'en', targetTime: 0, 
+            // 🚨 双语独立计时容器
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v65_times') || '{"en":0, "cn":0}'),
             scores: JSON.parse(localStorage.getItem('ob_v65_scores') || '{}'),
             earnedMap: JSON.parse(localStorage.getItem('ob_v65_emap') || '{}'),
             adBoostMap: JSON.parse(localStorage.getItem('ob_v65_boost') || '{}'),
@@ -501,6 +506,7 @@
         let globalPool = []; 
 
         function saveData() {
+            localStorage.setItem('ob_v65_times', JSON.stringify(state.sessionTimes)); // 🚨 保存双语时长
             localStorage.setItem('ob_v65_scores', JSON.stringify(state.scores)); 
             localStorage.setItem('ob_v65_emap', JSON.stringify(state.earnedMap));
             localStorage.setItem('ob_v65_boost', JSON.stringify(state.adBoostMap)); 
@@ -553,6 +559,7 @@
                 state.adLimit = 6; 
                 state.refillCount = 0; 
                 state.usedSlots = {}; 
+                state.sessionTimes = { en: 0, cn: 0 }; // 🚨 新的一天，双语学习时间全部归零
                 localStorage.setItem('ob_v65_refreshtime', now); 
                 saveData(); 
             }
@@ -581,6 +588,16 @@
             localStorage.removeItem('ob_v65_pool_3');
             checkAdRefresh(); 
 
+            // 🚨 防挂机探针监听器挂载
+            if (!window.idleListenerSetup) {
+                const resetIdle = () => { globalLastActionTime = Date.now(); };
+                document.addEventListener('touchstart', resetIdle, {passive: true});
+                document.addEventListener('click', resetIdle, {passive: true});
+                document.addEventListener('keydown', resetIdle, {passive: true});
+                window.idleListenerSetup = true;
+            }
+            globalLastActionTime = Date.now();
+
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); 
             globalPool = []; 
@@ -588,9 +605,23 @@
             
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
+            
+            // 🚨 双独立账本 + 防挂机 核心计时引擎
             appInterval = setInterval(() => { 
-                const now = Date.now(); const diffMin = (now - lastTimeTick) / 60000; lastTimeTick = now;
-                if (state.currentTime < state.targetTime) { state.currentTime += diffMin; updateTopBar(); }
+                const now = Date.now(); 
+                const diffMin = (now - lastTimeTick) / 60000; 
+                lastTimeTick = now;
+
+                // 超过 60 秒没有任何点击/滑动操作，判定为挂机
+                const isIdle = (now - globalLastActionTime) > 60000; 
+
+                if (!isIdle) {
+                    if (state.sessionTimes[state.path] < state.targetTime) { 
+                        state.sessionTimes[state.path] += diffMin; // 对应的语种账本增加时间
+                        saveData();
+                    }
+                }
+                updateTopBar(isIdle); 
             }, 1000);
         }
 
@@ -635,7 +666,6 @@
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
         }
 
-        // 🚨 核心新功能：词级高亮视觉反馈引擎（支持中英双语）
         window.highlightSentence = function(target, captured) {
             let coloredHTML = "";
             if (state.path === 'en') {
@@ -647,7 +677,6 @@
                         capWords.splice(idx, 1);
                         return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`;
                     } else {
-                        // 错词：标红 + 虚线底边
                         return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`;
                     }
                 });
@@ -657,7 +686,7 @@
                     const char = target[i];
                     if (/[\u4e00-\u9fa5]/.test(char)) {
                         if (capStr.includes(char)) {
-                            capStr = capStr.replace(char, ""); // 命中一次就消耗掉，防止重复字被误判
+                            capStr = capStr.replace(char, ""); 
                             coloredHTML += `<span class="text-emerald-400 transition-colors duration-300">${char}</span>`;
                         } else {
                             coloredHTML += `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${char}</span>`;
@@ -796,9 +825,22 @@
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
         }
 
-        function updateTopBar() {
+        // 🚨 顶栏UI更新：接管闲置视觉反馈与双轨计时渲染
+        function updateTopBar(isIdle = false) {
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-            document.getElementById('time-display').innerText = `${Math.floor(state.currentTime)}/${state.targetTime}m`;
+            
+            const curTime = state.sessionTimes[state.path] || 0;
+            const timeStr = `${Math.floor(curTime)}/${state.targetTime}m`;
+            const timeEl = document.getElementById('time-display');
+            
+            if (isIdle) {
+                timeEl.innerText = `💤 ${timeStr}`;
+                timeEl.classList.replace('text-white', 'text-slate-500');
+            } else {
+                timeEl.innerText = timeStr;
+                timeEl.classList.replace('text-slate-500', 'text-white');
+            }
+
             const ui = getUI(); document.getElementById('ad-limit-display').innerText = state.adLimit <= 0 ? (state.path === 'en' ? "点击求助" : "REFILL") : `🆘 ${state.adLimit}/6`;
             const flame = document.getElementById('streak-flame');
             if(state.streak > 1) { flame.classList.remove('opacity-0'); document.getElementById('streak-count').innerText = state.streak; } else { flame.classList.add('opacity-0'); }
@@ -914,7 +956,6 @@
                 } else { 
                     const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
                     
-                    // 🚨 核心改动：在显示分数前，将主句子进行绿/红高亮上色
                     if (txt !== "") {
                         document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt);
                     }
@@ -999,7 +1040,11 @@
         }
 
         window.promptExit = () => {
-            playSfx('click'); const left = Math.ceil(state.targetTime - state.currentTime); const content = document.getElementById('exit-content'); const ui = getUI();
+            playSfx('click');
+            // 🚨 修正：提示退出时，根据当前路线计算剩余时间
+            const curTime = state.sessionTimes[state.path] || 0;
+            const left = Math.ceil(state.targetTime - curTime); 
+            const content = document.getElementById('exit-content'); const ui = getUI();
             if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') {
                 content.innerHTML = `<h3 class="text-2xl font-black text-amber-400 mb-2">${ui.exit_weak_title}</h3><p class="text-slate-300 text-sm mb-6">${ui.exit_weak_sub}</p><button onclick="window.exitWeakMode()" class="w-full py-4 bg-amber-600 text-white font-black rounded-xl mb-3 shadow-lg">${ui.exit_weak_y}</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">${ui.exit_weak_n}</button>`;
                 window.openModal('exit-modal'); return;
@@ -1041,7 +1086,9 @@
             playSfx('click'); window.closeModal('rescue-modal'); window.closeModal('exit-modal'); 
             window.AdManager.showAd(() => { 
                 if (type === 'time') { 
-                    state.currentTime += 5; updateTopBar(); saveData(); playSfx('success'); 
+                    // 🚨 看广告奖励的时间需要加到当前语种的账本上
+                    state.sessionTimes[state.path] += 5; 
+                    updateTopBar(); saveData(); playSfx('success'); 
                 } else if (type === 'boost') { 
                     state.adLimit--; 
                     const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; 
