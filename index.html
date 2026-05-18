@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V67 - 互动与商业闭环版</title>
+    <title>Oasis Bridge V68 - 商业安全阶梯版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -31,7 +31,7 @@
         .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
         @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
         
-        /* 🚨 V67 智能受挫：无打扰呼吸灯晕染特效 */
+        /* 智能受挫：广告次数右上角呼吸灯特效 */
         @keyframes ad-glow { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.2); } 100% { box-shadow: 0 0 16px 4px rgba(59, 130, 246, 0.8); border-color: rgba(59, 130, 246, 0.7); background: rgba(59, 130, 246, 0.2) !important; } }
         .ad-glow-active { animation: ad-glow 1.2s infinite alternate !important; }
 
@@ -60,7 +60,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V67</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V68</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -89,7 +89,7 @@
                 <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
             </button>
             <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-apple-touch-icon text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
         </div>
     </div>
@@ -292,7 +292,7 @@
                         <input id="payout-account" type="text" placeholder="Account ID" class="w-full p-3 rounded-xl text-xs font-bold">
                         <div class="flex gap-2">
                             <input id="payout-amount" type="number" placeholder="AED" class="w-full p-3 rounded-xl text-xs font-bold" min="50">
-                            <button id="store-cash-btn" onclick="window.submitWithdrawal()" class="px-6 bg-emerald-600 rounded-xl text-white font-black text-xs">Cash Out</button>
+                            <input type="button" id="store-cash-btn" onclick="window.submitWithdrawal()" class="px-6 bg-emerald-600 rounded-xl text-white font-black text-xs cursor-pointer" value="Cash Out">
                         </div>
                         <p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p>
                     </div>
@@ -425,7 +425,7 @@
             document.getElementById('store-title').innerText = ui.store_title;
             document.getElementById('store-bal-lbl').innerText = ui.store_bal;
             document.getElementById('store-with-lbl').innerHTML = `🏦 ${ui.store_with} <span id="store-min-lbl" class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">${ui.store_min}</span>`;
-            document.getElementById('store-cash-btn').innerText = ui.store_cash;
+            document.getElementById('store-cash-btn').value = ui.store_cash;
             document.getElementById('rescue-cancel-btn').innerText = ui.rescue_cancel;
             
             document.getElementById('fb-title').innerText = ui.fb_title;
@@ -489,10 +489,12 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
+        
+        // 🚨 严格对齐核心阶梯机制 [0, 0.30, 0.35, 0.40, 0.45, 0.50]
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
-        let currentPhraseAttempts = 0; // 智能记录单句挑战数
+        let currentPhraseAttempts = 0; 
 
         let state = {
             path: 'en', targetTime: 0, 
@@ -502,9 +504,9 @@
             adBoostMap: JSON.parse(localStorage.getItem('ob_v67_boost') || '{}'),
             missedWords: JSON.parse(localStorage.getItem('ob_v67_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v67_adlim') !== null ? parseInt(localStorage.getItem('ob_v67_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v67_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v67_usedslots') || '{}'), // 🚨 档位去重锁机制容器
+            adLimit: 6, // 🚨 由云端数据库初始化接管
+            refillCount: 0, // 🚨 由云端数据库初始化接管
+            usedSlots: JSON.parse(localStorage.getItem('ob_v67_usedslots') || '{}'), 
             isBlindMode: localStorage.getItem('ob_v67_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
@@ -521,7 +523,7 @@
             localStorage.setItem('ob_v67_boost', JSON.stringify(state.adBoostMap)); 
             localStorage.setItem('ob_v67_adlim', state.adLimit);
             localStorage.setItem('ob_v67_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v67_usedslots', JSON.stringify(state.usedSlots)); // 同步存储去重锁
+            localStorage.setItem('ob_v67_usedslots', JSON.stringify(state.usedSlots));
             localStorage.setItem('ob_v67_missed', JSON.stringify(state.missedWords));
             localStorage.setItem('ob_v67_blind', state.isBlindMode);
         }
@@ -532,6 +534,23 @@
             else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; }
         }
 
+        // 🚨 核心云端实时风控写入同步机制
+        window.syncUserDataToCloud = async function() {
+            try {
+                const { data: { user } } = await oasisCloud.auth.getUser();
+                if (user) {
+                    await oasisCloud.from('profiles').update({
+                        wallet_balance: state.cloudBalance,
+                        ad_limit: state.adLimit,
+                        refill_count: state.refillCount,
+                        last_ad_refresh: new Date().toDateString()
+                    }).eq('id', user.id);
+                }
+            } catch (e) {
+                console.error("Cloud data sync error:", e);
+            }
+        }
+
         window.executeAuth = async function() {
             const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('auth-action-btn'); btn.disabled = true; btn.innerText = "AUTHENTICATING...";
@@ -539,13 +558,43 @@
                 const isReg = document.getElementById('auth-title').innerText === "Create Account";
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
                 if (error) throw error;
+                
+                // 🚨 广告限制次数100%强行向云端对齐读取，防止换设备或刷版本白嫖
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+                const todayStr = new Date().toDateString();
+                
                 if (!prof) {
-                    await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false });
+                    await oasisCloud.from('profiles').insert({ 
+                        id: data.user.id, 
+                        wallet_balance: 0, 
+                        lum_unlocked: false,
+                        ad_limit: 6,
+                        refill_count: 0,
+                        last_ad_refresh: todayStr
+                    });
                     state.cloudBalance = 0.00; state.lumUnlocked = false;
+                    state.adLimit = 6; state.refillCount = 0;
                 } else {
-                    state.cloudBalance = Number(prof.wallet_balance) || 0.00; state.lumUnlocked = prof.lum_unlocked === true;
+                    state.cloudBalance = Number(prof.wallet_balance) || 0.00; 
+                    state.lumUnlocked = prof.lum_unlocked === true;
+                    
+                    // 严格通过云端数据库打赏的日期执行跨天校验清算
+                    if (prof.last_ad_refresh !== todayStr) {
+                        state.adLimit = 6;
+                        state.refillCount = 0;
+                        state.usedSlots = {};
+                        localStorage.setItem('ob_v67_usedslots', '{}');
+                        await oasisCloud.from('profiles').update({ 
+                            ad_limit: 6, 
+                            refill_count: 0, 
+                            last_ad_refresh: todayStr 
+                        }).eq('id', data.user.id);
+                    } else {
+                        state.adLimit = prof.ad_limit !== undefined ? parseInt(prof.ad_limit, 10) : 6;
+                        state.refillCount = prof.refill_count !== undefined ? parseInt(prof.refill_count, 10) : 0;
+                    }
                 }
+                
                 saveData(); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                 document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen');
                 playSfx('success');
@@ -559,39 +608,37 @@
 
         window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         
-        // 🚨 严格校准自然跨天清算逻辑：负责在凌晨0点之后彻底刷新广告池和去重锁
         function checkAdRefresh() {
             const now = Date.now(); 
+            const todayStr = new Date(now).toDateString();
             const lastStr = localStorage.getItem('ob_v67_refreshtime');
-            const last = lastStr ? parseInt(lastStr, 10) : 0;
-            const isNewDay = !lastStr || new Date(now).toDateString() !== new Date(last).toDateString();
+            const isNewDay = !lastStr || lastStr !== todayStr;
             if (isNewDay) { 
                 state.adLimit = 6; 
                 state.refillCount = 0; 
-                state.usedSlots = {}; // 跨天重置所有档位的白嫖记录
+                state.usedSlots = {}; 
                 state.sessionTimes = { en: 0, cn: 0 }; 
-                localStorage.setItem('ob_v67_refreshtime', now); 
+                localStorage.setItem('ob_v67_refreshtime', todayStr); 
                 saveData(); 
+                window.syncUserDataToCloud();
             }
         }
 
-        // 🚨 档位去重锁核心逻辑：只有今天第一次点该时长时才刷新6次，如果该时长被激活过（不论是用完还是留着），绝对不送，完美继承当前剩余额度
+        // 🚨 档位去重锁机制：只有当天第一次点击该时长按钮才送6次，已激活过则沿用云端计数
         window.handleStepTime = (t) => { 
             playSfx('click'); 
             state.targetTime = t; 
-            
-            checkAdRefresh(); // 在选时间的第一时间，先看天数变了没有
+            checkAdRefresh(); 
             
             if (!state.usedSlots[t]) {
-                // 精准拦截：如果是今天第1次点击这个按钮，下发6次机会
                 state.adLimit = 6;
                 state.refillCount = 0;
-                state.usedSlots[t] = true; // 触发印记锁死
+                state.usedSlots[t] = true; 
                 saveData();
+                window.syncUserDataToCloud(); // 强制云端同步记录
                 alert(state.path === 'en' ? `🎁 成功开启 ${t} 分钟专属学习舱！\n系统已为您发放 6 次本局免费容错额度。` : `🎁 Unlocked ${t}-min session!\n6 free chances granted for this slot.`);
             } else {
-                // 如果今天已经通过这一档领过了，跳过刷新逻辑，完美继承本地真实的 adLimit，杜绝反复刷！
-                console.log(`[金库风控拦截] 今天已经通过 ${t} 分钟档位激活过额度了，复用当前限额。`);
+                console.log(`[金库去重风控] 今天已使用过 ${t} 分钟档位，不予发放额外次数。`);
             }
             
             hideAll(); 
@@ -604,8 +651,7 @@
             localStorage.removeItem('ob_v67_pool_1');
             localStorage.removeItem('ob_v67_pool_2');
             localStorage.removeItem('ob_v67_pool_3');
-            
-            checkAdRefresh(); // 进入演练舱做保底校验
+            checkAdRefresh(); 
 
             if (!window.idleListenerSetup) {
                 const resetIdle = () => { globalLastActionTime = Date.now(); };
@@ -629,7 +675,6 @@
                 const diffMin = (now - lastTimeTick) / 60000; 
                 lastTimeTick = now;
 
-                // 🚨 严格防挂机：30秒不碰屏幕则完全冻结
                 const isIdle = (now - globalLastActionTime) > 30000; 
 
                 if (!isIdle) {
@@ -724,8 +769,6 @@
 
         window.handleRefresh = function() { 
             currentPhraseAttempts = 0; 
-            
-            // 🚨 刷向新题时，把旧句子的营销呼吸灯和帮助提示微型框静静重置
             document.getElementById('limit-box').classList.remove('ad-glow-active');
             document.getElementById('ad-help-label').classList.add('hidden');
 
@@ -803,7 +846,6 @@
             const ui = getUI();
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
             
-            // 🚨 换句时刷新例句下方的实时分数槽
             const sentenceScoreEl = document.getElementById('sentence-current-score');
             if (sentenceScoreEl) sentenceScoreEl.innerText = "";
 
@@ -872,7 +914,7 @@
                 timeEl.classList.replace('text-slate-500', 'text-white');
             }
 
-            const ui = getUI(); document.getElementById('ad-limit-display').innerText = `🆘 ${state.adLimit}/6`;
+            document.getElementById('ad-limit-display').innerText = `🆘 ${state.adLimit}/6`;
             const flame = document.getElementById('streak-flame');
             if(state.streak > 1) { flame.classList.remove('opacity-0'); document.getElementById('streak-count').innerText = state.streak; } else { flame.classList.add('opacity-0'); }
         }
@@ -929,6 +971,7 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
+        // 🚨 核心风控：精细化阶梯返现结算引擎 
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -939,8 +982,15 @@
                 let score = 0;
                 let isNewBest = false;
                 
+                // 1. 获取当前句子历史上已经拿到的阶梯金额及对应的阶梯档位 
+                let currentEarned = state.earnedMap[rawT] || 0;
+                let currentTier = rewardStages.indexOf(currentEarned);
+                if (currentTier === -1) currentTier = 0;
+
+                let tier = 0;
+
                 if (!isAdBoost) {
-                    currentPhraseAttempts++; // 累计挑战次数
+                    currentPhraseAttempts++; 
                     analyzeMistakes(rawT, safeTxt);
                     let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); 
                     let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
@@ -959,7 +1009,6 @@
                     
                     let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
                     
-                    // 严格得分曲线逻辑（卡死满分天花板，放开60分及格线）
                     if (rawRatio >= 0.95) score = 100; 
                     else if (rawRatio >= 0.80) score = 90 + Math.floor((rawRatio - 0.80) * 66); 
                     else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); 
@@ -973,21 +1022,48 @@
                         isNewBest = true; 
                     }
                     if (score >= 80) state.streak += 1; else state.streak = 0;
-                } else { state.streak += 1; score = 100; }
+
+                    // 2. 根据硬核真实发音得分分配目标档位 
+                    if (score === 100) tier = 5;       // 100分 -> 0.50 AED 
+                    else if (score >= 90) tier = 4;   // 90-99分 -> 0.45 AED 
+                    else if (score >= 80) tier = 3;   // 80-89分 -> 0.40 AED 
+                    else if (score >= 70) tier = 2;   // 70-79分 -> 0.35 AED 
+                    else if (score >= 60) tier = 1;   // 60-69分 -> 0.30 AED 
+                    else tier = 0;                    // 60分以下不主动发奖金 
+
+                    // 普通练习只高走，决不降级
+                    tier = Math.max(tier, currentTier);
+                } else { 
+                    state.streak += 1; 
+                    score = 100; 
+                    // 🚨 核心阶梯设计：看广告助力的灵魂所在 —— “根据已经获得的分数向上提一档” 
+                    tier = Math.min(5, currentTier + 1);
+                }
                 
-                let tier = 0; if (score >= 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1;
-                const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0); const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
+                // 计算当前应补发的差额并实时更新
+                const finalTier = tier; 
+                const diff = Math.round((rewardStages[finalTier] - currentEarned) * 100) / 100;
 
                 if (diff > 0) {
-                    state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
-                    document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                    document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); playSfx('success');
-                    try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
+                    state.cloudBalance += diff; 
+                    state.earnedMap[rawT] = rewardStages[finalTier];
+                    document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); 
+                    document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+                    document.getElementById('total-earned').classList.add('money-jump'); 
+                    setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); 
+                    playSfx('success');
+                    
+                    // 🚨 实时强制云端持久化存证钱包余额及次数，绝无任何前台刷钱漏洞
+                    window.syncUserDataToCloud();
                 }
                 
                 const scoreDisp = document.getElementById('score-display');
                 
                 if (isAdBoost) { 
+                    const sentenceScoreEl = document.getElementById('sentence-current-score');
+                    if (sentenceScoreEl) {
+                        sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="text-blue-400 font-black text-sm animate-pulse">BOOSTED TIER ${finalTier}</span>`;
+                    }
                     scoreDisp.innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
                     setTimeout(() => { isEvaluating = false; setAppState('READY'); window.handleRefresh(); }, 1200);
                 } else { 
@@ -997,20 +1073,18 @@
                         document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt);
                     }
                     
-                    // 🚨 V67 升级点 2：在例句正下方实时高亮显现每次打分
                     const sentenceScoreEl = document.getElementById('sentence-current-score');
                     if (sentenceScoreEl) {
                         let badgeColor = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-red-400');
                         sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="${badgeColor} font-black text-sm animate-pulse">${score} PTS</span>`;
                     }
                     
-                    // 底部控制舱无缝解锁复活，保持主控权
                     if (score >= 80) {
                         scoreDisp.innerHTML = `
                             <div class="flex flex-col items-center w-full px-4 animate-pop-in">
                                 <div class="text-center w-full mb-1">
                                     <span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>
-                                    <span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-2 py-0.5 rounded-full ml-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>
+                                    ${diff > 0 ? `<span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-2 py-0.5 rounded-full ml-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>` : ''}
                                 </div>
                                 <div class="flex gap-3 mt-1.5 w-full max-w-[200px]">
                                     <button onclick="window.playAudio()" class="flex-1 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400 font-bold text-xs active:scale-95 shadow-sm">▶️ ${state.path==='en'?'听原音':'Listen'}</button>
@@ -1041,9 +1115,9 @@
 
                     saveData(); syncPhraseState();
                     isEvaluating = false; 
-                    setAppState('READY'); // 重置就绪态以供无限次高频朗读重练
+                    setAppState('READY'); 
 
-                    // 🚨 V67 升级点 3：3次以上没有明显进步（最高分没涨，或者得分在60分以下），右上角广告限额框悄悄亮起柔和呼吸灯并长出“帮助”小标签！
+                    // 连续 3 次没涨分或低于 60 分，右上角 Limit 激活呼吸灯营销，提示“帮助”
                     if (currentPhraseAttempts >= 3 && (!isNewBest || score < 60)) {
                         document.getElementById('limit-box').classList.add('ad-glow-active');
                         document.getElementById('ad-help-label').classList.remove('hidden');
@@ -1063,7 +1137,7 @@
             btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V67' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V68' });
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 playSfx('success');
@@ -1096,7 +1170,7 @@
         function renderLUMChart() {
             const ctx = document.getElementById('lumRadarChart').getContext('2d'); const isEn = state.path === 'en';
             const relevantScores = Object.entries(state.scores).filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text)).map(([_, score]) => score);
-            const avg = relevantScores.length ? relevantScores.reduce((a,b)=>a+b,0)/relevantScores.length : 0; const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
+            const avg = relevantScores.length ? relevantScores.reduce((a+b)=>a+b,0)/relevantScores.length : 0; const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
             if (lumChart) lumChart.destroy();
             const labels = isEn ? ['发音', '流利度', '语境', '词汇量', '准确度'] : ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'];
             lumChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ data: [avg, (avg * 0.9) + 5, mastery, avg * 0.95, avg * 0.85], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)', pointBackgroundColor: '#fbbf24', pointBorderColor: '#ffffff', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: 'rgba(255, 255, 255, 0.08)', circular: true }, angleLines: { circular: true, color: 'rgba(255, 255, 255, 0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family: "'Space Grotesk', sans-serif" } } } }, plugins: { legend: { display: false } } } });
@@ -1122,10 +1196,9 @@
             playSfx('click'); checkAdRefresh(); 
             if (appState === 'REWARDING') return; 
             
-            // 智能转化：如果用户处于“受挫状态”（正在闪烁呼吸灯），且他点到了这个呼吸灯按钮
             const isGlowing = document.getElementById('limit-box').classList.contains('ad-glow-active');
             if (isGlowing && state.adLimit > 0) {
-                if (confirm(state.path === 'en' ? "检测到当前发音遇到瓶颈，是否需要观看一则赞助视频，直接以100分满分通过拿取返现？" : "Need a hand? Watch a sponsor video to claim a PERFECT score and unlock earnings right away?")) {
+                if (confirm(state.path === 'en' ? "检测到当前发音遇到瓶颈，是否需要观看一则赞助视频，在当前阶梯基础上向上提一档获取返现？" : "Need a hand? Watch a sponsor video to step up your score tier and unlock earnings right away?")) {
                     window.watchAd('boost');
                     return;
                 }
@@ -1162,12 +1235,12 @@
                     updateTopBar(); saveData(); playSfx('success'); 
                 } else if (type === 'boost') { 
                     state.adLimit--; 
-                    const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; 
-                    const currentBoost = state.adBoostMap[t] || 0; 
-                    state.adBoostMap[t] = Math.min(5, currentBoost + 1); 
+                    saveData();
                     window.processAndScore("[AD_BOOST]"); 
                 } else if (type === 'refill') { 
                     state.adLimit = 6; state.refillCount++; updateTopBar(); saveData(); playSfx('success'); 
+                    // 🚨 补给重置次数必须立刻存入云端
+                    window.syncUserDataToCloud();
                 } 
             }, () => setAppState('READY')); 
         }
