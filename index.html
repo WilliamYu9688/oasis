@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V66.2 - 体验升阶版 (UX)</title>
+    <title>Oasis Bridge V67 - 互动升阶版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -56,7 +56,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V65 (UX)</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V67 (Interactive)</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -196,7 +196,7 @@
 
                 <div id="lum-diagnosis" class="min-h-[10px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
                 
-                <div id="score-display" class="h-24 flex flex-col items-center justify-center mt-2">
+                <div id="score-display" class="h-24 flex flex-col items-center justify-center mt-2 transition-all duration-300">
                     <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
                 </div>
             </div>
@@ -482,19 +482,20 @@
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
+        let currentPhraseAttempts = 0; // 🚨 V67 智能记录当前句子的尝试次数
 
         let state = {
             path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v65_times') || '{"en":0, "cn":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v65_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v65_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v65_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v65_missed') || '{}'),
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v67_times') || '{"en":0, "cn":0}'),
+            scores: JSON.parse(localStorage.getItem('ob_v67_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v67_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v67_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v67_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v65_adlim') !== null ? parseInt(localStorage.getItem('ob_v65_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v65_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v65_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v65_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v67_adlim') !== null ? parseInt(localStorage.getItem('ob_v67_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v67_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v67_usedslots') || '{}'), 
+            isBlindMode: localStorage.getItem('ob_v67_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -504,15 +505,15 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v65_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v65_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v65_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v65_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v65_adlim', state.adLimit);
-            localStorage.setItem('ob_v65_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v65_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v65_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v65_blind', state.isBlindMode);
+            localStorage.setItem('ob_v67_times', JSON.stringify(state.sessionTimes)); 
+            localStorage.setItem('ob_v67_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v67_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v67_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v67_adlim', state.adLimit);
+            localStorage.setItem('ob_v67_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v67_usedslots', JSON.stringify(state.usedSlots));
+            localStorage.setItem('ob_v67_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v67_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -550,7 +551,7 @@
         
         function checkAdRefresh() {
             const now = Date.now(); 
-            const lastStr = localStorage.getItem('ob_v65_refreshtime');
+            const lastStr = localStorage.getItem('ob_v67_refreshtime');
             const last = lastStr ? parseInt(lastStr, 10) : 0;
             const isNewDay = !lastStr || new Date(now).toDateString() !== new Date(last).toDateString();
             if (isNewDay) { 
@@ -558,7 +559,7 @@
                 state.refillCount = 0; 
                 state.usedSlots = {}; 
                 state.sessionTimes = { en: 0, cn: 0 }; 
-                localStorage.setItem('ob_v65_refreshtime', now); 
+                localStorage.setItem('ob_v67_refreshtime', now); 
                 saveData(); 
             }
         }
@@ -581,9 +582,9 @@
         window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
 
         window.enterMainApp = function() {
-            localStorage.removeItem('ob_v65_pool_1');
-            localStorage.removeItem('ob_v65_pool_2');
-            localStorage.removeItem('ob_v65_pool_3');
+            localStorage.removeItem('ob_v67_pool_1');
+            localStorage.removeItem('ob_v67_pool_2');
+            localStorage.removeItem('ob_v67_pool_3');
             checkAdRefresh(); 
 
             if (!window.idleListenerSetup) {
@@ -608,7 +609,6 @@
                 const diffMin = (now - lastTimeTick) / 60000; 
                 lastTimeTick = now;
 
-                // 🚨 防挂机探针：按老板要求设定为 30 秒 
                 const isIdle = (now - globalLastActionTime) > 30000; 
 
                 if (!isIdle) {
@@ -695,14 +695,17 @@
             return `"${coloredHTML}"`;
         }
 
-        // 🚨 修正跳过逻辑
         window.skipToNext = function() {
             playSfx('click');
             isEvaluating = false; 
             window.handleRefresh();
         }
 
-        window.handleRefresh = function() { if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); else window.fetchNewPhrase(); }
+        window.handleRefresh = function() { 
+            currentPhraseAttempts = 0; // 🚨 V67: 换题时重置尝试次数
+            if (currentPhrase && currentPhrase.scenario === 'WEAK WORD') window.practiceWeakLang(); 
+            else window.fetchNewPhrase(); 
+        }
 
         window.translateWord = async function(word, isEn) {
             try { const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=${isEn ? 'en|zh-CN' : 'zh-CN|en'}`); const data = await res.json(); return data.responseData.translatedText; } 
@@ -723,6 +726,7 @@
 
             const translation = await window.translateWord(pickedWord, !isCn);
             currentPhrase = { id: 'weak_' + pickedWord, text_en: isCn ? translation : pickedWord, text_zh: isCn ? pickedWord : translation, scenario: 'WEAK WORD' };
+            currentPhraseAttempts = 0; // 🚨 V67: 换题重置
             renderTextDisplay(); document.getElementById('lum-diagnosis').innerHTML = ""; syncPhraseState(); setAppState('READY');
         }
 
@@ -760,7 +764,7 @@
             try {
                 const { data } = await oasisCloud.from('phrases').select('*').eq('difficulty', level);
                 if (data && data.length > 0) {
-                    localStorage.setItem(`ob_v65_pool_${level}`, JSON.stringify(data)); 
+                    localStorage.setItem(`ob_v67_pool_${level}`, JSON.stringify(data)); 
                     return data;
                 }
             } catch(e) { console.log("Cloud fetch failed", e); }
@@ -768,12 +772,13 @@
         }
 
         window.fetchNewPhrase = async function() {
+            currentPhraseAttempts = 0; // 🚨 V67: 换题重置
             if (appState !== 'REWARDING') playSfx('click'); 
             const ui = getUI();
             document.getElementById('target-text').innerText = ui.txt_conn; document.getElementById('lum-diagnosis').innerHTML = ""; 
             
             if (globalPool.length === 0) {
-                const cachedData = localStorage.getItem(`ob_v65_pool_${state.dbLevel}`);
+                const cachedData = localStorage.getItem(`ob_v67_pool_${state.dbLevel}`);
                 if (cachedData) {
                     globalPool = JSON.parse(cachedData);
                     fetchPoolFromCloud(state.dbLevel).then(newData => {
@@ -894,6 +899,20 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
+        // 🚨 V67 专属营销弹窗：3次受挫后主动推销
+        window.promptBoost = function() {
+            playSfx('click');
+            if (state.adLimit <= 0) { window.requestRescue(); return; } // 如果没额度了走普通挽救
+            const ui = getUI();
+            document.getElementById('rescue-title').innerText = state.path === 'en' ? "遇到瓶颈了？" : "Stuck?";
+            document.getElementById('rescue-desc').innerText = state.path === 'en' ? "这道题似乎有点难，观看赞助视频直接获取满分助力并拿到返现！" : "Tried multiple times? Watch a sponsor video to get a PERFECT boost and earn rewards!";
+            const btn = document.getElementById('rescue-action-btn');
+            btn.innerText = state.path === 'en' ? "看广告获取满分助力" : "Get Perfect Boost";
+            btn.className = "w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300";
+            btn.onclick = () => window.watchAd('boost');
+            window.openModal('rescue-modal');
+        }
+
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -902,8 +921,10 @@
                 let safeTxt = isAdBoost ? "" : (txt || "");
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
                 let score = 0;
+                let isNewBest = false;
                 
                 if (!isAdBoost) {
+                    currentPhraseAttempts++; // 🚨 记录尝试次数
                     analyzeMistakes(rawT, safeTxt);
                     let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); 
                     let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
@@ -930,9 +951,12 @@
                     
                     if (score > 99 && rawRatio < 0.95) score = 99; 
                     
-                    if (score > (state.scores[rawT] || 0)) state.scores[rawT] = score;
+                    if (score > (state.scores[rawT] || 0)) {
+                        state.scores[rawT] = score;
+                        isNewBest = true; // 刷新了历史最高分
+                    }
                     if (score >= 80) state.streak += 1; else state.streak = 0;
-                } else { state.streak += 1; }
+                } else { state.streak += 1; score = 100; }
                 
                 let tier = 0; if (score >= 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1;
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0); const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
@@ -948,7 +972,7 @@
                 
                 if (isAdBoost) { 
                     scoreDisp.innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
-                    setTimeout(() => { isEvaluating = false; setAppState('READY'); window.handleRefresh(); }, 1200);
+                    setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 1200);
                 } else { 
                     const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
                     
@@ -956,39 +980,38 @@
                         document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt);
                     }
                     
-                    // 🚨 无论高分低分，彻底把主导权交给用户！
-                    if (score >= 80) {
-                        scoreDisp.innerHTML = `
-                            <div class="flex flex-col items-center w-full px-4 animate-pop-in">
-                                <div class="text-center w-full mb-1">
-                                    <span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>
-                                    <span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-2 py-0.5 rounded-full ml-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>
-                                </div>
-                                <div class="flex gap-3 mt-1.5 w-full max-w-[200px]">
-                                    <button onclick="window.playAudio()" class="flex-1 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400 font-bold text-[10px] active:scale-95 shadow-sm">▶️ ${state.path==='en'?'听原音':'Listen'}</button>
-                                    <button onclick="window.skipToNext()" class="flex-1 py-1.5 bg-emerald-600/20 border border-emerald-500/30 rounded-lg text-emerald-400 font-bold text-[10px] active:scale-95 shadow-sm">⏭️ ${state.path==='en'?'下一题':'Next'}</button>
-                                </div>
+                    // 🚨 无论哪种分数，都彻底解锁麦克风，不自动切题，允许无限重练！
+                    scoreDisp.innerHTML = `
+                        <div class="flex flex-col items-center w-full px-4 animate-pop-in">
+                            <div class="text-center w-full mb-1">
+                                <span class="text-2xl font-black ${score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-red-400')} drop-shadow-md">
+                                    ${score} PTS ${score === 100 ? '- PERFECT!' : ''}
+                                </span>
+                                ${diff > 0 ? `<span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-2 py-0.5 rounded-full ml-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>` : ''}
                             </div>
-                        `;
-                    } else {
-                        scoreDisp.innerHTML = `
-                            <div class="flex flex-col items-center w-full px-4 animate-pop-in">
-                                <div class="text-center w-full mb-1">
-                                    <span class="text-xl font-black ${score >= 60 ? 'text-amber-400' : 'text-red-400'}">${score} PTS - TRY AGAIN</span>
-                                    <p class="text-[9px] text-gray-400 truncate w-full mt-0.5">${heardText}</p>
-                                </div>
-                                <div class="flex gap-3 mt-1.5 w-full max-w-[200px]">
-                                    <button onclick="window.playAudio()" class="flex-1 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400 font-bold text-[10px] active:scale-95 shadow-sm">▶️ ${state.path==='en'?'听原音':'Listen'}</button>
-                                    <button onclick="window.skipToNext()" class="flex-1 py-1.5 glass-btn rounded-lg text-slate-300 font-bold text-[10px] active:scale-95 shadow-sm">⏭️ ${state.path==='en'?'跳过':'Skip'}</button>
-                                </div>
+                            ${score < 80 ? `<p class="text-[9px] text-gray-400 truncate w-full mt-0.5">${heardText}</p>` : ''}
+                            <div class="flex gap-3 mt-2 w-full max-w-[200px]">
+                                <button onclick="window.playAudio()" class="flex-1 py-2 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400 font-bold text-xs active:scale-95 shadow-sm">▶️ ${state.path==='en'?'听原音':'Listen'}</button>
+                                <button onclick="window.skipToNext()" class="flex-1 py-2 glass-btn rounded-lg text-slate-300 font-bold text-xs active:scale-95 shadow-sm">⏭️ ${state.path==='en'?'下一题':'Next'}</button>
                             </div>
-                        `;
+                        </div>
+                    `;
+                    
+                    // 如果刷出了新纪录，让顶部 Best Score 也跳一下
+                    if (isNewBest) {
+                        const bestEl = document.getElementById('item-best-score');
+                        bestEl.classList.add('text-emerald-400', 'scale-125');
+                        setTimeout(() => bestEl.classList.remove('text-emerald-400', 'scale-125'), 500);
                     }
+
                     saveData(); syncPhraseState();
                     isEvaluating = false; 
+                    setAppState('READY'); // 🚨 强行解锁大麦克风
                     
-                    // 🚨 核心解锁：调用 READY，中央大麦克风恢复可点击状态！
-                    setAppState('READY'); 
+                    // 🚨 V67 营销机制：连续 3 次没上 80 分，弹窗推销广告
+                    if (currentPhraseAttempts >= 3 && score < 80) {
+                        setTimeout(() => window.promptBoost(), 1000);
+                    }
                 }
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
@@ -1004,7 +1027,7 @@
             btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V65' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V67' });
                 document.getElementById('feedback-input').value = '';
                 window.closeModal('feedback-modal');
                 playSfx('success');
