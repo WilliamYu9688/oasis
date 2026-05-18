@@ -498,6 +498,7 @@
             lumUnlocked: false,
             adLimit: localStorage.getItem('ob_v65_adlim') !== null ? parseInt(localStorage.getItem('ob_v65_adlim')) : 6,
             refillCount: parseInt(localStorage.getItem('ob_v65_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v65_usedslots') || '{}'), // 🚨 新增：防刷钱专属锁
             isBlindMode: localStorage.getItem('ob_v65_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
@@ -513,6 +514,7 @@
             localStorage.setItem('ob_v65_boost', JSON.stringify(state.adBoostMap)); 
             localStorage.setItem('ob_v65_adlim', state.adLimit);
             localStorage.setItem('ob_v65_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v65_usedslots', JSON.stringify(state.usedSlots)); // 🚨 同步存储防刷锁
             localStorage.setItem('ob_v65_missed', JSON.stringify(state.missedWords));
             localStorage.setItem('ob_v65_blind', state.isBlindMode);
         }
@@ -550,16 +552,42 @@
 
         window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         
-        // 🚨 升级修复点 1：每次选择时间（开启新局），满血恢复6次额度
+        // 🚨 精确按“自然日”跨天检测
+        function checkAdRefresh() {
+            const now = Date.now(); 
+            const lastStr = localStorage.getItem('ob_v65_refreshtime');
+            const last = lastStr ? parseInt(lastStr, 10) : 0;
+            
+            // 只要日子变了（凌晨0点后），就重置所有锁
+            const isNewDay = !lastStr || new Date(now).toDateString() !== new Date(last).toDateString();
+            
+            if (isNewDay) { 
+                state.adLimit = 6; 
+                state.refillCount = 0; 
+                state.usedSlots = {}; // 跨天重置所有档位的点击记录
+                localStorage.setItem('ob_v65_refreshtime', now); 
+                saveData(); 
+            }
+        }
+
+        // 🚨 防刷钱与激活动力核心
         window.handleStepTime = (t) => { 
             playSfx('click'); 
             state.targetTime = t; 
             
-            // 🔥 重磅商业逻辑：选择时间意味着新开一局，直接重置免费容错额度与看广告限制
-            state.adLimit = 6;
-            state.refillCount = 0;
-            localStorage.setItem('ob_v65_refreshtime', Date.now()); 
-            saveData();
+            checkAdRefresh(); // 选择前先查一下是不是新的一天
+            
+            if (!state.usedSlots[t]) {
+                // 如果今天第一次点这个时长，送 6 次免费容错
+                state.adLimit = 6;
+                state.refillCount = 0;
+                state.usedSlots[t] = true;
+                saveData();
+                alert(state.path === 'en' ? `🎁 成功开启 ${t} 分钟专属学习舱！\n系统已为您下发 6 次本局免费容错额度。` : `🎁 Unlocked ${t}-min session!\n6 free chances granted for this slot.`);
+            } else {
+                // 已经被白嫖过了，直接复用当前剩余额度，防止无限刷
+                console.log(`防刷机制拦截：今天已经点过 ${t} 分钟档位了，不赠送额外次数。`);
+            }
             
             hideAll(); 
             document.getElementById('step-2').classList.remove('hidden-screen'); 
@@ -567,26 +595,12 @@
         
         window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
 
-        // 🚨 升级修复点 2：跨天检测修复机制
-        function checkAdRefresh() {
-            const now = Date.now(); 
-            const lastStr = localStorage.getItem('ob_v65_refreshtime');
-            const last = lastStr ? parseInt(lastStr, 10) : 0;
-            if (now - last > 24 * 60 * 60 * 1000) { 
-                state.adLimit = 6; 
-                state.refillCount = 0; 
-                localStorage.setItem('ob_v65_refreshtime', now); 
-                saveData(); 
-            }
-        }
-
         window.enterMainApp = function() {
             localStorage.removeItem('ob_v65_pool_1');
             localStorage.removeItem('ob_v65_pool_2');
             localStorage.removeItem('ob_v65_pool_3');
 
-            // 🔥 在这里强制进行一次检测，防止用户没经过选时间界面直接进入（比如刷新网页）导致过了一天额度还是5次
-            checkAdRefresh();
+            checkAdRefresh(); // 保险起见，进入主界面再检测一次
 
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); 
@@ -798,19 +812,11 @@
             const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
 
             if (audioUrl) {
-                console.log("🔊 正在播放云端高保真音频: ", audioUrl);
                 const audio = new Audio(audioUrl);
                 audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
-                audio.onerror = () => { 
-                    console.warn("⚠️ 云端音频加载失败，自动降级到本地TTS兜底");
-                    window.fallbackTTS(btn, originalContent, text); 
-                };
-                audio.play().catch((e) => { 
-                    console.warn("⚠️ 浏览器拦截自动播放，降级到本地TTS", e);
-                    window.fallbackTTS(btn, originalContent, text); 
-                });
+                audio.onerror = () => { window.fallbackTTS(btn, originalContent, text); };
+                audio.play().catch(() => { window.fallbackTTS(btn, originalContent, text); });
             } else {
-                console.log("⚠️ 数据库中尚未录入该句的MP3，触发本地TTS兜底");
                 window.fallbackTTS(btn, originalContent, text);
             }
         };
