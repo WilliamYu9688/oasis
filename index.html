@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V68 - 稳定纯净版</title>
+    <title>Oasis Bridge - 纯净回滚版 (阶梯打赏)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -31,7 +31,7 @@
         .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
         @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
         
-        /* 呼吸灯特效 */
+        /* 智能受挫呼吸灯特效 */
         @keyframes ad-glow { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.2); } 100% { box-shadow: 0 0 16px 4px rgba(59, 130, 246, 0.8); border-color: rgba(59, 130, 246, 0.7); background: rgba(59, 130, 246, 0.2) !important; } }
         .ad-glow-active { animation: ad-glow 1.2s infinite alternate !important; }
 
@@ -60,7 +60,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V68</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise Secure</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -489,12 +489,14 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
+        
+        // 🚨 阶梯返现原则：单句最大不超过0.5
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
         let currentPhraseAttempts = 0; 
 
-        // 🚨 全部退回到 V65 最初安全的 LocalStorage 机制，绝对不碰数据库表结构！
+        // 🚨 退回完全安全的本地缓存防线，保证秒登入、不卡死
         let state = {
             path: 'en', targetTime: 0, 
             sessionTimes: JSON.parse(localStorage.getItem('ob_v68_times') || '{"en":0, "cn":0}'),
@@ -541,7 +543,7 @@
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 
-                // 🚨 恢复绝对安全的 V65 登录逻辑，完全不请求任何新字段，绝不阻拦登录！
+                // 🚨 恢复原始纯净拉取，不要求数据库存在广告字段，绝不报错
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
                 
                 if (!prof) {
@@ -565,12 +567,13 @@
 
         window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         
-        // 🚨 依赖原生 LocalStorage 彻底落实自然天重置防白嫖机制
+        // 🚨 纯本地严密防白嫖检测（按自然日）
         function checkAdRefresh() {
             const now = Date.now(); 
             const todayStr = new Date(now).toDateString();
             const lastStr = localStorage.getItem('ob_v68_refreshtime');
-            if (!lastStr || lastStr !== todayStr) { 
+            const isNewDay = !lastStr || lastStr !== todayStr;
+            if (isNewDay) { 
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0 }; 
                 localStorage.setItem('ob_v68_refreshtime', todayStr); saveData(); 
             }
@@ -579,6 +582,7 @@
         window.handleStepTime = (t) => { 
             playSfx('click'); state.targetTime = t; checkAdRefresh(); 
             
+            // 如果此档位当天未被激活过，才发6次
             if (!state.usedSlots[t]) {
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots[t] = true; 
                 saveData(); 
@@ -654,7 +658,6 @@
                     if (cachedData) {
                         globalPool = JSON.parse(cachedData);
                         window.renderSceneFilters();
-                        // 依然在后台拉取更新
                         fetchPoolFromCloud(state.dbLevel).then(newData => { if(newData && newData.length > 0) { globalPool = newData; window.renderSceneFilters(); } });
                     } else {
                         const newData = await fetchPoolFromCloud(state.dbLevel); 
@@ -667,7 +670,7 @@
                 let filteredPool = globalPool;
                 if (state.currentScene !== 'ALL' && state.currentScene !== 'WEAK WORD') {
                     if (state.currentScene === 'cat_others') {
-                        // 🚨 剔除高级语法 flatMap，换成老旧手机绝对支持的写法
+                        // 🚨 剔除高级语法 flatMap，保护旧手机不白屏卡死
                         let allMapped = []; SCENE_CATEGORIES.forEach(c => { if(c.items) c.items.forEach(i => allMapped.push(i.toLowerCase())); });
                         filteredPool = globalPool.filter(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
                     } else {
@@ -727,7 +730,18 @@
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
                 let score = 0; let isNewBest = false;
                 
-                let currentEarned = state.earnedMap[rawT] || 0; let currentTier = rewardStages.indexOf(currentEarned); if (currentTier === -1) currentTier = 0;
+                // 🚨 阶梯返现：获取此句历史已提款阶段
+                let currentEarned = state.earnedMap[rawT] || 0; 
+                
+                // 确保浮点数比较精确，找到当前处于哪个阶梯 [0, 0.30, 0.35, 0.40, 0.45, 0.50]
+                let currentTier = 0;
+                if (currentEarned >= 0.50) currentTier = 5;
+                else if (currentEarned >= 0.45) currentTier = 4;
+                else if (currentEarned >= 0.40) currentTier = 3;
+                else if (currentEarned >= 0.35) currentTier = 2;
+                else if (currentEarned >= 0.30) currentTier = 1;
+                else currentTier = 0;
+
                 let tier = 0;
 
                 if (!isAdBoost) {
@@ -755,7 +769,9 @@
                     if (score === 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1; else tier = 0;
                     tier = Math.max(tier, currentTier);
                 } else {
-                    state.streak += 1; score = 100; tier = Math.min(5, currentTier + 1); 
+                    state.streak += 1; score = 100; 
+                    // 🚨 核心指令：看广告返现根据已经获得的分数向上提一档
+                    tier = Math.min(5, currentTier + 1); 
                 }
                 
                 const finalTier = tier; const diff = Math.round((rewardStages[finalTier] - currentEarned) * 100) / 100;
