@@ -613,7 +613,7 @@
                 lastTimeTick = now;
 
                 // 超过 60 秒没有任何点击/滑动操作，判定为挂机
-                const isIdle = (now - globalLastActionTime) > 60000; 
+                const isIdle = (now - globalLastActionTime) > 30000; 
 
                 if (!isIdle) {
                     if (state.sessionTimes[state.path] < state.targetTime) { 
