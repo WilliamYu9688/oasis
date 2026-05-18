@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V66.1 (UX)</title>
+    <title>Oasis Bridge V66.2 - 体验升阶版 (UX)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -481,12 +481,10 @@
         const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
-        // 🚨 记录全局活跃时间（防挂机探针）
         let globalLastActionTime = Date.now();
 
         let state = {
             path: 'en', targetTime: 0, 
-            // 🚨 双语独立计时容器
             sessionTimes: JSON.parse(localStorage.getItem('ob_v65_times') || '{"en":0, "cn":0}'),
             scores: JSON.parse(localStorage.getItem('ob_v65_scores') || '{}'),
             earnedMap: JSON.parse(localStorage.getItem('ob_v65_emap') || '{}'),
@@ -506,7 +504,7 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v65_times', JSON.stringify(state.sessionTimes)); // 🚨 保存双语时长
+            localStorage.setItem('ob_v65_times', JSON.stringify(state.sessionTimes)); 
             localStorage.setItem('ob_v65_scores', JSON.stringify(state.scores)); 
             localStorage.setItem('ob_v65_emap', JSON.stringify(state.earnedMap));
             localStorage.setItem('ob_v65_boost', JSON.stringify(state.adBoostMap)); 
@@ -559,7 +557,7 @@
                 state.adLimit = 6; 
                 state.refillCount = 0; 
                 state.usedSlots = {}; 
-                state.sessionTimes = { en: 0, cn: 0 }; // 🚨 新的一天，双语学习时间全部归零
+                state.sessionTimes = { en: 0, cn: 0 }; 
                 localStorage.setItem('ob_v65_refreshtime', now); 
                 saveData(); 
             }
@@ -588,7 +586,6 @@
             localStorage.removeItem('ob_v65_pool_3');
             checkAdRefresh(); 
 
-            // 🚨 防挂机探针监听器挂载
             if (!window.idleListenerSetup) {
                 const resetIdle = () => { globalLastActionTime = Date.now(); };
                 document.addEventListener('touchstart', resetIdle, {passive: true});
@@ -606,18 +603,17 @@
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
             
-            // 🚨 双独立账本 + 防挂机 核心计时引擎
             appInterval = setInterval(() => { 
                 const now = Date.now(); 
                 const diffMin = (now - lastTimeTick) / 60000; 
                 lastTimeTick = now;
 
-                // 超过 60 秒没有任何点击/滑动操作，判定为挂机
-                const isIdle = (now - globalLastActionTime) > 20000; 
+                // 🚨 防挂机探针：按老板要求设定为 30 秒 
+                const isIdle = (now - globalLastActionTime) > 30000; 
 
                 if (!isIdle) {
                     if (state.sessionTimes[state.path] < state.targetTime) { 
-                        state.sessionTimes[state.path] += diffMin; // 对应的语种账本增加时间
+                        state.sessionTimes[state.path] += diffMin; 
                         saveData();
                     }
                 }
@@ -699,6 +695,7 @@
             return `"${coloredHTML}"`;
         }
 
+        // 🚨 修正跳过逻辑
         window.skipToNext = function() {
             playSfx('click');
             isEvaluating = false; 
@@ -825,7 +822,6 @@
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
         }
 
-        // 🚨 顶栏UI更新：接管闲置视觉反馈与双轨计时渲染
         function updateTopBar(isIdle = false) {
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
             
@@ -942,7 +938,7 @@
                 const finalTier = Math.max(tier, state.adBoostMap[rawT] || 0); const diff = Math.round((rewardStages[finalTier] - (state.earnedMap[rawT] || 0)) * 100) / 100;
 
                 if (diff > 0) {
-                    setAppState('REWARDING'); state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
+                    state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
                     document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); playSfx('success');
                     try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
@@ -952,7 +948,7 @@
                 
                 if (isAdBoost) { 
                     scoreDisp.innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`; 
-                    setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 1200);
+                    setTimeout(() => { isEvaluating = false; setAppState('READY'); window.handleRefresh(); }, 1200);
                 } else { 
                     const heardText = safeTxt ? (state.path==='en' ? `听到: "${safeTxt}"` : `HEARD: "${safeTxt}"`) : (state.path==='en' ? "未检测到声音" : "NO AUDIO CAPTURED"); 
                     
@@ -960,15 +956,20 @@
                         document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt);
                     }
                     
+                    // 🚨 无论高分低分，彻底把主导权交给用户！
                     if (score >= 80) {
                         scoreDisp.innerHTML = `
-                            <div class="flex flex-col items-center animate-pop-in">
-                                <span class="text-3xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>
-                                <span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-3 py-1 rounded-full mt-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>
+                            <div class="flex flex-col items-center w-full px-4 animate-pop-in">
+                                <div class="text-center w-full mb-1">
+                                    <span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>
+                                    <span class="text-[10px] text-emerald-300 font-bold bg-emerald-900/40 px-2 py-0.5 rounded-full ml-1 border border-emerald-500/30">+${diff.toFixed(2)} AED</span>
+                                </div>
+                                <div class="flex gap-3 mt-1.5 w-full max-w-[200px]">
+                                    <button onclick="window.playAudio()" class="flex-1 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400 font-bold text-[10px] active:scale-95 shadow-sm">▶️ ${state.path==='en'?'听原音':'Listen'}</button>
+                                    <button onclick="window.skipToNext()" class="flex-1 py-1.5 bg-emerald-600/20 border border-emerald-500/30 rounded-lg text-emerald-400 font-bold text-[10px] active:scale-95 shadow-sm">⏭️ ${state.path==='en'?'下一题':'Next'}</button>
+                                </div>
                             </div>
                         `;
-                        saveData(); syncPhraseState();
-                        setTimeout(() => { isEvaluating = false; window.handleRefresh(); }, 2000); 
                     } else {
                         scoreDisp.innerHTML = `
                             <div class="flex flex-col items-center w-full px-4 animate-pop-in">
@@ -982,9 +983,12 @@
                                 </div>
                             </div>
                         `;
-                        saveData(); syncPhraseState();
-                        isEvaluating = false; 
                     }
+                    saveData(); syncPhraseState();
+                    isEvaluating = false; 
+                    
+                    // 🚨 核心解锁：调用 READY，中央大麦克风恢复可点击状态！
+                    setAppState('READY'); 
                 }
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
@@ -1041,7 +1045,6 @@
 
         window.promptExit = () => {
             playSfx('click');
-            // 🚨 修正：提示退出时，根据当前路线计算剩余时间
             const curTime = state.sessionTimes[state.path] || 0;
             const left = Math.ceil(state.targetTime - curTime); 
             const content = document.getElementById('exit-content'); const ui = getUI();
@@ -1086,7 +1089,6 @@
             playSfx('click'); window.closeModal('rescue-modal'); window.closeModal('exit-modal'); 
             window.AdManager.showAd(() => { 
                 if (type === 'time') { 
-                    // 🚨 看广告奖励的时间需要加到当前语种的账本上
                     state.sessionTimes[state.path] += 5; 
                     updateTopBar(); saveData(); playSfx('success'); 
                 } else if (type === 'boost') { 
