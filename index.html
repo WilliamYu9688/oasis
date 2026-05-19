@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V78 - 国际自适应双语版</title>
+    <title>Oasis Bridge V79 - 长期对赌版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V78</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V79</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -115,21 +115,21 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-transparent"></div>
                 <div class="relative z-10">
                     <p id="l0-name" class="font-bold text-base text-blue-400">破冰级 (L0)</p>
-                    <p id="l0-sub" class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/零基础</p>
+                    <p id="l0-sub" class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/限时1个月</p>
                 </div>
                 <div class="font-black text-blue-400 text-xl relative z-10">29<span class="text-[10px] text-blue-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
                 <div>
                     <p id="l1-name" class="font-bold text-base text-slate-200">入门级 (L1)</p>
-                    <p id="l1-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活与生存</p>
+                    <p id="l1-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活/限时3个月</p>
                 </div>
                 <div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
                 <div>
                     <p id="l2-name" class="font-bold text-base text-slate-200">职场级 (L2)</p>
-                    <p id="l2-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协作</p>
+                    <p id="l2-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协同/限时6个月</p>
                 </div>
                 <div class="font-black text-white text-xl">299<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
@@ -137,7 +137,7 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-transparent"></div>
                 <div class="relative z-10">
                     <p id="l3-name" class="font-bold text-base text-amber-400">精英级 (L3)</p>
-                    <p id="l3-sub" class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报</p>
+                    <p id="l3-sub" class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报/限时12个月</p>
                 </div>
                 <div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
@@ -159,7 +159,6 @@
     </div>
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
-        
         <div class="w-full px-4 pt-4 pb-2 z-50 flex justify-between items-start gap-2 shrink-0">
             <button id="lbl-quit" onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
                 ⏏ Quit
@@ -226,14 +225,11 @@
                 </div>
                 
                 <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[160px] flex flex-col items-center justify-center cursor-pointer shadow-inner mt-2">
-                    
                     <button id="play-audio-btn" onclick="event.stopPropagation(); window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                     </button>
-
                     <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight gap-x-1 gap-y-2 transition-all duration-300 text-center" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                     <p id="target-zh" class="text-xs text-slate-400 mb-1 min-h-[20px] px-2 text-center"></p>
-                    
                     <div id="sentence-current-score" class="text-[11px] font-bold text-slate-500 tracking-wider transition-all duration-300 mt-2 min-h-[16px] text-center"></div>
                 </div>
 
@@ -250,11 +246,9 @@
                 <button id="prev-btn" onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all opacity-30 cursor-not-allowed" disabled>
                     <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
-                
                 <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                     <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
-                
                 <button id="next-btn" onclick="window.goNextPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all">
                     <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                 </button>
@@ -423,13 +417,12 @@
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel",
                 rescue_max_title: "DAILY LIMIT REACHED", rescue_max_sub: "Please come back tomorrow.", rescue_max_btn: "MAXED OUT",
                 fb_title: "Feedback & Bugs", fb_sub: "Help us improve Oasis Bridge", fb_holder: "Describe the bug or share your ideas...", fb_submit: "SUBMIT REPORT",
-                // 🚨 难度选择全功能舱英文包
+                // 长期级对赌英文文本
                 difficulty_title_text: "Select Difficulty & Prize Pool",
-                l0_name: "Survival Level (L0)", l0_sub: "Survival Basics / Beginner",
-                l1_name: "Beginner Level (L1)", l1_sub: "Daily Life & Basic Communication",
-                l2_name: "Professional Level (L2)", l2_sub: "Cross-Department Collaboration",
-                l3_name: "Elite Level (L3)", l3_sub: "Strategic Presentations",
-                // 目标时间英文包
+                l0_name: "Survival Level (L0)", l0_sub: "Survival Basics / 1 Month Limit",
+                l1_name: "Beginner Level (L1)", l1_sub: "Daily Life / 3 Months Limit",
+                l2_name: "Professional Level (L2)", l2_sub: "Collaboration / 6 Months Limit",
+                l3_name: "Elite Level (L3)", l3_sub: "Strategic Presentation / 12 Months Limit",
                 time_screen_title: "Set Daily Goal", time_screen_sub: "Target Duration"
             },
             cn: { 
@@ -454,18 +447,16 @@
                 rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消",
                 rescue_max_title: "今日额度耗尽", rescue_max_sub: "请明天再来获取助力", rescue_max_btn: "已达上限",
                 fb_title: "意见反馈与 BUG", fb_sub: "帮助我们改进 Oasis Bridge", fb_holder: "请描述您遇到的问题或建议...", fb_submit: "提交反馈",
-                // 难度选择全功能舱中文包
+                // 长期级对赌中文文本
                 difficulty_title_text: "选择难度与奖池",
-                l0_name: "破冰级 (L0)", l0_sub: "生存必备/零基础",
-                l1_name: "入门级 (L1)", l1_sub: "基础生活与生存",
-                l2_name: "职场级 (L2)", l2_sub: "跨部门协作",
-                l3_name: "精英级 (L3)", l3_sub: "战略汇报",
-                // 目标时间中文包
+                l0_name: "破冰级 (L0)", l0_sub: "生存必备/限时1个月",
+                l1_name: "入门级 (L1)", l1_sub: "基础生活/限时3个月",
+                l2_name: "职场级 (L2)", l2_sub: "跨部门协作/限时6个月",
+                l3_name: "精英级 (L3)", l3_sub: "战略汇报/限时12个月",
                 time_screen_title: "设定每日目标", time_screen_sub: "Target Duration"
             }
         };
 
-        // 🚨 严格执行核心反转漏斗逻辑：学中文显示纯英文界面，学英文显示纯中文界面
         function getUI() { return state.path === 'cn' ? i18n.en : i18n.cn; }
 
         function applyI18N() {
@@ -497,7 +488,6 @@
             document.getElementById('feedback-input').placeholder = ui.fb_holder;
             document.getElementById('fb-submit-btn').innerText = ui.fb_submit;
 
-            // 🚨 极其关键：难度选择舱动态中英反转注入
             document.getElementById('difficulty-title-text').innerText = ui.difficulty_title_text;
             document.getElementById('l0-name').innerText = ui.l0_name;
             document.getElementById('l0-sub').innerText = ui.l0_sub;
@@ -508,7 +498,6 @@
             document.getElementById('l3-name').innerText = ui.l3_name;
             document.getElementById('l3-sub').innerText = ui.l3_sub;
 
-            // 目标时间舱自适应注入
             document.getElementById('time-screen-title').innerText = ui.time_screen_title;
             document.getElementById('time-screen-sub').innerText = ui.time_screen_sub;
             
@@ -568,7 +557,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // 智能中英五字段保底缓存防假死防崩溃线
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Hello, nice to meet you.', text_zh: '你好，很高兴见到你。', scenario: 'Casual' },
             { id: 902, text_en: 'How much is this?', text_zh: '这个多少钱？', scenario: 'Shopping' },
@@ -601,7 +589,6 @@
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
-        let lastTimeTick = Date.now(); 
         let globalPool = []; 
 
         function saveData() {
@@ -1060,7 +1047,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V78' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V79' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
