@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V70 - 时光机导航版</title>
+    <title>Oasis Bridge V70 - 导航升阶版 (修复)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -38,7 +38,7 @@
         .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
         
         .animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 70% { opacity: 1; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
         
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V70 (Nav)</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V70</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -498,18 +498,25 @@
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const LOCAL_CACHE = [{ id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' }];
         
-        // 阶梯返现原则
+        // 🚨 极其稳定的保底库扩容，保证没网时“下一句”绝对能翻出新花样，不再假死
+        const LOCAL_CACHE = [
+            { id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' },
+            { id: 902, text_en: 'Could you please send me the proposal?', text_zh: '你能把提案发给我吗？', scenario: 'Work' },
+            { id: 903, text_en: 'Let me confirm the details with my team.', text_zh: '让我和团队确认一下细节。', scenario: 'Meeting' },
+            { id: 904, text_en: 'We need to accelerate the development process.', text_zh: '我们需要加快开发进度。', scenario: 'Agile' },
+            { id: 905, text_en: 'This is a game changer for our business.', text_zh: '这对我们的业务来说是革命性的。', scenario: 'Marketing' }
+        ];
+        
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
         let currentPhraseAttempts = 0; 
         
-        // 🚨 V70: 建立底层“时光机记忆栈”
         let phraseHistory = [];
         let historyIndex = -1;
 
+        // 🚨 纯本地缓存防线，绝不因为修改云端表结构而登录报错
         let state = {
             path: 'en', targetTime: 0, 
             sessionTimes: JSON.parse(localStorage.getItem('ob_v70_times') || '{"en":0, "cn":0}'),
@@ -555,6 +562,7 @@
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 
+                // 完全不写数据库，保证秒登入
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
                 
                 if (!prof) {
@@ -618,7 +626,7 @@
 
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); globalPool = []; 
-            window.goNextPhrase(); // 进入时拉取第一题
+            window.goNextPhrase(); // 首次启动，拉取新题
             
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
@@ -654,23 +662,7 @@
             document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
         }
 
-        // 🚨 抽出独立的刷新UI逻辑，供“上一句”、“下一句”共同调用
-        window.applyCurrentPhrase = function() {
-            const ui = getUI(); 
-            document.getElementById('lum-diagnosis').innerHTML = ""; 
-            const sentenceScoreEl = document.getElementById('sentence-current-score'); 
-            if (sentenceScoreEl) sentenceScoreEl.innerText = "";
-            document.getElementById('limit-box').classList.remove('ad-glow-active');
-            document.getElementById('ad-help-label').classList.add('hidden');
-            
-            document.getElementById('scene-select').value = currentPhrase.scenario === 'WEAK WORD' ? 'ALL' : currentPhrase.scenario;
-            document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
-            
-            renderTextDisplay(); syncPhraseState(); setAppState('READY');
-            updateNavButtons(); // 更新导航按钮状态
-            if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
-        }
-        
+        // 🚨 更新底部左右导航箭头状态
         window.updateNavButtons = function() {
             const prevBtn = document.getElementById('prev-btn');
             if (historyIndex > 0) {
@@ -682,7 +674,29 @@
             }
         }
 
-        // 🚨 V70: 上一句 (从记忆栈回退)
+        // 🚨 将抽中的句子应用到屏幕，杜绝“假死”错觉
+        window.applyCurrentPhrase = function() {
+            const ui = getUI(); 
+            document.getElementById('lum-diagnosis').innerHTML = ""; 
+            const sentenceScoreEl = document.getElementById('sentence-current-score'); 
+            if (sentenceScoreEl) sentenceScoreEl.innerText = "";
+            document.getElementById('limit-box').classList.remove('ad-glow-active');
+            document.getElementById('ad-help-label').classList.add('hidden');
+            
+            // 🚨 修复BUG：下拉框永远固定为当前大类，绝不因为细分场景匹配不上而变空
+            document.getElementById('scene-select').value = state.currentScene;
+            document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
+            
+            // 🚨 修复BUG：触发文字闪烁动效，让用户清晰知道界面刷新了
+            const tc = document.getElementById('text-container');
+            tc.classList.remove('animate-pop-in');
+            void tc.offsetWidth; 
+            tc.classList.add('animate-pop-in');
+
+            renderTextDisplay(); syncPhraseState(); setAppState('READY');
+            if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
+        }
+
         window.goPrevPhrase = function() {
             if (appState === 'LISTENING') return;
             if (historyIndex > 0) {
@@ -695,7 +709,6 @@
             }
         }
 
-        // 🚨 V70: 下一句 (如果栈里有就往前走，没有就拉新题)
         window.goNextPhrase = async function() {
             if (appState === 'LISTENING' || isEvaluating) return;
             if (appState !== 'REWARDING') playSfx('click');
@@ -720,9 +733,6 @@
             }
         }
 
-        // 取代原本的 handleRefresh（现作为防卡死的备用按钮，依然指向 next）
-        window.handleRefresh = function() { window.goNextPhrase(); }
-
         async function fetchNewPhraseLogic() {
             try {
                 if (globalPool.length === 0) {
@@ -742,6 +752,7 @@
                 let filteredPool = globalPool;
                 if (state.currentScene !== 'ALL' && state.currentScene !== 'WEAK WORD') {
                     if (state.currentScene === 'cat_others') {
+                        // 🚨 剔除了旧版手机崩溃的 flatMap 语法
                         let allMapped = []; SCENE_CATEGORIES.forEach(c => { if(c.items) c.items.forEach(i => allMapped.push(i.toLowerCase())); });
                         filteredPool = globalPool.filter(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
                     } else {
@@ -856,7 +867,7 @@
             currentPhrase = { id: 'weak_' + pickedWord, text_en: isCn ? translation : pickedWord, text_zh: isCn ? pickedWord : translation, scenario: 'WEAK WORD' };
             currentPhraseAttempts = 0; 
             
-            phraseHistory.splice(historyIndex + 1); // 弱词特训作为新历史压入
+            phraseHistory.splice(historyIndex + 1); 
             phraseHistory.push(currentPhrase);
             if (phraseHistory.length > 50) phraseHistory.shift(); else historyIndex++;
             window.applyCurrentPhrase();
@@ -875,7 +886,7 @@
 
         window.setScene = function(scene) {
             playSfx('click'); state.currentScene = scene;
-            phraseHistory = []; historyIndex = -1; // 切换分类强制清空历史栈
+            phraseHistory = []; historyIndex = -1; // 切换分类重置历史栈
             window.goNextPhrase(); 
         }
 
@@ -924,6 +935,7 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
+        // 🚨 绝对死守规则：严格看广告阶梯提档记分制
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -935,7 +947,13 @@
                 
                 let currentEarned = state.earnedMap[rawT] || 0; 
                 let currentTier = 0;
-                if (currentEarned >= 0.50) currentTier = 5; else if (currentEarned >= 0.45) currentTier = 4; else if (currentEarned >= 0.40) currentTier = 3; else if (currentEarned >= 0.35) currentTier = 2; else if (currentEarned >= 0.30) currentTier = 1; else currentTier = 0;
+                if (currentEarned >= 0.50) currentTier = 5;
+                else if (currentEarned >= 0.45) currentTier = 4;
+                else if (currentEarned >= 0.40) currentTier = 3;
+                else if (currentEarned >= 0.35) currentTier = 2;
+                else if (currentEarned >= 0.30) currentTier = 1;
+                else currentTier = 0;
+
                 let tier = 0;
 
                 if (!isAdBoost) {
@@ -963,7 +981,9 @@
                     if (score === 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1; else tier = 0;
                     tier = Math.max(tier, currentTier);
                 } else {
-                    state.streak += 1; score = 100; tier = Math.min(5, currentTier + 1); 
+                    state.streak += 1; score = 100; 
+                    // 🚨 阶梯提额锁定
+                    tier = Math.min(5, currentTier + 1); 
                 }
                 
                 const finalTier = tier; const diff = Math.round((rewardStages[finalTier] - currentEarned) * 100) / 100;
@@ -979,7 +999,7 @@
                     const sentenceScoreEl = document.getElementById('sentence-current-score');
                     if (sentenceScoreEl) sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="text-blue-400 font-black text-sm animate-pulse">BOOSTED TIER ${finalTier}</span>`;
                     scoreDisp.innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`;
-                    setTimeout(() => { isEvaluating = false; setAppState('READY'); window.goNextPhrase(); }, 1200);
+                    setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 1200);
                 } else {
                     if (txt !== "") { document.getElementById('target-text').innerHTML = window.highlightSentence(rawT, safeTxt); }
                     
