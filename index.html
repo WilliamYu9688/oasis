@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V70 - 导航升阶版 (修复)</title>
+    <title>Oasis Bridge V71 - UI 布局适配版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -38,7 +38,7 @@
         .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
         
         .animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 70% { opacity: 1; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
         
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V70</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V71</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -134,15 +134,20 @@
     </div>
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
-        <button id="lbl-quit" onclick="window.promptExit()" class="absolute top-4 left-4 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all">⏏ Quit</button>
         
-        <div class="absolute top-4 right-4 z-50 flex gap-2">
-            <button id="lbl-fb" onclick="window.openFeedback()" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all">💬 FB</button>
-            <button id="blind-toggle-btn" onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all">👁️ Shadowing</button>
-            <button id="lbl-lum" onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all">📊 LUM</button>
+        <div class="absolute top-4 inset-x-4 z-50 flex justify-between items-start pointer-events-none gap-2">
+            <button id="lbl-quit" onclick="window.promptExit()" class="pointer-events-auto shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
+                ⏏ Quit
+            </button>
+            
+            <div class="flex gap-2 flex-wrap justify-end pointer-events-auto max-w-[70%]">
+                <button id="lbl-fb" onclick="window.openFeedback()" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">💬 FB</button>
+                <button id="blind-toggle-btn" onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">👁️ Shadowing</button>
+                <button id="lbl-lum" onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">📊 LUM</button>
+            </div>
         </div>
 
-        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-14 pb-4 px-2 z-40 shrink-0 shadow-lg">
+        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-16 pb-4 px-2 z-40 shrink-0 shadow-lg">
             <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
                 <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
                     <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
@@ -170,7 +175,7 @@
             </div>
         </div>
 
-        <div class="main-content-area px-4 sm:px-6">
+        <div class="main-content-area px-4 sm:px-6 mt-4">
             <div class="max-w-md mx-auto w-full text-center">
                 <div class="flex justify-between items-center mb-4 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
@@ -196,7 +201,7 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
                 
-                <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[160px] flex flex-col items-center justify-center cursor-pointer shadow-inner">
+                <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[160px] flex flex-col items-center justify-center cursor-pointer shadow-inner mt-2">
                     
                     <button id="play-audio-btn" onclick="event.stopPropagation(); window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
@@ -210,7 +215,7 @@
 
                 <div id="lum-diagnosis" class="min-h-[10px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
                 
-                <div id="score-display" class="h-24 flex flex-col items-center justify-center mt-2 transition-all duration-300">
+                <div id="score-display" class="h-16 flex flex-col items-center justify-center mt-1 transition-all duration-300">
                     <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
                 </div>
             </div>
@@ -499,7 +504,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // 🚨 极其稳定的保底库扩容，保证没网时“下一句”绝对能翻出新花样，不再假死
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', scenario: 'Casual' },
             { id: 902, text_en: 'Could you please send me the proposal?', text_zh: '你能把提案发给我吗？', scenario: 'Work' },
@@ -507,7 +511,6 @@
             { id: 904, text_en: 'We need to accelerate the development process.', text_zh: '我们需要加快开发进度。', scenario: 'Agile' },
             { id: 905, text_en: 'This is a game changer for our business.', text_zh: '这对我们的业务来说是革命性的。', scenario: 'Marketing' }
         ];
-        
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
@@ -516,19 +519,18 @@
         let phraseHistory = [];
         let historyIndex = -1;
 
-        // 🚨 纯本地缓存防线，绝不因为修改云端表结构而登录报错
         let state = {
             path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v70_times') || '{"en":0, "cn":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v70_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v70_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v70_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v70_missed') || '{}'),
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v71_times') || '{"en":0, "cn":0}'),
+            scores: JSON.parse(localStorage.getItem('ob_v71_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v71_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v71_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v71_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v70_adlim') !== null ? parseInt(localStorage.getItem('ob_v70_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v70_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v70_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v70_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v71_adlim') !== null ? parseInt(localStorage.getItem('ob_v71_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v71_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v71_usedslots') || '{}'), 
+            isBlindMode: localStorage.getItem('ob_v71_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -537,15 +539,15 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v70_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v70_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v70_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v70_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v70_adlim', state.adLimit);
-            localStorage.setItem('ob_v70_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v70_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v70_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v70_blind', state.isBlindMode);
+            localStorage.setItem('ob_v71_times', JSON.stringify(state.sessionTimes)); 
+            localStorage.setItem('ob_v71_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v71_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v71_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v71_adlim', state.adLimit);
+            localStorage.setItem('ob_v71_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v71_usedslots', JSON.stringify(state.usedSlots));
+            localStorage.setItem('ob_v71_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v71_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -562,7 +564,6 @@
                 const { data, error } = isReg ? await oasisCloud.auth.signUp({ email, password }) : await oasisCloud.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 
-                // 完全不写数据库，保证秒登入
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
                 
                 if (!prof) {
@@ -589,10 +590,10 @@
         function checkAdRefresh() {
             const now = Date.now(); 
             const todayStr = new Date(now).toDateString();
-            const lastStr = localStorage.getItem('ob_v70_refreshtime');
+            const lastStr = localStorage.getItem('ob_v71_refreshtime');
             if (!lastStr || lastStr !== todayStr) { 
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0 }; 
-                localStorage.setItem('ob_v70_refreshtime', todayStr); saveData(); 
+                localStorage.setItem('ob_v71_refreshtime', todayStr); saveData(); 
             }
         }
 
@@ -626,7 +627,7 @@
 
             document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
             applyI18N(); globalPool = []; 
-            window.goNextPhrase(); // 首次启动，拉取新题
+            window.goNextPhrase(); 
             
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
@@ -662,19 +663,6 @@
             document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
         }
 
-        // 🚨 更新底部左右导航箭头状态
-        window.updateNavButtons = function() {
-            const prevBtn = document.getElementById('prev-btn');
-            if (historyIndex > 0) {
-                prevBtn.classList.remove('opacity-30', 'cursor-not-allowed');
-                prevBtn.disabled = false;
-            } else {
-                prevBtn.classList.add('opacity-30', 'cursor-not-allowed');
-                prevBtn.disabled = true;
-            }
-        }
-
-        // 🚨 将抽中的句子应用到屏幕，杜绝“假死”错觉
         window.applyCurrentPhrase = function() {
             const ui = getUI(); 
             document.getElementById('lum-diagnosis').innerHTML = ""; 
@@ -683,52 +671,47 @@
             document.getElementById('limit-box').classList.remove('ad-glow-active');
             document.getElementById('ad-help-label').classList.add('hidden');
             
-            // 🚨 修复BUG：下拉框永远固定为当前大类，绝不因为细分场景匹配不上而变空
-            document.getElementById('scene-select').value = state.currentScene;
+            document.getElementById('scene-select').value = currentPhrase.scenario === 'WEAK WORD' ? 'ALL' : (currentPhrase.scenario || 'ALL');
             document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
             
-            // 🚨 修复BUG：触发文字闪烁动效，让用户清晰知道界面刷新了
             const tc = document.getElementById('text-container');
-            tc.classList.remove('animate-pop-in');
-            void tc.offsetWidth; 
-            tc.classList.add('animate-pop-in');
+            tc.classList.remove('animate-pop-in'); void tc.offsetWidth; tc.classList.add('animate-pop-in');
 
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
+            window.updateNavButtons(); 
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
+        }
+        
+        window.updateNavButtons = function() {
+            const prevBtn = document.getElementById('prev-btn');
+            if (historyIndex > 0) {
+                prevBtn.classList.remove('opacity-30', 'cursor-not-allowed'); prevBtn.disabled = false;
+            } else {
+                prevBtn.classList.add('opacity-30', 'cursor-not-allowed'); prevBtn.disabled = true;
+            }
         }
 
         window.goPrevPhrase = function() {
             if (appState === 'LISTENING') return;
             if (historyIndex > 0) {
-                playSfx('click');
-                currentPhraseAttempts = 0; 
-                isEvaluating = false;
-                historyIndex--;
-                currentPhrase = phraseHistory[historyIndex];
-                window.applyCurrentPhrase();
+                playSfx('click'); currentPhraseAttempts = 0; isEvaluating = false;
+                historyIndex--; currentPhrase = phraseHistory[historyIndex]; window.applyCurrentPhrase();
             }
         }
 
         window.goNextPhrase = async function() {
             if (appState === 'LISTENING' || isEvaluating) return;
             if (appState !== 'REWARDING') playSfx('click');
-            currentPhraseAttempts = 0; 
-            isEvaluating = false;
+            currentPhraseAttempts = 0; isEvaluating = false;
             
             if (historyIndex < phraseHistory.length - 1) {
-                historyIndex++;
-                currentPhrase = phraseHistory[historyIndex];
-                window.applyCurrentPhrase();
+                historyIndex++; currentPhrase = phraseHistory[historyIndex]; window.applyCurrentPhrase();
             } else {
                 document.getElementById('target-text').innerText = getUI().txt_conn;
                 await fetchNewPhraseLogic();
                 
                 phraseHistory.push(currentPhrase);
-                if (phraseHistory.length > 50) {
-                    phraseHistory.shift(); 
-                } else {
-                    historyIndex++;
-                }
+                if (phraseHistory.length > 50) { phraseHistory.shift(); } else { historyIndex++; }
                 window.applyCurrentPhrase();
             }
         }
@@ -736,7 +719,7 @@
         async function fetchNewPhraseLogic() {
             try {
                 if (globalPool.length === 0) {
-                    const cachedData = localStorage.getItem(`ob_v70_pool_${state.dbLevel}`);
+                    const cachedData = localStorage.getItem(`ob_v71_pool_${state.dbLevel}`);
                     if (cachedData) {
                         globalPool = JSON.parse(cachedData);
                         window.renderSceneFilters();
@@ -752,7 +735,6 @@
                 let filteredPool = globalPool;
                 if (state.currentScene !== 'ALL' && state.currentScene !== 'WEAK WORD') {
                     if (state.currentScene === 'cat_others') {
-                        // 🚨 剔除了旧版手机崩溃的 flatMap 语法
                         let allMapped = []; SCENE_CATEGORIES.forEach(c => { if(c.items) c.items.forEach(i => allMapped.push(i.toLowerCase())); });
                         filteredPool = globalPool.filter(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
                     } else {
@@ -767,9 +749,7 @@
                 
                 let newPhrase; do { newPhrase = filteredPool[Math.floor(Math.random() * filteredPool.length)]; } while (filteredPool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
                 currentPhrase = newPhrase || LOCAL_CACHE[0];
-            } catch (err) {
-                console.error(err); currentPhrase = LOCAL_CACHE[0];
-            }
+            } catch (err) { console.error(err); currentPhrase = LOCAL_CACHE[0]; }
         }
 
         function initBlindModeUI() {
@@ -818,29 +798,18 @@
             if (state.path === 'en') {
                 const capWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
                 coloredHTML = target.replace(/\b([a-zA-Z']+)\b/g, (match) => {
-                    const cleanWord = match.toLowerCase().replace(/[^a-z]/g, "");
-                    const idx = capWords.indexOf(cleanWord);
-                    if (idx > -1) {
-                        capWords.splice(idx, 1);
-                        return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`;
-                    } else {
-                        return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`;
-                    }
+                    const cleanWord = match.toLowerCase().replace(/[^a-z]/g, ""); const idx = capWords.indexOf(cleanWord);
+                    if (idx > -1) { capWords.splice(idx, 1); return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`; } 
+                    else { return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`; }
                 });
             } else {
                 let capStr = captured.replace(/[^\u4e00-\u9fa5]/g, "");
                 for (let i = 0; i < target.length; i++) {
                     const char = target[i];
                     if (/[\u4e00-\u9fa5]/.test(char)) {
-                        if (capStr.includes(char)) {
-                            capStr = capStr.replace(char, ""); 
-                            coloredHTML += `<span class="text-emerald-400 transition-colors duration-300">${char}</span>`;
-                        } else {
-                            coloredHTML += `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${char}</span>`;
-                        }
-                    } else {
-                        coloredHTML += char;
-                    }
+                        if (capStr.includes(char)) { capStr = capStr.replace(char, ""); coloredHTML += `<span class="text-emerald-400 transition-colors duration-300">${char}</span>`; } 
+                        else { coloredHTML += `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${char}</span>`; }
+                    } else { coloredHTML += char; }
                 }
             }
             return `"${coloredHTML}"`;
@@ -860,15 +829,12 @@
             window.closeModal('lum-modal');
             document.getElementById('target-text').innerText = ui.txt_translating; document.getElementById('target-zh').innerText = ""; 
             
-            state.currentScene = 'WEAK WORD'; 
-            document.getElementById('scene-select').value = 'ALL';
-
+            state.currentScene = 'WEAK WORD'; document.getElementById('scene-select').value = 'ALL';
             const translation = await window.translateWord(pickedWord, !isCn);
             currentPhrase = { id: 'weak_' + pickedWord, text_en: isCn ? translation : pickedWord, text_zh: isCn ? pickedWord : translation, scenario: 'WEAK WORD' };
             currentPhraseAttempts = 0; 
             
-            phraseHistory.splice(historyIndex + 1); 
-            phraseHistory.push(currentPhrase);
+            phraseHistory.splice(historyIndex + 1); phraseHistory.push(currentPhrase);
             if (phraseHistory.length > 50) phraseHistory.shift(); else historyIndex++;
             window.applyCurrentPhrase();
         }
@@ -886,8 +852,7 @@
 
         window.setScene = function(scene) {
             playSfx('click'); state.currentScene = scene;
-            phraseHistory = []; historyIndex = -1; // 切换分类重置历史栈
-            window.goNextPhrase(); 
+            phraseHistory = []; historyIndex = -1; window.goNextPhrase(); 
         }
 
         async function fetchPoolFromCloud(level) {
@@ -935,7 +900,6 @@
             const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
-        // 🚨 绝对死守规则：严格看广告阶梯提档记分制
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
@@ -947,13 +911,7 @@
                 
                 let currentEarned = state.earnedMap[rawT] || 0; 
                 let currentTier = 0;
-                if (currentEarned >= 0.50) currentTier = 5;
-                else if (currentEarned >= 0.45) currentTier = 4;
-                else if (currentEarned >= 0.40) currentTier = 3;
-                else if (currentEarned >= 0.35) currentTier = 2;
-                else if (currentEarned >= 0.30) currentTier = 1;
-                else currentTier = 0;
-
+                if (currentEarned >= 0.50) currentTier = 5; else if (currentEarned >= 0.45) currentTier = 4; else if (currentEarned >= 0.40) currentTier = 3; else if (currentEarned >= 0.35) currentTier = 2; else if (currentEarned >= 0.30) currentTier = 1; else currentTier = 0;
                 let tier = 0;
 
                 if (!isAdBoost) {
@@ -981,9 +939,7 @@
                     if (score === 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1; else tier = 0;
                     tier = Math.max(tier, currentTier);
                 } else {
-                    state.streak += 1; score = 100; 
-                    // 🚨 阶梯提额锁定
-                    tier = Math.min(5, currentTier + 1); 
+                    state.streak += 1; score = 100; tier = Math.min(5, currentTier + 1); 
                 }
                 
                 const finalTier = tier; const diff = Math.round((rewardStages[finalTier] - currentEarned) * 100) / 100;
@@ -1036,7 +992,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V70' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V71' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
