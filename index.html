@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V77 - 绿钻引流国际版</title>
+    <title>Oasis Bridge V78 - 国际自适应双语版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V77 (Diamond)</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V78</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -94,7 +94,10 @@
     </div>
 
     <div id="step-time" class="app-screen z-[57] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2><p class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p></div>
+        <div class="mb-10 text-center">
+            <h2 id="time-screen-title" class="text-2xl font-black text-white drop-shadow-md">设定每日目标</h2>
+            <p id="time-screen-sub" class="text-[10px] text-amber-500 mt-2 font-bold tracking-widest uppercase">Target Duration</p>
+        </div>
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
             <button onclick="window.handleStepTime(15)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600">15 Min</button>
             <button onclick="window.handleStepTime(30)" class="glass-panel py-8 rounded-[24px] font-black text-lg active:bg-amber-600">30 Min</button>
@@ -104,22 +107,39 @@
     </div>
 
     <div id="step-2" class="app-screen z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
-        <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2></div>
+        <div class="mb-10 text-center">
+            <h2 id="difficulty-title-text" class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2>
+        </div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <div onclick="window.handleStep2(0)" class="glass-panel p-5 rounded-[24px] border-blue-500/30 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-transparent"></div>
-                <div class="relative z-10"><p class="font-bold text-base text-blue-400">破冰级 (L0)</p><p class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/零基础</p></div>
+                <div class="relative z-10">
+                    <p id="l0-name" class="font-bold text-base text-blue-400">破冰级 (L0)</p>
+                    <p id="l0-sub" class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/零基础</p>
+                </div>
                 <div class="font-black text-blue-400 text-xl relative z-10">29<span class="text-[10px] text-blue-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
-                <div><p class="font-bold text-base text-slate-200">入门级 (L1)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活与生存</p></div><div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
+                <div>
+                    <p id="l1-name" class="font-bold text-base text-slate-200">入门级 (L1)</p>
+                    <p id="l1-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活与生存</p>
+                </div>
+                <div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
-                <div><p class="font-bold text-base text-slate-200">职场级 (L2)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协作</p></div><div class="font-black text-white text-xl">299<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
+                <div>
+                    <p id="l2-name" class="font-bold text-base text-slate-200">职场级 (L2)</p>
+                    <p id="l2-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协作</p>
+                </div>
+                <div class="font-black text-white text-xl">299<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(3)" class="glass-panel p-5 rounded-[24px] border-amber-500/40 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-transparent"></div>
-                <div class="relative z-10"><p class="font-bold text-base text-amber-400">精英级 (L3)</p><p class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报</p></div><div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
+                <div class="relative z-10">
+                    <p id="l3-name" class="font-bold text-base text-amber-400">精英级 (L3)</p>
+                    <p id="l3-sub" class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报</p>
+                </div>
+                <div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
         </div>
     </div>
@@ -309,7 +329,6 @@
                     <p>• 100.00 💎 = 100.00 AED (迪拉姆)</p>
                     <p>• 100.00 💎 = 27.20 USD (美元)</p>
                 </div>
-
                 <div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20">
                     <h4 id="store-with-lbl" class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span id="store-min-lbl" class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 💎</span></h4>
                     <div class="space-y-3">
@@ -391,7 +410,7 @@
                 txt_conn: "Connecting...", txt_scene: "ALL SCENES", txt_scene_badge: "SCENE: ", txt_translating: "Translating...",
                 exit_met_title: "Target Met!", exit_met_btn: "EXIT",
                 exit_not_title: "Goal Not Met", exit_not_rem: "mins remaining.",
-                exit_ad_btn: "Watch Ad (+5 Mins)", exit_quit_btn: "QUIT ANYWAY", exit_not_title: "Goal Not Met", exit_cont_btn: "CONTINUE",
+                exit_ad_btn: "Watch Ad (+5 Mins)", exit_quit_btn: "QUIT ANYWAY", exit_cont_btn: "CONTINUE",
                 exit_weak_title: "End Targeted Practice?", exit_weak_sub: "Return to normal scenarios", exit_weak_y: "Yes, Return", exit_weak_n: "Keep Practicing",
                 store_title: "Financial Center", store_bal: "Balance:", store_with: "Withdrawal",
                 store_min: "Min 50 💎", store_cash: "Cash Out",
@@ -403,7 +422,15 @@
                 lum_lock_title: "LUM Analytics", lum_lock_sub: "Unlock multi-dimensional radar and targeted weak words practice.", lum_lock_btn: "10.00 💎 Unlock",
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel",
                 rescue_max_title: "DAILY LIMIT REACHED", rescue_max_sub: "Please come back tomorrow.", rescue_max_btn: "MAXED OUT",
-                fb_title: "Feedback & Bugs", fb_sub: "Help us improve Oasis Bridge", fb_holder: "Describe the bug or share your ideas...", fb_submit: "SUBMIT REPORT"
+                fb_title: "Feedback & Bugs", fb_sub: "Help us improve Oasis Bridge", fb_holder: "Describe the bug or share your ideas...", fb_submit: "SUBMIT REPORT",
+                // 🚨 难度选择全功能舱英文包
+                difficulty_title_text: "Select Difficulty & Prize Pool",
+                l0_name: "Survival Level (L0)", l0_sub: "Survival Basics / Beginner",
+                l1_name: "Beginner Level (L1)", l1_sub: "Daily Life & Basic Communication",
+                l2_name: "Professional Level (L2)", l2_sub: "Cross-Department Collaboration",
+                l3_name: "Elite Level (L3)", l3_sub: "Strategic Presentations",
+                // 目标时间英文包
+                time_screen_title: "Set Daily Goal", time_screen_sub: "Target Duration"
             },
             cn: { 
                 lbl_wallet: "钻石余额", lbl_session: "学习时长", lbl_limit: "求助额度",
@@ -426,11 +453,20 @@
                 lum_lock_title: "LUM 智慧透视仪", lum_lock_sub: "基于大模型，解锁多维度能力雷达与薄弱生词专攻库。", lum_lock_btn: "10.00 💎 解锁",
                 rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消",
                 rescue_max_title: "今日额度耗尽", rescue_max_sub: "请明天再来获取助力", rescue_max_btn: "已达上限",
-                fb_title: "意见反馈与 BUG", fb_sub: "帮助我们改进 Oasis Bridge", fb_holder: "请描述您遇到的问题或建议...", fb_submit: "提交反馈"
+                fb_title: "意见反馈与 BUG", fb_sub: "帮助我们改进 Oasis Bridge", fb_holder: "请描述您遇到的问题或建议...", fb_submit: "提交反馈",
+                // 难度选择全功能舱中文包
+                difficulty_title_text: "选择难度与奖池",
+                l0_name: "破冰级 (L0)", l0_sub: "生存必备/零基础",
+                l1_name: "入门级 (L1)", l1_sub: "基础生活与生存",
+                l2_name: "职场级 (L2)", l2_sub: "跨部门协作",
+                l3_name: "精英级 (L3)", l3_sub: "战略汇报",
+                // 目标时间中文包
+                time_screen_title: "设定每日目标", time_screen_sub: "Target Duration"
             }
         };
 
-        function getUI() { return state.path === 'en' ? i18n.cn : i18n.en; }
+        // 🚨 严格执行核心反转漏斗逻辑：学中文显示纯英文界面，学英文显示纯中文界面
+        function getUI() { return state.path === 'cn' ? i18n.en : i18n.cn; }
 
         function applyI18N() {
             const ui = getUI();
@@ -460,6 +496,21 @@
             document.getElementById('fb-sub').innerText = ui.fb_sub;
             document.getElementById('feedback-input').placeholder = ui.fb_holder;
             document.getElementById('fb-submit-btn').innerText = ui.fb_submit;
+
+            // 🚨 极其关键：难度选择舱动态中英反转注入
+            document.getElementById('difficulty-title-text').innerText = ui.difficulty_title_text;
+            document.getElementById('l0-name').innerText = ui.l0_name;
+            document.getElementById('l0-sub').innerText = ui.l0_sub;
+            document.getElementById('l1-name').innerText = ui.l1_name;
+            document.getElementById('l1-sub').innerText = ui.l1_sub;
+            document.getElementById('l2-name').innerText = ui.l2_name;
+            document.getElementById('l2-sub').innerText = ui.l2_sub;
+            document.getElementById('l3-name').innerText = ui.l3_name;
+            document.getElementById('l3-sub').innerText = ui.l3_sub;
+
+            // 目标时间舱自适应注入
+            document.getElementById('time-screen-title').innerText = ui.time_screen_title;
+            document.getElementById('time-screen-sub').innerText = ui.time_screen_sub;
             
             initBlindModeUI();
         }
@@ -517,6 +568,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // 智能中英五字段保底缓存防假死防崩溃线
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Hello, nice to meet you.', text_zh: '你好，很高兴见到你。', scenario: 'Casual' },
             { id: 902, text_en: 'How much is this?', text_zh: '这个多少钱？', scenario: 'Shopping' },
@@ -579,7 +631,6 @@
                 if (error) throw error;
                 
                 const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
-                
                 if (!prof) {
                     await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false });
                     state.cloudBalance = 0.00; state.lumUnlocked = false;
@@ -599,7 +650,7 @@
         window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
         window.openModal = function(id) { document.getElementById(id).classList.add('active'); playSfx('click'); }
 
-        window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); applyI18N(); }
         
         function checkAdRefresh() {
             const now = Date.now(); 
@@ -613,11 +664,9 @@
 
         window.handleStepTime = (t) => { 
             playSfx('click'); state.targetTime = t; checkAdRefresh(); 
-            
             if (!state.usedSlots[t]) {
-                state.adLimit = 6; state.refillCount = 0; state.usedSlots[t] = true; 
-                saveData(); 
-                alert(state.path === 'en' ? `🎁 成功开启 ${t} 分钟专属学习舱！\n系统已为您发放 6 次本局免费容错额度。` : `🎁 Unlocked ${t}-min session!\n6 free chances granted for this slot.`);
+                state.adLimit = 6; state.refillCount = 0; state.usedSlots[t] = true; saveData(); 
+                alert(state.path === 'en' ? `🎁 成功开启 ${t} 分钟专属学习舱！\n系统已为您发放 6 次本局免费容错额度。` : `🎁 Session unlocked for ${t} minutes!\n6 free chances granted for this slot.`);
             }
             hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); 
         }
@@ -1011,7 +1060,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V77' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V78' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
