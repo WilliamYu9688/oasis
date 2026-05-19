@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V73 - 国际引流版</title>
+    <title>Oasis Bridge V74 - 国际全量版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -38,7 +38,7 @@
         .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
         
         .animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 70% { opacity: 1; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
         
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
@@ -53,7 +53,7 @@
         select option { background-color: #0f172a; color: #fff; font-weight: bold; padding: 10px; }
         select optgroup { background-color: #1e293b; color: #fbbf24; font-weight: 900; font-style: italic; }
 
-        /* 中东阿语特殊字体排版适配 */
+        /* 🚨 阿语专属排版：从右向左 */
         .rtl-text { direction: rtl; unicode-bidi: embed; font-family: 'Amiri', 'Traditional Arabic', Arial, sans-serif; }
     </style>
 </head>
@@ -62,7 +62,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V73 (Global)</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V74</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -88,16 +88,13 @@
         <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-5 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div>
-                <h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
             </button>
             <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-5 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇺🇸</div>
-                <h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇺🇸</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
             <button onclick="window.handleStep1('ar')" class="w-full glass-panel rounded-[28px] p-5 text-left active:scale-95 transition-transform relative overflow-hidden border-emerald-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇸🇦</div>
-                <h3 class="font-bold text-xl text-emerald-400">我要学阿语</h3><p class="text-[10px] text-emerald-600 mt-1 font-bold tracking-widest uppercase">中东生存与破冰</p>
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇸🇦</div><h3 class="font-bold text-xl text-emerald-400">我要学阿语</h3><p class="text-[10px] text-emerald-600 mt-1 font-bold tracking-widest uppercase">中东生存与破冰</p>
             </button>
         </div>
     </div>
@@ -115,13 +112,11 @@
     <div id="step-2" class="app-screen z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-10 text-center"><h2 class="text-2xl font-black text-white drop-shadow-md">选择难度与奖池</h2></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
-            
             <div onclick="window.handleStep2(0)" class="glass-panel p-5 rounded-[24px] border-blue-500/30 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-transparent"></div>
                 <div class="relative z-10"><p class="font-bold text-base text-blue-400">破冰级 (L0)</p><p class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/零基础</p></div>
                 <div class="font-black text-blue-400 text-xl relative z-10">29<span class="text-[10px] text-blue-500 ml-0.5">AED</span></div>
             </div>
-
             <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
                 <div><p class="font-bold text-base text-slate-200">入门级 (L1)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活与生存</p></div><div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">AED</span></div>
             </div>
@@ -150,15 +145,19 @@
     </div>
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
-        <button id="lbl-quit" onclick="window.promptExit()" class="absolute top-4 left-4 z-50 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">⏏ Quit</button>
         
-        <div class="absolute top-4 right-4 z-50 flex gap-2">
-            <button id="lbl-fb" onclick="window.openFeedback()" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">💬 FB</button>
-            <button id="blind-toggle-btn" onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">👁️ Shadowing</button>
-            <button id="lbl-lum" onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">📊 LUM</button>
+        <div class="w-full px-4 pt-4 pb-2 z-50 flex justify-between items-start gap-2 shrink-0">
+            <button id="lbl-quit" onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
+                ⏏ Quit
+            </button>
+            <div class="flex gap-2 flex-wrap justify-end max-w-[75%]">
+                <button id="lbl-fb" onclick="window.openFeedback()" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">💬 FB</button>
+                <button id="blind-toggle-btn" onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">👁️ Shadowing</button>
+                <button id="lbl-lum" onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">📊 LUM</button>
+            </div>
         </div>
 
-        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-16 pb-4 px-2 z-40 shrink-0 shadow-lg">
+        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-2 pb-4 px-2 z-40 shrink-0 shadow-lg">
             <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
                 <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
                     <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
@@ -515,7 +514,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // 🚨 V73：扩充阿拉伯语保底词库测试
+        // 🚨 V74: 扩容中、英、阿三语测试库
         const LOCAL_CACHE = [
             { id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', text_ar: 'تحقق من ذلك الآن.', scenario: 'Casual' },
             { id: 902, text_en: 'Could you please send me the proposal?', text_zh: '你能把提案发给我吗？', text_ar: 'هل يمكنك إرسال الاقتراح لي؟', scenario: 'Work' },
@@ -532,19 +531,18 @@
         let phraseHistory = [];
         let historyIndex = -1;
 
-        // 🚨 V73：状态容器增加阿拉伯语 (ar)
         let state = {
             path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v73_times') || '{"en":0, "cn":0, "ar":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v73_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v73_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v73_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v73_missed') || '{}'),
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v74_times') || '{"en":0, "cn":0, "ar":0}'),
+            scores: JSON.parse(localStorage.getItem('ob_v74_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v74_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v74_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v74_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v73_adlim') !== null ? parseInt(localStorage.getItem('ob_v73_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v73_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v73_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v73_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v74_adlim') !== null ? parseInt(localStorage.getItem('ob_v74_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v74_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v74_usedslots') || '{}'), 
+            isBlindMode: localStorage.getItem('ob_v74_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
@@ -553,15 +551,15 @@
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v73_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v73_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v73_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v73_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v73_adlim', state.adLimit);
-            localStorage.setItem('ob_v73_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v73_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v73_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v73_blind', state.isBlindMode);
+            localStorage.setItem('ob_v74_times', JSON.stringify(state.sessionTimes)); 
+            localStorage.setItem('ob_v74_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v74_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v74_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v74_adlim', state.adLimit);
+            localStorage.setItem('ob_v74_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v74_usedslots', JSON.stringify(state.usedSlots));
+            localStorage.setItem('ob_v74_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v74_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -604,10 +602,10 @@
         function checkAdRefresh() {
             const now = Date.now(); 
             const todayStr = new Date(now).toDateString();
-            const lastStr = localStorage.getItem('ob_v73_refreshtime');
+            const lastStr = localStorage.getItem('ob_v74_refreshtime');
             if (!lastStr || lastStr !== todayStr) { 
                 state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0, ar: 0 }; 
-                localStorage.setItem('ob_v73_refreshtime', todayStr); saveData(); 
+                localStorage.setItem('ob_v74_refreshtime', todayStr); saveData(); 
             }
         }
 
@@ -733,7 +731,7 @@
         async function fetchNewPhraseLogic() {
             try {
                 if (globalPool.length === 0) {
-                    const cachedData = localStorage.getItem(`ob_v73_pool_${state.dbLevel}`);
+                    const cachedData = localStorage.getItem(`ob_v74_pool_${state.dbLevel}`);
                     if (cachedData) {
                         globalPool = JSON.parse(cachedData);
                         window.renderSceneFilters();
@@ -803,7 +801,7 @@
             if (!currentPhrase) return;
             const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh'); const container = document.getElementById('text-container');
             
-            // 🚨 动态设置阿语排版 RTL
+            // 🚨 阿语排版支持：动态开启 RTL
             if (state.path === 'ar') tEl.classList.add('rtl-text');
             else tEl.classList.remove('rtl-text');
 
@@ -814,11 +812,10 @@
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
         }
 
-        // 🚨 阿语等新语种的词级拆分高亮修复
+        // 🚨 多语种高亮修复：彻底兼容阿语的特殊符号体系与空格切分
         window.highlightSentence = function(target, captured) {
             let coloredHTML = "";
             if (state.path === 'en' || state.path === 'ar') {
-                // 过滤所有符号，通过空格打散，适配阿语等用空格分词的语言
                 const capWords = captured.replace(/[.,!?؟،\-_"']/g, "").split(/\s+/);
                 let targetWords = target.split(' ');
                 coloredHTML = targetWords.map(match => {
@@ -1033,7 +1030,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V73' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V74' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
