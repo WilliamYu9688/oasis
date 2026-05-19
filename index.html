@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V74 - 国际全量版</title>
+    <title>Oasis Bridge V76 - 纯净中英L0版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -38,7 +38,7 @@
         .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
         
         .animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 70% { opacity: 1; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
         
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
@@ -52,9 +52,6 @@
         
         select option { background-color: #0f172a; color: #fff; font-weight: bold; padding: 10px; }
         select optgroup { background-color: #1e293b; color: #fbbf24; font-weight: 900; font-style: italic; }
-
-        /* 🚨 阿语专属排版：从右向左 */
-        .rtl-text { direction: rtl; unicode-bidi: embed; font-family: 'Amiri', 'Traditional Arabic', Arial, sans-serif; }
     </style>
 </head>
 <body>
@@ -62,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V74</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V76</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -87,14 +84,11 @@
     <div id="step-1" class="app-screen z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
-            <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-5 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
+            <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
                 <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn AED</p>
             </button>
-            <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-5 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇺🇸</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
-            </button>
-            <button onclick="window.handleStep1('ar')" class="w-full glass-panel rounded-[28px] p-5 text-left active:scale-95 transition-transform relative overflow-hidden border-emerald-500/30 shadow-xl">
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇸🇦</div><h3 class="font-bold text-xl text-emerald-400">我要学阿语</h3><p class="text-[10px] text-emerald-600 mt-1 font-bold tracking-widest uppercase">中东生存与破冰</p>
+            <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
+                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
         </div>
     </div>
@@ -427,7 +421,7 @@
             }
         };
 
-        function getUI() { return (state.path === 'en' || state.path === 'ar') ? i18n.cn : i18n.en; }
+        function getUI() { return state.path === 'en' ? i18n.cn : i18n.en; }
 
         function applyI18N() {
             const ui = getUI();
@@ -514,15 +508,14 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
         let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // 🚨 V74: 扩容中、英、阿三语测试库
+        // 🚨 V76: 本地保底库扩展 L0 语料，防止断网没数据时翻页崩溃
         const LOCAL_CACHE = [
-            { id: 901, text_en: 'Check it out right now.', text_zh: '现在就来看看吧。', text_ar: 'تحقق من ذلك الآن.', scenario: 'Casual' },
-            { id: 902, text_en: 'Could you please send me the proposal?', text_zh: '你能把提案发给我吗？', text_ar: 'هل يمكنك إرسال الاقتراح لي؟', scenario: 'Work' },
-            { id: 903, text_en: 'Let me confirm the details with my team.', text_zh: '让我和团队确认一下细节。', text_ar: 'دعني أؤكد التفاصيل مع فريقي.', scenario: 'Meeting' },
-            { id: 904, text_en: 'We need to accelerate the development process.', text_zh: '我们需要加快开发进度。', text_ar: 'نحتاج إلى تسريع عملية التطوير.', scenario: 'Agile' },
-            { id: 905, text_en: 'This is a game changer for our business.', text_zh: '这对我们的业务来说是革命性的。', text_ar: 'هذا سيغير قواعد اللعبة لعملنا.', scenario: 'Marketing' }
+            { id: 901, text_en: 'Hello, nice to meet you.', text_zh: '你好，很高兴见到你。', scenario: 'Casual' },
+            { id: 902, text_en: 'How much is this?', text_zh: '这个多少钱？', scenario: 'Shopping' },
+            { id: 903, text_en: 'Where is the restroom?', text_zh: '洗手间在哪里？', scenario: 'Daily Life' },
+            { id: 904, text_en: 'Water, please.', text_zh: '请给我水。', scenario: 'Dining' },
+            { id: 905, text_en: 'The bill, please.', text_zh: '请结账。', scenario: 'Dining' }
         ];
-        
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
         let globalLastActionTime = Date.now();
@@ -533,33 +526,34 @@
 
         let state = {
             path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v74_times') || '{"en":0, "cn":0, "ar":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v74_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v74_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v74_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v74_missed') || '{}'),
+            sessionTimes: JSON.parse(localStorage.getItem('ob_v76_times') || '{"en":0, "cn":0}'),
+            scores: JSON.parse(localStorage.getItem('ob_v76_scores') || '{}'),
+            earnedMap: JSON.parse(localStorage.getItem('ob_v76_emap') || '{}'),
+            adBoostMap: JSON.parse(localStorage.getItem('ob_v76_boost') || '{}'),
+            missedWords: JSON.parse(localStorage.getItem('ob_v76_missed') || '{}'),
             lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v74_adlim') !== null ? parseInt(localStorage.getItem('ob_v74_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v74_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v74_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v74_blind') === 'true',
+            adLimit: localStorage.getItem('ob_v76_adlim') !== null ? parseInt(localStorage.getItem('ob_v76_adlim')) : 6,
+            refillCount: parseInt(localStorage.getItem('ob_v76_refillcount') || '0'), 
+            usedSlots: JSON.parse(localStorage.getItem('ob_v76_usedslots') || '{}'), 
+            isBlindMode: localStorage.getItem('ob_v76_blind') === 'true',
             currentScene: 'ALL', 
             streak: 0, dbLevel: 1, cloudBalance: 0.00
         };
 
         let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
+        let lastTimeTick = Date.now(); 
         let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v74_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v74_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v74_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v74_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v74_adlim', state.adLimit);
-            localStorage.setItem('ob_v74_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v74_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v74_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v74_blind', state.isBlindMode);
+            localStorage.setItem('ob_v76_times', JSON.stringify(state.sessionTimes)); 
+            localStorage.setItem('ob_v76_scores', JSON.stringify(state.scores)); 
+            localStorage.setItem('ob_v76_emap', JSON.stringify(state.earnedMap));
+            localStorage.setItem('ob_v76_boost', JSON.stringify(state.adBoostMap)); 
+            localStorage.setItem('ob_v76_adlim', state.adLimit);
+            localStorage.setItem('ob_v76_refillcount', state.refillCount); 
+            localStorage.setItem('ob_v76_usedslots', JSON.stringify(state.usedSlots));
+            localStorage.setItem('ob_v76_missed', JSON.stringify(state.missedWords));
+            localStorage.setItem('ob_v76_blind', state.isBlindMode);
         }
 
         window.toggleAuthMode = function() {
@@ -602,10 +596,10 @@
         function checkAdRefresh() {
             const now = Date.now(); 
             const todayStr = new Date(now).toDateString();
-            const lastStr = localStorage.getItem('ob_v74_refreshtime');
+            const lastStr = localStorage.getItem('ob_v76_refreshtime');
             if (!lastStr || lastStr !== todayStr) { 
-                state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0, ar: 0 }; 
-                localStorage.setItem('ob_v74_refreshtime', todayStr); saveData(); 
+                state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0 }; 
+                localStorage.setItem('ob_v76_refreshtime', todayStr); saveData(); 
             }
         }
 
@@ -670,9 +664,9 @@
         }
 
         function syncPhraseState() {
-            const rawT = state.path === 'en' ? currentPhrase.text_en : (state.path === 'ar' ? currentPhrase.text_ar : currentPhrase.text_zh);
-            document.getElementById('item-best-score').innerText = state.scores[rawT] || 0;
-            document.getElementById('item-earned').innerText = (state.earnedMap[rawT] || 0).toFixed(2); updateTopBar();
+            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            document.getElementById('item-best-score').innerText = state.scores[t] || 0;
+            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
         }
 
         window.applyCurrentPhrase = function() {
@@ -731,7 +725,7 @@
         async function fetchNewPhraseLogic() {
             try {
                 if (globalPool.length === 0) {
-                    const cachedData = localStorage.getItem(`ob_v74_pool_${state.dbLevel}`);
+                    const cachedData = localStorage.getItem(`ob_v76_pool_${state.dbLevel}`);
                     if (cachedData) {
                         globalPool = JSON.parse(cachedData);
                         window.renderSceneFilters();
@@ -800,26 +794,19 @@
         function renderTextDisplay() {
             if (!currentPhrase) return;
             const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh'); const container = document.getElementById('text-container');
-            
-            // 🚨 阿语排版支持：动态开启 RTL
-            if (state.path === 'ar') tEl.classList.add('rtl-text');
-            else tEl.classList.remove('rtl-text');
-
-            const txt = state.path === 'en' ? currentPhrase.text_en : (state.path === 'ar' ? currentPhrase.text_ar : currentPhrase.text_zh);
-            const sub = state.path === 'en' ? currentPhrase.text_zh : (state.path === 'ar' ? currentPhrase.text_zh : currentPhrase.text_en);
+            const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             
             tEl.innerHTML = `"${generateLiaisonHints(txt)}"`; zhEl.innerText = sub;
             if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
         }
 
-        // 🚨 多语种高亮修复：彻底兼容阿语的特殊符号体系与空格切分
         window.highlightSentence = function(target, captured) {
             let coloredHTML = "";
-            if (state.path === 'en' || state.path === 'ar') {
-                const capWords = captured.replace(/[.,!?؟،\-_"']/g, "").split(/\s+/);
-                let targetWords = target.split(' ');
-                coloredHTML = targetWords.map(match => {
-                    const cleanWord = match.replace(/[.,!?؟،\-_"']/g, "");
+            if (state.path === 'en') {
+                const capWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
+                coloredHTML = target.replace(/\b([a-zA-Z']+)\b/g, (match) => {
+                    const cleanWord = match.toLowerCase().replace(/[^a-z]/g, "");
                     const idx = capWords.indexOf(cleanWord);
                     if (idx > -1) {
                         capWords.splice(idx, 1);
@@ -827,7 +814,7 @@
                     } else {
                         return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`;
                     }
-                }).join(' ');
+                });
             } else {
                 let capStr = captured.replace(/[^\u4e00-\u9fa5]/g, "");
                 for (let i = 0; i < target.length; i++) {
@@ -907,13 +894,11 @@
         }
 
         window.playAudio = async (isAuto = false) => {
-            if(!isAuto) playSfx('click'); 
-            const text = state.path === 'en' ? currentPhrase.text_en : (state.path === 'ar' ? currentPhrase.text_ar : currentPhrase.text_zh);
+            if(!isAuto) playSfx('click'); const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             if (!text || text.includes('Connecting')) return;
             const btn = document.getElementById("play-audio-btn"); const originalContent = btn.innerHTML;
             btn.innerHTML = `<svg class="w-5 h-5 text-blue-400 animate-spin ml-1" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-            btn.disabled = true; 
-            const audioUrl = state.path === 'en' ? currentPhrase.audio_url : (state.path === 'ar' ? currentPhrase.audio_ar_url : currentPhrase.audio_zh_url);
+            btn.disabled = true; const audioUrl = state.path === 'en' ? currentPhrase.audio_url : currentPhrase.audio_zh_url;
             if (audioUrl) {
                 const audio = new Audio(audioUrl); audio.onended = () => { btn.innerHTML = originalContent; btn.disabled = false; };
                 audio.onerror = () => { window.fallbackTTS(btn, originalContent, text); }; audio.play().catch(() => { window.fallbackTTS(btn, originalContent, text); });
@@ -923,25 +908,15 @@
         window.fallbackTTS = (btn, originalContent, text) => {
             const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; let voices = window.speechSynthesis.getVoices();
             if (state.path === 'en') { u.lang = 'en-US'; let bestVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; } 
-            else if (state.path === 'ar') { u.lang = 'ar-SA'; let bestVoice = voices.find(v => v.lang.includes('ar')); if (bestVoice) u.voice = bestVoice; }
             else { u.lang = 'zh-CN'; let bestVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Premium') || v.name.includes('Enhanced') || v.name.includes('Ting-Ting') || v.name.includes('Siri') || v.name.includes('Google'))); if (bestVoice) u.voice = bestVoice; }
             u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; }; u.onerror = () => { btn.innerHTML = originalContent; btn.disabled = false; }; window.speechSynthesis.speak(u);
-        }
-
-        function analyzeMistakes(target, captured) {
-            let tWords = []; let cWords = [];
-            if (state.path === 'en') { tWords = target.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/); cWords = captured.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/); } 
-            else if (state.path === 'ar') { tWords = target.replace(/[.,!?؟،\-_"']/g, "").split(/\s+/); cWords = captured.replace(/[.,!?؟،\-_"']/g, "").split(/\s+/); }
-            else { if (window.Intl && Intl.Segmenter) { const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' }); tWords = Array.from(segmenter.segment(target.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment); cWords = Array.from(segmenter.segment(captured.replace(/[^\u4e00-\u9fa5]/g, ""))).filter(s => s.isWordLike).map(s => s.segment); } else { tWords = target.replace(/[^\u4e00-\u9fa5]/g,"").split(''); cWords = captured.replace(/[^\u4e00-\u9fa5]/g,"").split(''); } }
-            const missed = tWords.filter(w => w && !cWords.includes(w)); missed.forEach(w => { state.missedWords[w] = (state.missedWords[w] || 0) + 1; }); return missed;
         }
 
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
                 document.getElementById('text-container').classList.remove('blind-mode-active');
-                const isAdBoost = (txt === "[AD_BOOST]"); 
-                const rawT = state.path === 'en' ? currentPhrase.text_en : (state.path === 'ar' ? currentPhrase.text_ar : currentPhrase.text_zh);
+                const isAdBoost = (txt === "[AD_BOOST]"); const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                 let safeTxt = isAdBoost ? "" : (txt || "");
                 if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
                 let score = 0; let isNewBest = false;
@@ -957,8 +932,6 @@
                     if (state.path === 'en') {
                         const stops = ['a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'is', 'are', 'am'];
                         fmtC = fmtC.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim(); fmtT = fmtT.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim();
-                    } else if (state.path === 'ar') {
-                        fmtC = safeTxt.replace(/[.,!?؟،\-_"']/g, "").split(/\s+/).join(' ').trim(); fmtT = rawT.replace(/[.,!?؟،\-_"']/g, "").split(/\s+/).join(' ').trim();
                     } else { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); }
                     
                     const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
@@ -986,6 +959,7 @@
                     state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
                     document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); playSfx('success');
+                    try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
                 }
                 
                 const scoreDisp = document.getElementById('score-display');
@@ -1025,12 +999,12 @@
         }
 
         window.openFeedback = () => { playSfx('click'); window.openModal('feedback-modal'); }
-        window.submitFeedback = async () => {
+        window.submitFeedback = async function() {
             playSfx('click'); const txt = document.getElementById('feedback-input').value.trim(); if (!txt) return;
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V74' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V76' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
@@ -1126,11 +1100,7 @@
 
         window.initWhisper = async function() {
             const bar = document.getElementById('loading-progress-bar');
-            try { 
-                let asrLang = 'english';
-                if (state.path === 'cn') asrLang = 'chinese';
-                if (state.path === 'ar') asrLang = 'arabic';
-                window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } } }); window.enterMainApp(); } 
+            try { window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } } }); window.enterMainApp(); } 
             catch (e) { alert("AI Load Error"); }
         }
 
@@ -1143,12 +1113,7 @@
                 window.mediaRecorder.onstop = async () => {
                     setAppState('PROCESSING');
                     const blob = new Blob(chunks, { type: 'audio/webm' }); const buf = await blob.arrayBuffer(); const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 }); const decoded = await audioCtx.decodeAudioData(buf);
-                    
-                    let asrLang = 'english';
-                    if (state.path === 'cn') asrLang = 'chinese';
-                    if (state.path === 'ar') asrLang = 'arabic';
-
-                    const result = await window.whisperPipeline(decoded.getChannelData(0), { language: asrLang, task: 'transcribe' });
+                    const result = await window.whisperPipeline(decoded.getChannelData(0), { language: 'english', task: 'transcribe' });
                     window.processAndScore(result.text || "");
                 };
                 window.mediaRecorder.start(); setAppState('LISTENING');
