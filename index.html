@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V71 - UI 布局适配版</title>
+    <title>Oasis Bridge V72 - 自适应排版修复版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V71</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V72</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -135,19 +135,19 @@
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
         
-        <div class="absolute top-4 inset-x-4 z-50 flex justify-between items-start pointer-events-none gap-2">
-            <button id="lbl-quit" onclick="window.promptExit()" class="pointer-events-auto shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
+        <div class="w-full px-4 pt-4 pb-2 z-50 flex justify-between items-start gap-2 shrink-0">
+            <button id="lbl-quit" onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
                 ⏏ Quit
             </button>
             
-            <div class="flex gap-2 flex-wrap justify-end pointer-events-auto max-w-[70%]">
+            <div class="flex gap-2 flex-wrap justify-end max-w-[75%]">
                 <button id="lbl-fb" onclick="window.openFeedback()" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">💬 FB</button>
                 <button id="blind-toggle-btn" onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">👁️ Shadowing</button>
                 <button id="lbl-lum" onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">📊 LUM</button>
             </div>
         </div>
 
-        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-16 pb-4 px-2 z-40 shrink-0 shadow-lg">
+        <div class="glass-panel border-x-0 border-t-0 border-b border-white/5 pt-2 pb-4 px-2 z-40 shrink-0 shadow-lg">
             <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
                 <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
                     <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
