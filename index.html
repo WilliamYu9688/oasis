@@ -729,6 +729,8 @@
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
             window.updateNavButtons(); 
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
+            // 只在 applyCurrentPhrase 函数的最后增加这一行，实现倒计时刷新
+            refreshCountdownUI();
         }
         
         window.updateNavButtons = function() {
@@ -1162,6 +1164,28 @@
                 window.mediaRecorder.start(); setAppState('LISTENING');
             } catch (e) { console.error("麦克风错误:", e); alert(state.path === 'en' ? "无法访问麦克风，请在浏览器设置中开启权限。" : "Cannot access microphone. Please enable permission in browser settings."); setAppState('READY'); }
         }
+    function refreshCountdownUI() {
+    const ui = getUI();
+    const displayEl = document.getElementById('countdown-display');
+    if (!displayEl) return; // 防护：如果界面没加载完直接退出，不报错
+    
+    document.getElementById('countdown-label').innerText = ui.countdown_label;
+    
+    // 天数逻辑：L0-30天, L1-90天, L2-180天, L3-365天
+    const dayLimits = [30, 90, 180, 365];
+    const diff = (currentPhrase && typeof currentPhrase.difficulty !== 'undefined') ? currentPhrase.difficulty : state.dbLevel;
+    const maxDays = dayLimits[diff] || 30;
+    const currentLeftDays = maxDays - 1; 
+    
+    displayEl.innerText = `⏳ ${currentLeftDays}${ui.countdown_days}`;
+
+    // 低于10天触发红灯预警
+    if (currentLeftDays <= 10) {
+        displayEl.classList.add('countdown-panic');
+    } else {
+        displayEl.classList.remove('countdown-panic');
+    }
+}
     </script>
 </body>
 </html>
