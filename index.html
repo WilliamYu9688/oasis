@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V80-倒计时</title>
+    <title>Oasis Bridge V80 - 长期对赌修复版</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -59,7 +59,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V79</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V80</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -151,10 +151,6 @@
                 <h2 class="text-2xl font-black text-white mt-4 tracking-wider uppercase">AI ENGINE</h2>
                 <p id="loading-status-text" class="text-xs text-blue-400 font-bold mt-2 uppercase tracking-widest">Loading Neurals...</p>
             </div>
-            <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden border border-white/10 relative">
-                <div id="loading-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-blue-400 w-0 transition-all duration-300"></div>
-            </div>
-            <p id="loading-percent" class="text-right text-[10px] text-gray-400 font-bold mt-1">0%</p>
         </div>
     </div>
 
@@ -224,7 +220,7 @@
                     <span id="scene-display" class="text-[9px] font-black text-amber-500 uppercase tracking-widest">SCENE: STANDBY</span>
                 </div>
                 
-                <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[160px] flex flex-col items-center justify-center cursor-pointer shadow-inner mt-2">
+                <div id="text-container" onclick="window.revealBlindText()" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[220px] mb-4 flex flex-col items-center justify-center cursor-pointer shadow-inner mt-2">
                     <button id="play-audio-btn" onclick="event.stopPropagation(); window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                     </button>
@@ -417,7 +413,6 @@
                 rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel",
                 rescue_max_title: "DAILY LIMIT REACHED", rescue_max_sub: "Please come back tomorrow.", rescue_max_btn: "MAXED OUT",
                 fb_title: "Feedback & Bugs", fb_sub: "Help us improve Oasis Bridge", fb_holder: "Describe the bug or share your ideas...", fb_submit: "SUBMIT REPORT",
-                // 长期级对赌英文文本
                 difficulty_title_text: "Select Difficulty & Prize Pool",
                 l0_name: "Survival Level (L0)", l0_sub: "Survival Basics / 1 Month Limit",
                 l1_name: "Beginner Level (L1)", l1_sub: "Daily Life / 3 Months Limit",
@@ -447,7 +442,6 @@
                 rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消",
                 rescue_max_title: "今日额度耗尽", rescue_max_sub: "请明天再来获取助力", rescue_max_btn: "已达上限",
                 fb_title: "意见反馈与 BUG", fb_sub: "帮助我们改进 Oasis Bridge", fb_holder: "请描述您遇到的问题或建议...", fb_submit: "提交反馈",
-                // 长期级对赌中文文本
                 difficulty_title_text: "选择难度与奖池",
                 l0_name: "破冰级 (L0)", l0_sub: "生存必备/限时1个月",
                 l1_name: "入门级 (L1)", l1_sub: "基础生活/限时3个月",
@@ -658,7 +652,32 @@
             hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); 
         }
         
-        window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); if (!window.whisperPipeline) { document.getElementById('loading-screen').classList.remove('hidden-screen'); window.initWhisper(); } else { window.enterMainApp(); } }
+        // 修复补丁 4：增加扣款逻辑，并跳过 Whisper 模型下载，直接进入主应用
+        window.handleStep2 = async (lv) => { 
+            playSfx('click'); 
+            const costMap = { 0: 29, 1: 99, 2: 299, 3: 500 };
+            const requiredDiamonds = costMap[lv] || 0;
+
+            if (state.cloudBalance < requiredDiamonds) {
+                alert(state.path === 'en' ? `❌ 绿钻余额不足！进入此舱需要 ${requiredDiamonds} 💎。\n请在界面右上角点击求助观看广告补充！` : `❌ Not enough Diamonds! ${requiredDiamonds} 💎 required.`);
+                return; // 阻止进入
+            }
+
+            state.cloudBalance -= requiredDiamonds;
+            document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
+            saveData();
+            
+            try { 
+                const { data: { user } } = await oasisCloud.auth.getUser(); 
+                if (user) { 
+                    await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); 
+                } 
+            } catch (e) {}
+
+            state.dbLevel = lv; 
+            hideAll(); 
+            window.enterMainApp(); // 直接进入，使用手机自带语音识别
+        }
 
         window.enterMainApp = function() {
             checkAdRefresh(); 
@@ -729,8 +748,6 @@
             renderTextDisplay(); syncPhraseState(); setAppState('READY');
             window.updateNavButtons(); 
             if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
-            // 只在 applyCurrentPhrase 函数的最后增加这一行，实现倒计时刷新
-            refreshCountdownUI();
         }
         
         window.updateNavButtons = function() {
@@ -972,7 +989,7 @@
                 let tier = 0;
 
                 if (!isAdBoost) {
-                    currentPhraseAttempts++; analyzeMistakes(rawT, safeTxt);
+                    currentPhraseAttempts++; 
                     let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
                     if (state.path === 'en') {
                         const stops = ['a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'is', 'are', 'am'];
@@ -1049,7 +1066,7 @@
             const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
             try {
                 const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V79' });
+                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V80' });
                 document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
                 alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
             } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
@@ -1137,55 +1154,60 @@
         window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
         window.submitWithdrawal = async function() { alert(state.path === 'en' ? "提现处理中 (3-5个工作日)" : "Processing Cash Out (3-5 Days)"); }
 
-    </script>
-
-    <script type="module">
-        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
-        env.allowLocalModels = false; window.whisperPipeline = null; window.globalAudioStream = null; 
-
-        window.initWhisper = async function() {
-            const bar = document.getElementById('loading-progress-bar');
-            try { window.whisperPipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { progress_callback: (d) => { if (d.status === 'downloading') { const p = Math.round((d.loaded/d.total)*100); bar.style.width = p+'%'; document.getElementById('loading-percent').innerText = p+'%'; } } }); window.enterMainApp(); } 
-            catch (e) { alert("AI Load Error"); }
-        }
-
+        // 修复补丁 2 & 3：使用原生手机语音识别 API，强制唤醒麦克风权限
+        let activeRecognition = null;
         window.toggleRecord = async function() {
-            if (appState === 'LISTENING') { if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') { window.mediaRecorder.stop(); } return; }
+            if (appState === 'LISTENING') {
+                if (activeRecognition) { activeRecognition.stop(); }
+                return;
+            }
+            
             try {
-                if (!window.globalAudioStream) { window.globalAudioStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
-                playSfx('record'); window.mediaRecorder = new MediaRecorder(window.globalAudioStream); let chunks = [];
-                window.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-                window.mediaRecorder.onstop = async () => {
-                    setAppState('PROCESSING');
-                    const blob = new Blob(chunks, { type: 'audio/webm' }); const buf = await blob.arrayBuffer(); const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 }); const decoded = await audioCtx.decodeAudioData(buf);
-                    const result = await window.whisperPipeline(decoded.getChannelData(0), { language: 'english', task: 'transcribe' });
-                    window.processAndScore(result.text || "");
-                };
-                window.mediaRecorder.start(); setAppState('LISTENING');
-            } catch (e) { console.error("麦克风错误:", e); alert(state.path === 'en' ? "无法访问麦克风，请在浏览器设置中开启权限。" : "Cannot access microphone. Please enable permission in browser settings."); setAppState('READY'); }
-        }
-    function refreshCountdownUI() {
-    const ui = getUI();
-    const displayEl = document.getElementById('countdown-display');
-    if (!displayEl) return; // 防护：如果界面没加载完直接退出，不报错
-    
-    document.getElementById('countdown-label').innerText = ui.countdown_label;
-    
-    // 天数逻辑：L0-30天, L1-90天, L2-180天, L3-365天
-    const dayLimits = [30, 90, 180, 365];
-    const diff = (currentPhrase && typeof currentPhrase.difficulty !== 'undefined') ? currentPhrase.difficulty : state.dbLevel;
-    const maxDays = dayLimits[diff] || 30;
-    const currentLeftDays = maxDays - 1; 
-    
-    displayEl.innerText = `⏳ ${currentLeftDays}${ui.countdown_days}`;
+                // 强制向手机底层请求麦克风授权弹窗
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                playSfx('record');
+            } catch (e) {
+                console.error("麦克风权限被拒绝", e);
+                alert(state.path === 'en' ? "⚠️ 必须允许麦克风权限才能进行口语打分！" : "⚠️ Mic permission is required for scoring!");
+                return;
+            }
 
-    // 低于10天触发红灯预警
-    if (currentLeftDays <= 10) {
-        displayEl.classList.add('countdown-panic');
-    } else {
-        displayEl.classList.remove('countdown-panic');
-    }
-}
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert(state.path === 'en' ? "抱歉，您的手机浏览器不支持原生语音识别，建议使用系统键盘的语音输入或换用 Safari / Chrome。" : "Browser does not support native Speech Recognition.");
+                return;
+            }
+
+            activeRecognition = new SpeechRecognition();
+            activeRecognition.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
+            activeRecognition.interimResults = false;
+            activeRecognition.maxAlternatives = 1;
+
+            activeRecognition.onstart = function() {
+                setAppState('LISTENING');
+            };
+
+            activeRecognition.onresult = function(event) {
+                setAppState('PROCESSING');
+                const transcript = event.results[0][0].transcript;
+                window.processAndScore(transcript);
+            };
+
+            activeRecognition.onerror = function(event) {
+                console.error("录音报错:", event.error);
+                setAppState('READY');
+            };
+
+            activeRecognition.onend = function() {
+                if (appState === 'LISTENING') setAppState('READY');
+            };
+
+            try {
+                activeRecognition.start();
+            } catch(e) {
+                setAppState('READY');
+            }
+        }
     </script>
 </body>
 </html>
