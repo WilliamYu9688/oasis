@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V82 - 完整功能融合版</title>
+    <title>Oasis Bridge V83 - Ultimate Edition</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link class="apple-touch-icon" href="icon.svg">
+    <link rel="icon" href="logo.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         ::-webkit-scrollbar { display: none; }
         * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        input { background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
-        input:focus { border-color: #fbbf24; }
+        input, textarea, select { -webkit-user-select: auto; user-select: auto; background: rgba(0,0,0,0.3); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
+        input:focus, textarea:focus, select:focus { border-color: #fbbf24; }
         
         .app-screen { background: radial-gradient(circle at top right, #1e293b, #020617 85%); color: #f3f4f6; width: 100vw; height: 100vh; height: 100dvh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .glass-panel { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
@@ -32,20 +33,21 @@
         
         @keyframes ad-glow { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.2); } 100% { box-shadow: 0 0 16px 4px rgba(59, 130, 246, 0.8); border-color: rgba(59, 130, 246, 0.7); background: rgba(59, 130, 246, 0.2) !important; } }
         .ad-glow-active { animation: ad-glow 1.2s infinite alternate !important; }
+
         .blind-mode-active { filter: blur(8px) opacity(0.8); transition: filter 0.4s ease, opacity 0.4s ease; cursor: pointer; }
         .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
-        
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); max-height: 90dvh; display: flex; flex-direction: column; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
         .modal-overlay.active .bottom-sheet { transform: translateY(0); }
         .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
+        .jackpot-glow { text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.4); }
         
         #main-app { display: flex; flex-direction: column; }
         .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; position: relative; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
-        .jackpot-glow { text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.4); }
+        select option { background-color: #0f172a; color: #fff; font-weight: bold; padding: 10px; }
     </style>
 </head>
 <body>
@@ -53,25 +55,28 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V82</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">V83 Enterprise</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
-            <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
+            <h2 class="text-2xl font-black text-white mb-6 text-center">System Login</h2>
             <form onsubmit="event.preventDefault(); window.executeAuth();" class="space-y-4 relative z-10">
                 <input id="email" type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
                 <input id="password" type="password" placeholder="Password" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
-                <button type="submit" id="auth-action-btn" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 transition-transform shadow-lg uppercase">Secure Access</button>
+                <button type="submit" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 shadow-lg uppercase">Secure Access</button>
             </form>
         </div>
+        <footer class="text-center pb-4 text-[10px] text-slate-500 font-bold">
+            <a href="terms.html" class="underline">Terms of Service</a> | <a href="privacy.html" class="underline">Privacy Policy</a>
+        </footer>
     </div>
 
     <div id="step-1" class="app-screen z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-10 text-center"><h1 class="text-4xl font-black text-gold-gradient italic drop-shadow-lg">Select Path</h1></div>
         <div class="space-y-4 max-w-sm mx-auto w-full">
-            <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden shadow-xl">
+            <button onclick="window.handleStep1('cn')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 relative overflow-hidden shadow-xl">
                 <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇨🇳</div><h3 class="font-bold text-xl text-white">Learn Mandarin</h3><p class="text-[10px] text-amber-500 mt-1 font-bold tracking-widest uppercase">Earn Rewards</p>
             </button>
-            <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 transition-transform relative overflow-hidden border-amber-500/30 shadow-xl">
+            <button onclick="window.handleStep1('en')" class="w-full glass-panel rounded-[28px] p-6 text-left active:scale-95 relative overflow-hidden border-amber-500/30 shadow-xl">
                 <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-10">🇦🇪</div><h3 class="font-bold text-xl text-amber-400">我要学英语</h3><p class="text-[10px] text-slate-400 mt-1 font-bold tracking-widest uppercase">商务实战</p>
             </button>
         </div>
@@ -96,28 +101,28 @@
             <h2 class="text-4xl font-black text-amber-400 jackpot-glow flex justify-center items-center gap-1">
                 <span class="text-2xl">💰</span> <span id="global-pool-display">52,430.50</span>
             </h2>
-            <p class="text-slate-400 text-[9px] mt-2">达标退还全额本金，额外瓜分全球奖池</p>
+            <p class="text-slate-400 text-[9px] mt-2">达标退还本金，额外瓜分全球奖池</p>
         </div>
 
         <div class="flex-grow overflow-y-auto no-scrollbar pb-10">
             <div class="space-y-4 max-w-sm mx-auto w-full">
-                <div onclick="window.handleStep2(0)" class="glass-panel p-5 rounded-[24px] border-blue-500/30 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
+                <div onclick="window.startCalibration(0)" class="glass-panel p-5 rounded-[24px] border-blue-500/30 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
                     <div class="relative z-10"><p class="font-bold text-base text-blue-400">破冰级 (L0)</p><p class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">30 Days Challenge</p></div>
                     <div class="font-black text-blue-400 text-xl relative z-10">29<span class="text-[10px] ml-0.5 text-slate-400">AED</span></div>
                 </div>
-                <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
+                <div onclick="window.startCalibration(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
                     <div><p class="font-bold text-base text-slate-200">入门级 (L1)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">90 Days Challenge</p></div>
                     <div class="font-black text-white text-xl">99<span class="text-[10px] ml-0.5 text-slate-400">AED</span></div>
                 </div>
-                <div onclick="window.handleStep2(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
+                <div onclick="window.startCalibration(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
                     <div><p class="font-bold text-base text-slate-200">职场级 (L2)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">180 Days Challenge</p></div>
                     <div class="font-black text-white text-xl">299<span class="text-[10px] ml-0.5 text-slate-400">AED</span></div>
                 </div>
-                <div onclick="window.handleStep2(3)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
+                <div onclick="window.startCalibration(3)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
                     <div><p class="font-bold text-base text-slate-200">精英级 (L3)</p><p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">365 Days Challenge</p></div>
                     <div class="font-black text-white text-xl">499<span class="text-[10px] ml-0.5 text-slate-400">AED</span></div>
                 </div>
-                <div onclick="window.handleStep2(4)" class="glass-panel p-5 rounded-[24px] border-purple-500/40 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
+                <div onclick="window.startCalibration(4)" class="glass-panel p-5 rounded-[24px] border-purple-500/40 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
                     <div class="relative z-10"><p class="font-bold text-base text-purple-400">大师级 (L4)</p><p class="text-[9px] text-purple-400/70 mt-0.5 uppercase tracking-widest">Lifetime Elite</p></div>
                     <div class="font-black text-purple-400 text-2xl relative z-10">999<span class="text-[10px] ml-0.5 text-slate-400">AED</span></div>
                 </div>
@@ -127,11 +132,11 @@
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
         <div class="w-full px-4 pt-4 pb-2 z-50 flex justify-between items-start gap-2 shrink-0">
-            <button onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
-                ⏏ Quit
-            </button>
+            <button onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 shadow-md">⏏ Quit</button>
             <div class="flex gap-2 flex-wrap justify-end max-w-[75%]">
-                <button onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">👁️ Shadowing</button>
+                <button onclick="window.openModal('feedback-modal')" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 shadow-md">💬 FB</button>
+                <button onclick="window.toggleBlindMode()" id="blind-toggle-btn" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 shadow-md">👁️ Shadowing</button>
+                <button onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 shadow-md">📊 LUM</button>
             </div>
         </div>
 
@@ -139,13 +144,10 @@
             <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
                 <div class="text-center flex-[1.2] mx-1">
                     <div class="bg-slate-800/50 rounded-xl py-1.5 border border-white/10">
-                        <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">My Deposit (本金)</p>
-                        <h1 class="text-sm font-black text-white flex items-center justify-center">
-                            <span id="principal-amount">0.00</span><span class="text-[9px] ml-0.5 text-slate-500">AED</span>
-                        </h1>
+                        <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Deposit (本金)</p>
+                        <h1 class="text-sm font-black text-white"><span id="principal-amount">0.00</span><span class="text-[9px] ml-0.5 text-slate-500">AED</span></h1>
                     </div>
                 </div>
-                
                 <div class="text-center flex-[1.4] mx-1 transition-all duration-300 relative">
                     <button id="activate-btn" onclick="window.activateChallenge()" class="hidden-screen absolute inset-0 w-full h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl flex flex-col items-center justify-center border border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-95 transition-all z-20">
                         <span class="text-white font-black text-[11px] uppercase tracking-wider">🔒 充值激活</span>
@@ -158,13 +160,10 @@
                         </h1>
                     </div>
                 </div>
-
                 <div class="text-center flex-1 cursor-pointer" onclick="window.requestRescue()">
                     <div id="limit-box" class="bg-blue-500/10 rounded-xl py-1.5 border border-blue-500/20 transition-all duration-300">
                         <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">Limit</p>
-                        <h1 class="text-sm font-black text-blue-400 flex items-center justify-center gap-1">
-                            <span id="ad-limit-display">🆘 6/6</span>
-                        </h1>
+                        <h1 class="text-sm font-black text-blue-400"><span id="ad-limit-display">🆘 6/6</span></h1>
                     </div>
                 </div>
             </div>
@@ -172,6 +171,14 @@
 
         <div class="main-content-area px-4 sm:px-6 mt-4">
             <div class="max-w-md mx-auto w-full text-center">
+                <div class="relative w-full max-w-xs mx-auto mb-4">
+                    <select id="scene-select" onchange="window.setScene(this.value)" class="w-full bg-black/60 text-amber-400 border border-white/10 rounded-2xl px-4 py-2 font-black text-xs uppercase tracking-widest outline-none appearance-none text-center shadow-lg transition-colors">
+                        <option value="ALL">ALL SCENES</option>
+                        <option value="cat_work">💼 Workplace (职场)</option>
+                        <option value="cat_life">🏠 Daily Life (生活)</option>
+                    </select>
+                </div>
+
                 <div id="text-container" class="transition-all duration-500 relative bg-black/20 p-5 rounded-[24px] border border-white/5 min-h-[220px] mb-4 flex flex-col items-center justify-center cursor-pointer shadow-inner mt-2">
                     <button id="play-audio-btn" onclick="window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
@@ -188,15 +195,58 @@
 
         <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-6 max-w-sm mx-auto px-4 w-full">
-                <button id="prev-btn" onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all opacity-30">
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
+                <button onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all opacity-30"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
                 <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
-                    <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
-                <button id="next-btn" onclick="window.goNextPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all">
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                </button>
+                <button onclick="window.goNextPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="calibration-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[110]">
+        <div class="flex-grow w-full sm:hidden" onclick="window.closeModal('calibration-modal')"></div>
+        <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95 border-blue-500/30">
+            <h3 class="text-2xl font-black text-blue-400 mb-2">Anti-Fraud Calibration</h3>
+            <p class="text-slate-300 text-[11px] mb-6">为保证奖池公平，请朗读下方句子进行基准定级测试：</p>
+            <div class="bg-black/40 p-4 rounded-xl border border-white/10 mb-6">
+                <p class="text-white font-bold italic text-lg">"Innovation distinguishes between a leader and a follower."</p>
+            </div>
+            <button onclick="window.runCalibrationTest()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300">🎙️ 立即定级 (Tap to Read)</button>
+        </div>
+    </div>
+
+    <div id="lum-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[110]">
+        <div class="flex-grow w-full" onclick="window.closeModal('lum-modal')"></div>
+        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[85dvh] relative overflow-hidden">
+            <div id="lum-locked-overlay" class="absolute inset-0 z-20 bg-[#020617]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
+                <div class="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/30 mb-6 animate-pulse">
+                    <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-white mb-2">LUM Analytics</h3>
+                <p class="text-slate-400 text-xs mb-8">Unlock multi-dimensional radar and targeted weak words practice.</p>
+                <button onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 AED Unlock</button>
+            </div>
+            <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
+                <div><h3 class="text-2xl font-black text-blue-400">LUM Analytics</h3><p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Capability Mapping</p></div>
+                <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-10 relative z-10">
+                <div class="w-full relative flex justify-center items-center h-[240px] sm:h-[280px]"><canvas id="lumRadarChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="feedback-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[110]">
+        <div class="flex-grow w-full" onclick="window.closeModal('feedback-modal')"></div>
+        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[65dvh] flex flex-col">
+            <div class="flex justify-between items-center mb-5 shrink-0">
+                <div><h3 class="text-2xl font-black text-purple-400">Feedback & Bugs</h3><p class="text-slate-400 text-[10px] uppercase font-bold">Help us improve Oasis Bridge</p></div>
+                <button onclick="window.closeModal('feedback-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="flex-grow flex flex-col space-y-4">
+                <textarea id="feedback-input" class="w-full flex-grow p-4 rounded-xl text-sm font-bold bg-black/40 border border-white/10 text-white resize-none" placeholder="Describe the bug or share your ideas..."></textarea>
+                <button onclick="window.closeModal('feedback-modal'); alert('Feedback Submitted!');" class="w-full py-4 bg-purple-600 rounded-xl text-white font-black text-sm uppercase shadow-lg shadow-purple-900/50">Submit Report</button>
             </div>
         </div>
     </div>
@@ -204,15 +254,15 @@
     <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white">
         <svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2>
-        <p class="text-sm text-gray-400 mb-8">（模拟：看广告换取奖励/通行证）</p>
+        <p class="text-sm text-gray-400 mb-8">（模拟广告：看完提升分数并计入奖金）</p>
         <button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button>
     </div>
 
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]">
         <div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div>
         <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95">
-            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">Limit Reached</h3>
-            <p id="rescue-desc" class="text-slate-300 text-xs mb-6">System Support</p>
+            <h3 class="text-2xl font-black text-blue-400 mb-2">Limit Reached</h3>
+            <p class="text-slate-300 text-xs mb-6">System Support</p>
             <button onclick="window.watchAd('boost')" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300">Get Sponsored (+ Boost)</button>
             <button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button>
         </div>
@@ -221,25 +271,27 @@
     <script>
         let state = {
             path: 'en',
-            targetTime: 15,
             principal: 0.00,       
             pendingReward: 0.00,   
             isTrial: false,        
             currentLevel: 0,
             adLimit: 6,
-            isBlindMode: false
+            isBlindMode: false,
+            lumUnlocked: false,
+            calibrated: false, // 是否完成摸底测试
+            pendingLevelRequest: null // 记住用户点击了哪个关卡
         };
 
         const LOCAL_CACHE = [
-            { text_en: 'Hello, welcome to Oasis Scholarship Challenge.', text_zh: '你好，欢迎来到绿洲奖学金挑战。' },
-            { text_en: 'We need to optimize our supply chain.', text_zh: '我们需要优化我们的供应链。' },
-            { text_en: 'What is your marketing strategy?', text_zh: '你们的营销策略是什么？' }
+            { text_en: 'Hello, welcome to Oasis Scholarship Challenge.', text_zh: '你好，欢迎来到绿洲奖学金挑战。', category: 'cat_work' },
+            { text_en: 'We need to optimize our supply chain.', text_zh: '我们需要优化我们的供应链。', category: 'cat_work' },
+            { text_en: 'Could I have a glass of water, please?', text_zh: '请给我一杯水好吗？', category: 'cat_life' }
         ];
         let currentPhrase = LOCAL_CACHE[0];
         let historyIndex = 0;
         let globalPoolAmount = 52430.50; 
+        let lumChart = null;
 
-        // 奖池数字跳动特效
         setInterval(() => {
             if(Math.random() > 0.6) {
                 globalPoolAmount += (Math.random() * 5);
@@ -273,31 +325,57 @@
         window.openModal = (id) => { document.getElementById(id).classList.add('active'); }
         window.closeModal = (id) => { document.getElementById(id).classList.remove('active'); }
 
-        // --- 核心流转 ---
-        window.executeAuth = function() {
+        window.executeAuth = function() { playSfx('click'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
+        window.handleStep1 = function(p) { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        window.handleStepTime = function(t) { playSfx('click'); hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+
+        // --- 防线二：定级测试逻辑 ---
+        window.startCalibration = function(lv) {
             playSfx('click');
-            hideAll(); document.getElementById('step-1').classList.remove('hidden-screen');
+            state.pendingLevelRequest = lv;
+            
+            // 如果已经定级过，直接进入判断逻辑
+            if(state.calibrated) {
+                processEntryDecision(lv);
+                return;
+            }
+            
+            // 弹出定级窗口
+            window.openModal('calibration-modal');
         }
 
-        window.handleStep1 = function(p) {
-            playSfx('click'); state.path = p;
-            hideAll(); document.getElementById('step-time').classList.remove('hidden-screen');
+        window.runCalibrationTest = async function() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                playSfx('click');
+                const btn = document.querySelector('#calibration-modal button');
+                btn.innerText = "🎙️ 评测中 / LISTENING...";
+                
+                setTimeout(() => {
+                    btn.innerText = "🎙️ 立即定级 (Tap to Read)";
+                    // 模拟生成定级分数 (这里为了测试防线，设定有概率生成98分)
+                    const score = Math.random() > 0.7 ? 98 : 85; 
+                    
+                    if (score > 95) {
+                        alert("⚠️ 定级警告 ⚠️\n\n经系统声纹与语调检测，您的发音特征 (98 PTS) 已达到母语/大师级别！\n\n为保证奖池公平性，您被判定为【能力超标 (OVERQUALIFIED)】。\n绿洲低级对赌舱已无法提升您的能力，您将被限制瓜分新手奖金，建议挑战 L4 大师级。");
+                        window.closeModal('calibration-modal');
+                    } else {
+                        alert(`✅ 定级完成 (${score} PTS)。\n您符合当前奖学金挑战池的新手准入资格！`);
+                        state.calibrated = true;
+                        window.closeModal('calibration-modal');
+                        processEntryDecision(state.pendingLevelRequest);
+                    }
+                }, 2000);
+            } catch (e) { alert("⚠️ 需开启麦克风权限进行反作弊核验！"); }
         }
 
-        window.handleStepTime = function(t) {
-            playSfx('click'); state.targetTime = t;
-            hideAll(); document.getElementById('step-2').classList.remove('hidden-screen');
-        }
-
-        // L0-L4 选关逻辑
-        window.handleStep2 = function(lv) {
-            playSfx('click');
+        // 决定是试玩还是正式扣款
+        function processEntryDecision(lv) {
             const costs = { 0: 29, 1: 99, 2: 299, 3: 499, 4: 999 };
             const req = costs[lv];
 
             if (state.principal < req) {
-                // 试玩转化逻辑
-                const msg = `余额不足 ${req} AED。\n\n是否立即开启【0元奖学金资格考核】？\n考核期间产生的练习收益将为您全额预存！`;
+                const msg = `余额不足 ${req} AED。\n\n是否开启【0元资格考核】？\n考核期产生的奖励将为您预存，充值激活后即可连同本金一起提现！`;
                 if (confirm(msg)) {
                     state.isTrial = true;
                     state.currentLevel = lv;
@@ -311,12 +389,7 @@
             }
         }
 
-        // 退出修复：回到 Step 1
-        window.promptExit = () => {
-            playSfx('click');
-            hideAll();
-            document.getElementById('step-1').classList.remove('hidden-screen');
-        }
+        window.promptExit = () => { playSfx('click'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
 
         window.enterMainApp = function() {
             hideAll();
@@ -338,12 +411,21 @@
 
         window.activateChallenge = function() {
             playSfx('click');
-            alert(`🔥 当前已为您预存 ${state.pendingReward.toFixed(2)} AED 奖金！\n请充值保证金，激活账户锁定收益！\n(此处接入支付系统)`);
+            alert(`🔥 当前已为您预存 ${state.pendingReward.toFixed(2)} AED 奖金！\n请充值保证金激活账户锁定收益！\n(此处接入支付系统)`);
             state.principal += 29.00; state.isTrial = false;
             updateTopBar(); playSfx('success');
         }
 
-        // --- 句子交互与打分 ---
+        window.setScene = function(cat) {
+            playSfx('click');
+            let pool = LOCAL_CACHE;
+            if(cat !== 'ALL') pool = LOCAL_CACHE.filter(p => p.category === cat);
+            if(pool.length === 0) pool = LOCAL_CACHE;
+            currentPhrase = pool[0];
+            historyIndex = 0;
+            renderTextDisplay();
+        }
+
         window.goNextPhrase = function() {
             playSfx('click');
             historyIndex = (historyIndex + 1) % LOCAL_CACHE.length;
@@ -351,20 +433,21 @@
             renderTextDisplay();
             document.getElementById('score-display').innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`;
         }
-
-        window.goPrevPhrase = function() {
-            if(historyIndex > 0) {
-                playSfx('click');
-                historyIndex--; currentPhrase = LOCAL_CACHE[historyIndex];
-                renderTextDisplay();
-            }
-        }
+        window.goPrevPhrase = function() { if(historyIndex > 0) { playSfx('click'); historyIndex--; currentPhrase = LOCAL_CACHE[historyIndex]; renderTextDisplay(); } }
 
         window.toggleBlindMode = function() { playSfx('click'); state.isBlindMode = !state.isBlindMode; renderTextDisplay(); }
+        
+        // DP 算法高亮模拟
+        function highlightSentence(target) {
+            // 简单模拟有些单词对了，有些错了 (加颜色)
+            const words = target.split(' ');
+            return `"${words.map((w, i) => i % 3 === 0 ? `<span class="text-emerald-400">${w}</span>` : `<span class="text-red-400 border-b border-red-500/50">${w}</span>`).join(' ')}"`;
+        }
 
         function renderTextDisplay() {
             const container = document.getElementById('text-container');
-            document.getElementById('target-text').innerText = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            document.getElementById('target-text').innerText = `"${txt}"`;
             document.getElementById('target-zh').innerText = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
             if (state.isBlindMode) container.classList.add('blind-mode-active'); else container.classList.remove('blind-mode-active');
         }
@@ -372,9 +455,7 @@
         window.playAudio = () => {
             playSfx('click');
             const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            window.speechSynthesis.speak(u);
+            const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u);
         }
 
         window.toggleRecord = async function() {
@@ -384,28 +465,27 @@
                 document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse">🎙️ 聆听中 / LISTENING...</p>`;
                 
                 setTimeout(() => {
-                    // 模拟精准打分：随机生成 60-100 的分数
                     const score = Math.floor(Math.random() * 41) + 60; 
                     window.processAndScore(score);
                 }, 2000);
             } catch (e) { alert("⚠️ 请允许麦克风权限！"); }
         }
 
-        // 恢复精准打分和返现动效
         window.processAndScore = function(score) {
+            // 恢复高亮
+            const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+            document.getElementById('target-text').innerHTML = highlightSentence(rawT);
+
             let bonus = 0;
             const display = document.getElementById('score-display');
             
-            // 依据分数给奖金
-            if (score >= 90) bonus = 0.50;
-            else if (score >= 80) bonus = 0.20;
+            if (score >= 90) bonus = 0.50; else if (score >= 80) bonus = 0.20;
 
             if (score >= 80) {
                 display.innerHTML = `<span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - EXCELLENT!</span>
                                      <span class="text-[10px] text-emerald-300 mt-1 block">本次产生奖金: +${bonus.toFixed(2)} AED</span>`;
             } else {
                 display.innerHTML = `<span class="text-xl font-black text-red-400">${score} PTS - TRY AGAIN</span>`;
-                // 分数过低，弹出广告求助高亮
                 document.getElementById('limit-box').classList.add('ad-glow-active');
             }
 
@@ -414,7 +494,6 @@
                 updateTopBar();
                 playSfx('success');
                 
-                // 试玩期特有的诱导提示
                 if (state.isTrial) {
                     setTimeout(() => {
                         if (confirm(`🎉 表现优异！系统已为您预存 ${bonus.toFixed(2)} AED 奖学金。\n\n当前累计：${state.pendingReward.toFixed(2)} AED！\n是否立即激活挑战，锁定这笔收益？`)) {
@@ -428,7 +507,6 @@
             }
         }
 
-        // --- 广告模式 (恢复) ---
         window.requestRescue = function() {
             playSfx('click');
             if (state.adLimit <= 0) { alert("今日广告额度已耗尽！"); return; }
@@ -437,7 +515,6 @@
 
         window.watchAd = function(type) {
             playSfx('click'); window.closeModal('rescue-modal');
-            
             const adUI = document.getElementById('web-ad-overlay');
             adUI.classList.remove('hidden'); adUI.style.display = 'flex';
             
@@ -446,10 +523,35 @@
                 if (type === 'boost') {
                     state.adLimit--; updateTopBar();
                     document.getElementById('limit-box').classList.remove('ad-glow-active');
-                    // 广告看完，强制给个100分
-                    window.processAndScore(100);
+                    window.processAndScore(100); // 广告看完直接给100分加奖金
                 }
             };
+        }
+
+        // LUM 雷达
+        window.openLUM = () => {
+            playSfx('click');
+            if (state.lumUnlocked) { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); } 
+            else { document.getElementById('lum-locked-overlay').style.display = 'flex'; }
+            window.openModal('lum-modal');
+        }
+
+        window.buyLUM = () => {
+            playSfx('click');
+            if (state.principal >= 10) { 
+                state.principal -= 10; state.lumUnlocked = true; updateTopBar(); 
+                document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart();
+            } else { alert("本金余额不足 10.00 AED，请先充值！"); }
+        }
+
+        function renderLUMChart() {
+            const ctx = document.getElementById('lumRadarChart').getContext('2d');
+            if (lumChart) lumChart.destroy();
+            lumChart = new Chart(ctx, { 
+                type: 'radar', 
+                data: { labels: ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'], datasets: [{ data: [85, 90, 75, 88, 82], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)' }] }, 
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } } 
+            });
         }
     </script>
 </body>
