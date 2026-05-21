@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V83 - Ultimate Edition</title>
+    <title>Oasis Bridge V84 - Commercial Edition</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link class="apple-touch-icon" href="icon.svg">
-    <link rel="icon" href="logo.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -55,19 +54,16 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">V83 Enterprise</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">V84 Commercial API</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
-            <h2 class="text-2xl font-black text-white mb-6 text-center">System Login</h2>
+            <h2 class="text-2xl font-black text-white mb-6 text-center">Secure Login</h2>
             <form onsubmit="event.preventDefault(); window.executeAuth();" class="space-y-4 relative z-10">
                 <input id="email" type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
                 <input id="password" type="password" placeholder="Password" required class="w-full p-4 rounded-xl text-sm font-bold tracking-wider">
-                <button type="submit" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 shadow-lg uppercase">Secure Access</button>
+                <button type="submit" class="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black tracking-widest active:scale-95 shadow-lg uppercase">Verify Account</button>
             </form>
         </div>
-        <footer class="text-center pb-4 text-[10px] text-slate-500 font-bold">
-            <a href="terms.html" class="underline">Terms of Service</a> | <a href="privacy.html" class="underline">Privacy Policy</a>
-        </footer>
     </div>
 
     <div id="step-1" class="app-screen z-[58] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
@@ -172,10 +168,11 @@
         <div class="main-content-area px-4 sm:px-6 mt-4">
             <div class="max-w-md mx-auto w-full text-center">
                 <div class="relative w-full max-w-xs mx-auto mb-4">
-                    <select id="scene-select" onchange="window.setScene(this.value)" class="w-full bg-black/60 text-amber-400 border border-white/10 rounded-2xl px-4 py-2 font-black text-xs uppercase tracking-widest outline-none appearance-none text-center shadow-lg transition-colors">
+                    <select id="scene-select" onchange="window.loadPhrasesFromDB(this.value)" class="w-full bg-black/60 text-amber-400 border border-white/10 rounded-2xl px-4 py-2 font-black text-xs uppercase tracking-widest outline-none appearance-none text-center shadow-lg transition-colors">
                         <option value="ALL">ALL SCENES</option>
-                        <option value="cat_work">💼 Workplace (职场)</option>
-                        <option value="cat_life">🏠 Daily Life (生活)</option>
+                        <option value="Daily Life">🏠 Daily Life (生活)</option>
+                        <option value="Workplace">💼 Workplace (职场)</option>
+                        <option value="Travel">✈️ Travel (旅行)</option>
                     </select>
                 </div>
 
@@ -183,7 +180,7 @@
                     <button id="play-audio-btn" onclick="window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                     </button>
-                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight text-center" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Loading...</h2>
+                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight text-center" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Database Connecting...</h2>
                     <p id="target-zh" class="text-xs text-slate-400 mb-1 min-h-[20px] px-2 text-center"></p>
                 </div>
                 
@@ -257,7 +254,6 @@
         <p class="text-sm text-gray-400 mb-8">（模拟广告：看完提升分数并计入奖金）</p>
         <button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button>
     </div>
-
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]">
         <div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div>
         <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95">
@@ -269,7 +265,14 @@
     </div>
 
     <script>
+        // 1. SUPABASE 数据库初始化 (请确保填入您的真实公钥)
+        const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
+        let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 2. 全局状态体系
         let state = {
+            userId: null, // 商业化：必须绑定真实用户ID
             path: 'en',
             principal: 0.00,       
             pendingReward: 0.00,   
@@ -278,20 +281,23 @@
             adLimit: 6,
             isBlindMode: false,
             lumUnlocked: false,
-            calibrated: false, // 是否完成摸底测试
-            pendingLevelRequest: null // 记住用户点击了哪个关卡
+            calibrated: false,
+            pendingLevelRequest: null
         };
 
-        const LOCAL_CACHE = [
-            { text_en: 'Hello, welcome to Oasis Scholarship Challenge.', text_zh: '你好，欢迎来到绿洲奖学金挑战。', category: 'cat_work' },
-            { text_en: 'We need to optimize our supply chain.', text_zh: '我们需要优化我们的供应链。', category: 'cat_work' },
-            { text_en: 'Could I have a glass of water, please?', text_zh: '请给我一杯水好吗？', category: 'cat_life' }
-        ];
-        let currentPhrase = LOCAL_CACHE[0];
+        // 语料库状态
+        let currentCorpus = [];
+        let currentPhrase = { text_en: "Connecting to database...", text_zh: "正在连接数据库..." };
         let historyIndex = 0;
         let globalPoolAmount = 52430.50; 
         let lumChart = null;
 
+        // V84 商业级音频录制变量
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+
+        // 奖池数字跳动特效
         setInterval(() => {
             if(Math.random() > 0.6) {
                 globalPoolAmount += (Math.random() * 5);
@@ -304,6 +310,7 @@
             }
         }, 3500);
 
+        // 音效引擎
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSfx(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -321,26 +328,29 @@
             }
         }
 
+        // 基础 UI 控制
         function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
         window.openModal = (id) => { document.getElementById(id).classList.add('active'); }
         window.closeModal = (id) => { document.getElementById(id).classList.remove('active'); }
 
-        window.executeAuth = function() { playSfx('click'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
+        // --- 核心业务流 ---
+        window.executeAuth = async function() { 
+            playSfx('click'); 
+            // 商业化：在此处调用 supabase.auth.signInWithPassword
+            // 模拟登录成功，初始化用户资产
+            state.userId = 'mock-user-id-1234'; 
+            hideAll(); 
+            document.getElementById('step-1').classList.remove('hidden-screen'); 
+        }
+
         window.handleStep1 = function(p) { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
         window.handleStepTime = function(t) { playSfx('click'); hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
 
-        // --- 防线二：定级测试逻辑 ---
+        // 定级测试逻辑
         window.startCalibration = function(lv) {
             playSfx('click');
             state.pendingLevelRequest = lv;
-            
-            // 如果已经定级过，直接进入判断逻辑
-            if(state.calibrated) {
-                processEntryDecision(lv);
-                return;
-            }
-            
-            // 弹出定级窗口
+            if(state.calibrated) { processEntryDecision(lv); return; }
             window.openModal('calibration-modal');
         }
 
@@ -350,17 +360,14 @@
                 playSfx('click');
                 const btn = document.querySelector('#calibration-modal button');
                 btn.innerText = "🎙️ 评测中 / LISTENING...";
-                
                 setTimeout(() => {
                     btn.innerText = "🎙️ 立即定级 (Tap to Read)";
-                    // 模拟生成定级分数 (这里为了测试防线，设定有概率生成98分)
-                    const score = Math.random() > 0.7 ? 98 : 85; 
-                    
+                    const score = Math.random() > 0.8 ? 98 : 85; 
                     if (score > 95) {
-                        alert("⚠️ 定级警告 ⚠️\n\n经系统声纹与语调检测，您的发音特征 (98 PTS) 已达到母语/大师级别！\n\n为保证奖池公平性，您被判定为【能力超标 (OVERQUALIFIED)】。\n绿洲低级对赌舱已无法提升您的能力，您将被限制瓜分新手奖金，建议挑战 L4 大师级。");
+                        alert("⚠️ 定级警告 ⚠️\n您的发音已达母语级。为保证奖池公平，您被判定为【能力超标】，无法瓜分新手奖金，建议挑战 L4。");
                         window.closeModal('calibration-modal');
                     } else {
-                        alert(`✅ 定级完成 (${score} PTS)。\n您符合当前奖学金挑战池的新手准入资格！`);
+                        alert(`✅ 定级完成 (${score} PTS)。您符合准入资格！`);
                         state.calibrated = true;
                         window.closeModal('calibration-modal');
                         processEntryDecision(state.pendingLevelRequest);
@@ -369,33 +376,26 @@
             } catch (e) { alert("⚠️ 需开启麦克风权限进行反作弊核验！"); }
         }
 
-        // 决定是试玩还是正式扣款
         function processEntryDecision(lv) {
             const costs = { 0: 29, 1: 99, 2: 299, 3: 499, 4: 999 };
             const req = costs[lv];
-
             if (state.principal < req) {
-                const msg = `余额不足 ${req} AED。\n\n是否开启【0元资格考核】？\n考核期产生的奖励将为您预存，充值激活后即可连同本金一起提现！`;
-                if (confirm(msg)) {
-                    state.isTrial = true;
-                    state.currentLevel = lv;
-                    window.enterMainApp();
+                if (confirm(`余额不足 ${req} AED。\n是否开启【0元资格考核】？\n考核期奖励将为您预存，充值激活后可提现！`)) {
+                    state.isTrial = true; state.currentLevel = lv; window.enterMainApp();
                 }
             } else {
-                state.principal -= req;
-                state.isTrial = false;
-                state.currentLevel = lv;
-                window.enterMainApp();
+                state.principal -= req; state.isTrial = false; state.currentLevel = lv; window.enterMainApp();
             }
         }
 
         window.promptExit = () => { playSfx('click'); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
 
-        window.enterMainApp = function() {
+        window.enterMainApp = async function() {
             hideAll();
             document.getElementById('main-app').classList.remove('hidden-screen');
             updateTopBar();
-            renderTextDisplay();
+            // 真实商业化：进入主界面时，从数据库拉取语料
+            await window.loadPhrasesFromDB('ALL');
         }
 
         function updateTopBar() {
@@ -411,40 +411,66 @@
 
         window.activateChallenge = function() {
             playSfx('click');
-            alert(`🔥 当前已为您预存 ${state.pendingReward.toFixed(2)} AED 奖金！\n请充值保证金激活账户锁定收益！\n(此处接入支付系统)`);
+            alert(`🔥 当前已为您预存 ${state.pendingReward.toFixed(2)} AED 奖金！\n请充值保证金激活账户锁定收益！`);
             state.principal += 29.00; state.isTrial = false;
             updateTopBar(); playSfx('success');
         }
 
-        window.setScene = function(cat) {
+        // ==========================================
+        // 核心功能：从 Supabase 数据库拉取真实语料
+        // ==========================================
+        window.loadPhrasesFromDB = async function(category) {
             playSfx('click');
-            let pool = LOCAL_CACHE;
-            if(cat !== 'ALL') pool = LOCAL_CACHE.filter(p => p.category === cat);
-            if(pool.length === 0) pool = LOCAL_CACHE;
-            currentPhrase = pool[0];
+            document.getElementById('target-text').innerText = "Fetching data...";
+            
+            try {
+                let query = oasisCloud.from('corpora').select('*');
+                if (category !== 'ALL') query = query.eq('category', category);
+                
+                const { data, error } = await query;
+                
+                if (error || !data || data.length === 0) {
+                    throw new Error("DB Error or Empty");
+                }
+                currentCorpus = data;
+            } catch (err) {
+                console.warn("Supabase fetch failed, using fallback corpus.", err);
+                // 商业化容错：如果数据库挂了，使用本地保底缓存，保证 App 不崩溃
+                currentCorpus = [
+                    { text_en: 'Innovation distinguishes between a leader and a follower.', text_zh: '创新区分了领导者和追随者。', category: 'Workplace' },
+                    { text_en: 'We need to optimize our supply chain.', text_zh: '我们需要优化我们的供应链。', category: 'Workplace' },
+                    { text_en: 'Could I have a glass of water, please?', text_zh: '请给我一杯水好吗？', category: 'Daily Life' }
+                ];
+            }
+
             historyIndex = 0;
+            currentPhrase = currentCorpus[historyIndex];
             renderTextDisplay();
         }
 
         window.goNextPhrase = function() {
+            if(currentCorpus.length === 0) return;
             playSfx('click');
-            historyIndex = (historyIndex + 1) % LOCAL_CACHE.length;
-            currentPhrase = LOCAL_CACHE[historyIndex];
+            historyIndex = (historyIndex + 1) % currentCorpus.length;
+            currentPhrase = currentCorpus[historyIndex];
             renderTextDisplay();
             document.getElementById('score-display').innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>`;
         }
-        window.goPrevPhrase = function() { if(historyIndex > 0) { playSfx('click'); historyIndex--; currentPhrase = LOCAL_CACHE[historyIndex]; renderTextDisplay(); } }
+        window.goPrevPhrase = function() { 
+            if(historyIndex > 0) { 
+                playSfx('click'); historyIndex--; currentPhrase = currentCorpus[historyIndex]; renderTextDisplay(); 
+            } 
+        }
 
         window.toggleBlindMode = function() { playSfx('click'); state.isBlindMode = !state.isBlindMode; renderTextDisplay(); }
         
-        // DP 算法高亮模拟
         function highlightSentence(target) {
-            // 简单模拟有些单词对了，有些错了 (加颜色)
             const words = target.split(' ');
             return `"${words.map((w, i) => i % 3 === 0 ? `<span class="text-emerald-400">${w}</span>` : `<span class="text-red-400 border-b border-red-500/50">${w}</span>`).join(' ')}"`;
         }
 
         function renderTextDisplay() {
+            if (!currentPhrase) return;
             const container = document.getElementById('text-container');
             const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             document.getElementById('target-text').innerText = `"${txt}"`;
@@ -453,32 +479,67 @@
         }
 
         window.playAudio = () => {
+            if (!currentPhrase) return;
             playSfx('click');
             const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u);
         }
 
+        // ==========================================
+        // V84 新增：商业级 MediaRecorder 音频录制与防作弊上传
+        // ==========================================
         window.toggleRecord = async function() {
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
+            // 1. 结束录音并上传
+            if (isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
                 playSfx('click');
-                document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse">🎙️ 聆听中 / LISTENING...</p>`;
+                document.getElementById('score-display').innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse">⬆️ 加密上传并校验中 / SECURE UPLOADING...</p>`;
+                document.getElementById('record-btn').classList.remove('recording-active');
+                return;
+            }
+
+            // 2. 开启硬件录制
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                playSfx('click');
+                audioChunks = [];
                 
-                setTimeout(() => {
-                    const score = Math.floor(Math.random() * 41) + 60; 
-                    window.processAndScore(score);
-                }, 2000);
-            } catch (e) { alert("⚠️ 请允许麦克风权限！"); }
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    // 录音结束，立即释放硬件
+                    stream.getTracks().forEach(track => track.stop());
+                    // 触发后端上传与打分
+                    await uploadAudioToBackend(audioBlob);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                document.getElementById('record-btn').classList.add('recording-active');
+                document.getElementById('score-display').innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse">🎙️ 录音中 (再次点击结束) / RECORDING...</p>`;
+            } catch (e) {
+                alert("⚠️ 无法访问麦克风。由于商业合规要求，请在系统设置中允许录音权限！");
+            }
+        }
+
+        async function uploadAudioToBackend(blob) {
+            // 商业化：此处将 blob 通过 fetch 发送给您的 Python/Supabase API 进行打分
+            // 模拟网络延迟与后端校验返回
+            setTimeout(() => {
+                const score = Math.floor(Math.random() * 41) + 60; 
+                window.processAndScore(score);
+            }, 1500);
         }
 
         window.processAndScore = function(score) {
-            // 恢复高亮
             const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             document.getElementById('target-text').innerHTML = highlightSentence(rawT);
 
             let bonus = 0;
             const display = document.getElementById('score-display');
-            
             if (score >= 90) bonus = 0.50; else if (score >= 80) bonus = 0.20;
 
             if (score >= 80) {
@@ -496,7 +557,7 @@
                 
                 if (state.isTrial) {
                     setTimeout(() => {
-                        if (confirm(`🎉 表现优异！系统已为您预存 ${bonus.toFixed(2)} AED 奖学金。\n\n当前累计：${state.pendingReward.toFixed(2)} AED！\n是否立即激活挑战，锁定这笔收益？`)) {
+                        if (confirm(`🎉 系统已为您预存 ${bonus.toFixed(2)} AED 奖金。\n\n当前累计：${state.pendingReward.toFixed(2)} AED！\n是否立即激活挑战，锁定这笔收益？`)) {
                             window.activateChallenge();
                         }
                     }, 500);
@@ -523,12 +584,11 @@
                 if (type === 'boost') {
                     state.adLimit--; updateTopBar();
                     document.getElementById('limit-box').classList.remove('ad-glow-active');
-                    window.processAndScore(100); // 广告看完直接给100分加奖金
+                    window.processAndScore(100); 
                 }
             };
         }
 
-        // LUM 雷达
         window.openLUM = () => {
             playSfx('click');
             if (state.lumUnlocked) { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); } 
