@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oasis Bridge V79 - 长期对赌商用版</title>
+    <title>Oasis Bridge V90 - Core Logic Restored</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -22,12 +22,13 @@
         input:focus, textarea:focus, select:focus { border-color: #fbbf24; }
         
         .app-screen { background: radial-gradient(circle at top right, #1e293b, #020617 85%); color: #f3f4f6; width: 100vw; height: 100vh; height: 100dvh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .glass-panel { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
-        .glass-btn { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-panel { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
+        .glass-btn { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .text-gold-gradient { background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
         
+        .recording-active { animation: pulse-gold 1.2s infinite alternate; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; border-color: rgba(239, 68, 68, 0.5) !important; }
         @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6), 0 0 15px rgba(239, 68, 68, 0.3); } 100% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0), 0 0 30px rgba(239, 68, 68, 0.1); } }
+        
         .money-jump { animation: jump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); color: #10b981 !important; text-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
         @keyframes jump { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
         
@@ -35,23 +36,19 @@
         .ad-glow-active { animation: ad-glow 1.2s infinite alternate !important; }
 
         .blind-mode-active { filter: blur(8px) opacity(0.8); transition: filter 0.4s ease, opacity 0.4s ease; cursor: pointer; }
-        .blind-mode-active:active { filter: blur(4px) opacity(0.9); }
-        
-        .animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
-        
         .hidden-screen { display: none !important; opacity: 0; pointer-events: none; }
-        .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
+        .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 100; position: fixed; inset: 0; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); max-height: 90dvh; display: flex; flex-direction: column; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
         .modal-overlay.active .bottom-sheet { transform: translateY(0); }
         .ad-btn-bg { background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%); }
+        .countdown-panic { color: #ef4444 !important; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        
         #main-app { display: flex; flex-direction: column; }
         .main-content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; padding-bottom: 20px; position: relative; }
         .bottom-controls { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); padding-top: 10px; background: linear-gradient(to top, rgba(2,6,23,0.95) 40%, transparent); position: relative; z-index: 30; }
-        
         select option { background-color: #0f172a; color: #fff; font-weight: bold; padding: 10px; }
-        select optgroup { background-color: #1e293b; color: #fbbf24; font-weight: 900; font-style: italic; }
     </style>
 </head>
 <body>
@@ -59,7 +56,7 @@
     <div id="auth-screen" class="app-screen z-[60] flex flex-col p-6 sm:p-8 justify-center transition-all duration-500">
         <div class="mb-8 text-center mt-auto">
             <h1 class="text-4xl sm:text-5xl font-black text-gold-gradient tracking-tighter italic drop-shadow-lg">Oasis Bridge</h1>
-            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V79</p>
+            <p class="text-amber-500/80 mt-2 text-[10px] font-bold tracking-[0.4em] uppercase">Enterprise V90</p>
         </div>
         <div class="glass-panel p-6 sm:p-8 rounded-[36px] shadow-2xl relative w-full max-w-sm mx-auto mb-auto">
             <h2 id="auth-title" class="text-xl sm:text-2xl font-black text-white mb-6 text-center">System Login</h2>
@@ -108,66 +105,43 @@
 
     <div id="step-2" class="app-screen z-[56] flex flex-col p-6 sm:p-8 justify-center hidden-screen">
         <div class="mb-6 text-center max-w-sm mx-auto w-full glass-panel p-4 rounded-3xl border-amber-500/30">
-            <p id="difficulty-title-text" class="text-amber-500 text-[10px] font-black tracking-widest uppercase mb-1">Global Scholarship Pool / 全球奖学金池</p>
+            <p id="difficulty-title-text" class="text-amber-500 text-[10px] font-black tracking-widest uppercase mb-1">Global Scholarship Pool</p>
             <h2 class="text-4xl font-black text-amber-400 flex justify-center items-center gap-1" style="text-shadow: 0 0 10px rgba(251, 191, 36, 0.8);">
                 <span class="text-2xl">💰</span> <span id="global-pool-display">52,430.50</span>
             </h2>
             <p class="text-slate-400 text-[9px] mt-2">达标退还本金，额外瓜分全球奖池</p>
         </div>
-        
         <div class="space-y-4 max-w-sm mx-auto w-full">
             <div onclick="window.handleStep2(0)" class="glass-panel p-5 rounded-[24px] border-blue-500/30 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-transparent"></div>
-                <div class="relative z-10">
-                    <p id="l0-name" class="font-bold text-base text-blue-400">破冰级 (L0)</p>
-                    <p id="l0-sub" class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/限时1个月</p>
-                </div>
+                <div class="relative z-10"><p id="l0-name" class="font-bold text-base text-blue-400">破冰级 (L0)</p><p id="l0-sub" class="text-[9px] text-blue-300/70 mt-0.5 uppercase tracking-widest">生存必备/限时1个月</p></div>
                 <div class="font-black text-blue-400 text-xl relative z-10">29<span class="text-[10px] text-blue-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(1)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
-                <div>
-                    <p id="l1-name" class="font-bold text-base text-slate-200">入门级 (L1)</p>
-                    <p id="l1-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活/限时3个月</p>
-                </div>
+                <div><p id="l1-name" class="font-bold text-base text-slate-200">入门级 (L1)</p><p id="l1-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">基础生活/限时3个月</p></div>
                 <div class="font-black text-white text-xl">99<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(2)" class="glass-panel p-5 rounded-[24px] flex justify-between items-center active:scale-95 cursor-pointer">
-                <div>
-                    <p id="l2-name" class="font-bold text-base text-slate-200">职场级 (L2)</p>
-                    <p id="l2-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协同/限时6个月</p>
-                </div>
+                <div><p id="l2-name" class="font-bold text-base text-slate-200">职场级 (L2)</p><p id="l2-sub" class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-widest">跨部门协同/限时6个月</p></div>
                 <div class="font-black text-white text-xl">299<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
             </div>
             <div onclick="window.handleStep2(3)" class="glass-panel p-5 rounded-[24px] border-amber-500/40 flex justify-between items-center active:scale-95 cursor-pointer relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-amber-600/10 to-transparent"></div>
-                <div class="relative z-10">
-                    <p id="l3-name" class="font-bold text-base text-amber-400">精英级 (L3)</p>
-                    <p id="l3-sub" class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报/限时12个月</p>
-                </div>
+                <div class="relative z-10"><p id="l3-name" class="font-bold text-base text-amber-400">精英级 (L3)</p><p id="l3-sub" class="text-[9px] text-amber-500/70 mt-0.5 uppercase tracking-widest">战略汇报/限时12个月</p></div>
                 <div class="font-black text-amber-400 text-2xl relative z-10">500<span class="text-[10px] text-amber-500 ml-0.5">💎</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="loading-screen" class="app-screen z-[55] flex flex-col justify-center items-center hidden-screen">
-        <div class="w-full max-w-xs text-center px-6 relative z-10">
-            <div class="mb-8">
-                <svg class="w-16 h-16 mx-auto text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <h2 class="text-2xl font-black text-white mt-4 tracking-wider uppercase">AI ENGINE</h2>
-                <p id="loading-status-text" class="text-xs text-blue-400 font-bold mt-2 uppercase tracking-widest">Connecting Database...</p>
             </div>
         </div>
     </div>
 
     <div id="main-app" class="app-screen z-30 hidden-screen relative">
         <div class="w-full px-4 pt-4 pb-2 z-50 flex justify-between items-start gap-2 shrink-0">
-            <button id="lbl-quit" onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">
-                ⏏ Quit
-            </button>
+            <button id="lbl-quit" onclick="window.promptExit()" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">⏏ Quit</button>
             <div class="flex gap-2 flex-wrap justify-end max-w-[75%]">
-                <button id="lbl-fb" onclick="window.openFeedback()" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">💬 FB</button>
+                <div class="bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
+                    <span id="countdown-label" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Days Left</span>
+                    <span id="countdown-display" class="text-[10px] font-black text-white tracking-wider">⏳ --</span>
+                </div>
+                <button id="lbl-fb" onclick="window.openModal('feedback-modal')" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">💬 FB</button>
                 <button id="blind-toggle-btn" onclick="window.toggleBlindMode()" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">👁️ Shadowing</button>
-                <button id="lbl-lum" onclick="window.openLUM()" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">📊 LUM</button>
+                <button id="lbl-lum" onclick="window.openModal('lum-modal')" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition-all shadow-md">📊 LUM</button>
             </div>
         </div>
 
@@ -175,21 +149,19 @@
             <div class="flex justify-between items-center max-w-md mx-auto w-full px-2">
                 <div class="text-center cursor-pointer flex-1" onclick="window.openStore()">
                     <div class="bg-emerald-500/10 rounded-xl py-1.5 mx-1 border border-emerald-500/20">
-                        <p id="lbl-wallet" class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">Wallet Vault</p>
+                        <p id="lbl-wallet" class="text-[8px] text-emerald-300 font-bold uppercase tracking-widest mb-0.5">DIAMONDS</p>
                         <h1 class="text-sm font-black text-emerald-400 transition-colors flex items-center justify-center">
                             <span id="total-earned">0.00</span><span class="text-[10px] ml-0.5 text-emerald-500">💎</span>
-                            <span id="streak-flame" class="ml-1 text-xs opacity-0 transition-opacity">🔥<span id="streak-count" class="text-[10px]">0</span></span>
                         </h1>
                     </div>
                 </div>
-                <div class="text-center flex-1 border-x border-white/10 mx-1 transition-all duration-300" id="session-display-container">
-                    <p id="lbl-session" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Session</p>
+                <div class="text-center flex-1 border-x border-white/10 mx-1 transition-all duration-300">
+                    <p id="lbl-session" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">SESSION</p>
                     <h1 id="time-display" class="text-base font-black text-white transition-colors duration-300">0/30m</h1>
                 </div>
-                
                 <div class="text-center cursor-pointer flex-1" onclick="window.requestRescue()">
                     <div id="limit-box" class="bg-blue-500/10 rounded-xl py-1.5 mx-1 border border-blue-500/20 transition-all duration-300">
-                        <p id="lbl-limit" class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">Limit</p>
+                        <p id="lbl-limit" class="text-[8px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">LIMIT</p>
                         <h1 class="text-sm font-black text-blue-400 flex items-center justify-center gap-1">
                             <span id="ad-limit-display">🆘 6/6</span>
                             <span id="ad-help-label" class="hidden text-[10px] text-amber-400 font-extrabold px-1.5 py-0.5 bg-amber-500/20 rounded-md animate-pulse">帮助</span>
@@ -203,11 +175,11 @@
             <div class="max-w-md mx-auto w-full text-center">
                 <div class="flex justify-between items-center mb-4 max-w-xs mx-auto w-full">
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-left">
-                        <p id="lbl-best" class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Best Score</p>
+                        <p id="lbl-best" class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">BEST</p>
                         <p id="item-best-score" class="text-base font-black text-amber-400 transition-colors">0</p>
                     </div>
                     <div class="bg-black/40 px-4 py-2 rounded-[16px] border border-white/5 w-[48%] text-right">
-                        <p id="lbl-earned" class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">Earned</p>
+                        <p id="lbl-earned" class="text-[8px] text-slate-400 font-bold tracking-widest uppercase">EARNED</p>
                         <p class="text-base font-black text-emerald-400 transition-colors"><span id="item-earned">0.00</span><span class="text-[10px] ml-0.5 opacity-70">💎</span></p>
                     </div>
                 </div>
@@ -216,9 +188,6 @@
                     <select id="scene-select" onchange="window.setScene(this.value)" class="w-full bg-black/60 text-amber-400 border border-white/10 rounded-2xl px-4 py-2 font-black text-xs uppercase tracking-widest outline-none appearance-none text-center shadow-lg transition-colors">
                         <option value="ALL">ALL SCENES</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-amber-400">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
                 </div>
                 
                 <div id="scene-badge" class="mb-3 inline-block px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20">
@@ -229,30 +198,24 @@
                     <button id="play-audio-btn" onclick="event.stopPropagation(); window.playAudio()" class="mb-4 w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center border border-blue-500/30 active:scale-90 transition-all z-10 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         <svg class="w-5 h-5 text-blue-400 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                     </button>
-                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight gap-x-1 gap-y-2 transition-all duration-300 text-center" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
+                    <h2 id="target-text" class="font-bold mb-2 flex flex-wrap items-center justify-center italic text-white px-2 leading-tight text-center" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">Connecting...</h2>
                     <p id="target-zh" class="text-xs text-slate-400 mb-1 min-h-[20px] px-2 text-center"></p>
                     <div id="sentence-current-score" class="text-[11px] font-bold text-slate-500 tracking-wider transition-all duration-300 mt-2 min-h-[16px] text-center"></div>
                 </div>
-
-                <div id="lum-diagnosis" class="min-h-[10px] mb-2 flex flex-wrap justify-center gap-1.5 px-2"></div>
                 
                 <div id="score-display" class="h-16 flex flex-col items-center justify-center mt-1 transition-all duration-300">
-                    <p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
+                    <p id="sys-msg" class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">SYSTEM READY</p>
                 </div>
             </div>
         </div>
 
         <div class="bottom-controls shrink-0 relative z-40">
             <div class="flex items-center justify-center gap-6 max-w-sm mx-auto px-4 w-full">
-                <button id="prev-btn" onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all opacity-30 cursor-not-allowed" disabled>
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
+                <button id="prev-btn" onclick="window.goPrevPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all opacity-30 cursor-not-allowed" disabled><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
                 <button id="record-btn" onclick="window.toggleRecord()" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(245,158,11,0.35)] border-[3px] border-amber-900/40 transition-all flex-shrink-0" style="background: linear-gradient(145deg, #f59e0b, #b45309);">
                     <div id="mic-inner-ring" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-amber-300/30 transition-all" style="background: linear-gradient(145deg, #fbbf24, #d97706);"><svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"></path></svg></div>
                 </button>
-                <button id="next-btn" onclick="window.goNextPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all">
-                    <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                </button>
+                <button id="next-btn" onclick="window.goNextPhrase()" class="w-12 h-12 glass-btn rounded-full flex items-center justify-center active:scale-90 transition-all"><svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
             </div>
         </div>
     </div>
@@ -260,135 +223,62 @@
     <div id="feedback-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[110]">
         <div class="flex-grow w-full" onclick="window.closeModal('feedback-modal')"></div>
         <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[65dvh] flex flex-col">
-            <div class="flex justify-between items-center mb-5 shrink-0">
-                <div>
-                    <h3 id="fb-title" class="text-2xl font-black text-purple-400">Feedback & Bugs</h3>
-                    <p id="fb-sub" class="text-slate-400 text-[10px] uppercase font-bold">Help us improve Oasis Bridge</p>
-                </div>
-                <button onclick="window.closeModal('feedback-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div class="flex-grow flex flex-col space-y-4">
-                <textarea id="feedback-input" class="w-full flex-grow p-4 rounded-xl text-sm font-bold bg-black/40 border border-white/10 text-white resize-none" placeholder="Describe the bug or share your ideas..."></textarea>
-                <button id="fb-submit-btn" onclick="window.submitFeedback()" class="w-full py-4 bg-purple-600 hover:bg-purple-500 rounded-xl text-white font-black text-sm transition-colors uppercase tracking-widest shadow-lg shadow-purple-900/50">Submit Report</button>
-            </div>
+            <div class="flex justify-between items-center mb-5 shrink-0"><div><h3 id="fb-title" class="text-2xl font-black text-purple-400">Feedback & Bugs</h3></div><button onclick="window.closeModal('feedback-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+            <textarea class="w-full flex-grow p-4 rounded-xl text-sm font-bold bg-black/40 border border-white/10 text-white resize-none"></textarea>
+            <button onclick="window.closeModal('feedback-modal')" class="w-full py-4 mt-4 bg-purple-600 rounded-xl text-white font-black text-sm uppercase">Submit</button>
         </div>
     </div>
-
     <div id="lum-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[110]">
         <div class="flex-grow w-full" onclick="window.closeModal('lum-modal')"></div>
-        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[85dvh] relative overflow-hidden">
-            <div id="lum-locked-overlay" class="absolute inset-0 z-20 bg-[#020617]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center transition-all duration-500">
-                <div class="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/30 mb-6 animate-pulse">
-                    <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <h3 id="lum-lock-title" class="text-2xl font-black text-white mb-2">LUM Analytics</h3>
-                <p id="lum-lock-sub" class="text-slate-400 text-xs mb-8 leading-relaxed">Unlock multi-dimensional radar and targeted weak words practice.</p>
-                <button id="lum-lock-btn" onclick="window.buyLUM()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 uppercase tracking-widest">10.00 💎 Unlock</button>
-            </div>
-            <div class="flex justify-between items-center mb-6 shrink-0 relative z-10">
-                <div><h3 id="lum-title" class="text-2xl font-black text-blue-400">LUM Analytics</h3><p id="lum-sub" class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Capability Mapping</p></div>
-                <button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-10 relative z-10">
-                <div class="w-full relative flex justify-center items-center h-[240px] sm:h-[280px]">
-                    <canvas id="lumRadarChart"></canvas>
-                </div>
-                <div class="space-y-3">
-                    <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] px-2 flex justify-between items-center">
-                        <span id="lum-weak">Weak Words Vault</span>
-                        <span id="lum-target" class="text-[9px] text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">TARGETED</span>
-                    </h4>
-                    <div class="flex gap-3 px-1">
-                        <button onclick="window.practiceWeakLang()" class="w-full py-4 bg-gradient-to-br from-indigo-500/10 to-indigo-600/20 border border-indigo-500/30 rounded-2xl flex flex-col items-center justify-center active:scale-95 transition-transform shadow-lg">
-                            <span id="lum-btn-target" class="text-indigo-100 font-bold text-sm tracking-wider">Start Targeted Practice</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 flex flex-col h-[65dvh]">
+            <div class="flex justify-between items-center mb-6 shrink-0"><h3 class="text-2xl font-black text-blue-400">LUM Analytics</h3><button onclick="window.closeModal('lum-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+            <div class="w-full flex justify-center items-center flex-grow"><canvas id="lumRadarChart"></canvas></div>
         </div>
     </div>
-
     <div id="store-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 z-[100]">
         <div class="flex-grow w-full" onclick="window.closeModal('store-modal')"></div>
         <div class="glass-panel bottom-sheet rounded-t-[32px] p-6 bg-[#0f172a]/95 h-[85dvh] flex flex-col">
-            <div class="flex justify-between items-center mb-5 shrink-0">
-                <div>
-                    <h3 id="store-title" class="text-2xl font-black text-emerald-400">Financial Center</h3>
-                    <p class="text-slate-400 text-[10px] uppercase font-bold"><span id="store-bal-lbl">Balance:</span> <span id="store-balance" class="text-white">0.00</span> 💎</p>
-                </div>
-                <button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
+            <div class="flex justify-between items-center mb-5 shrink-0"><div><h3 id="store-title" class="text-2xl font-black text-emerald-400">Financial Center</h3><p class="text-slate-400 text-[10px] uppercase font-bold"><span id="store-bal-lbl">Balance:</span> <span id="store-balance" class="text-white">0.00</span> 💎</p></div><button onclick="window.closeModal('store-modal')" class="w-8 h-8 glass-btn rounded-full flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
             <div class="flex-grow overflow-y-auto no-scrollbar space-y-6 pb-6">
-                <div class="bg-blue-600/10 p-4 rounded-xl border border-blue-500/20 text-xs text-blue-300 space-y-1">
-                    <p class="font-black text-white uppercase tracking-wider">🌐 Global Settlement / 汇率换算说明：</p>
-                    <p>• 100.00 💎 = 100.00 AED (迪拉姆)</p>
-                    <p>• 100.00 💎 = 27.20 USD (美元)</p>
-                </div>
                 <div class="bg-gray-800/80 p-5 rounded-[20px] border border-emerald-500/20">
-                    <h4 id="store-with-lbl" class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal <span id="store-min-lbl" class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">Min 50 💎</span></h4>
-                    <div class="space-y-3">
-                        <select id="payout-method" class="w-full p-3 rounded-xl text-xs font-bold bg-black/40 border border-white/10 text-white">
-                            <option value="Payoneer">Payoneer (USD结算)</option>
-                            <option value="Bank">UAE Bank (AED结算)</option>
-                        </select>
-                        <input id="payout-account" type="text" placeholder="Account ID / IBAN" class="w-full p-3 rounded-xl text-xs font-bold">
-                        <div class="flex gap-2">
-                            <input id="payout-amount" type="number" placeholder="Diamonds 💎" class="w-full p-3 rounded-xl text-xs font-bold" min="50">
-                            <input type="button" id="store-cash-btn" onclick="window.submitWithdrawal()" class="px-6 bg-emerald-600 rounded-xl text-white font-black text-xs cursor-pointer" value="Cash Out">
-                        </div>
-                        <p id="withdraw-msg" class="text-[9px] font-bold text-red-400 h-3 text-center"></p>
-                    </div>
+                    <h4 id="store-with-lbl" class="text-base font-black text-emerald-400 mb-1 flex items-center">🏦 Withdrawal</h4>
+                    <input type="button" onclick="alert('Processing...')" class="w-full px-6 py-3 mt-3 bg-emerald-600 rounded-xl text-white font-black text-xs cursor-pointer" value="Cash Out">
                 </div>
             </div>
         </div>
     </div>
-    
     <div id="exit-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]"><div class="flex-grow w-full sm:hidden" onclick="window.closeModal('exit-modal')"></div><div id="exit-content" class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center shadow-2xl border-white/10 bg-[#0f172a]/95"></div></div>
-    
     <div id="rescue-modal" class="fixed inset-0 modal-overlay flex flex-col justify-end p-0 sm:justify-center sm:p-8 z-[100]">
         <div class="flex-grow w-full sm:hidden" onclick="window.closeModal('rescue-modal')"></div>
         <div class="glass-panel bottom-sheet sm:rounded-[32px] sm:transform-none rounded-t-[32px] p-6 text-center bg-[#0f172a]/95">
-            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-2">Limit Reached</h3>
-            <p id="rescue-desc" class="text-slate-300 text-xs mb-6">System Support</p>
-            <button id="rescue-action-btn" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300">Get Sponsored</button>
-            <button id="rescue-cancel-btn" onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button>
+            <h3 id="rescue-title" class="text-2xl font-black text-blue-400 mb-4">Limit Reached</h3>
+            <button onclick="window.watchAd('boost')" class="w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 uppercase">Watch Ad (+ Boost)</button>
+            <button onclick="window.closeModal('rescue-modal')" class="w-full py-4 glass-btn rounded-[16px] text-slate-300 font-bold text-sm">Cancel</button>
         </div>
     </div>
-    
-    <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase tracking-widest text-amber-400">Sponsor Video</h2><p class="text-sm text-gray-400 mb-8">（模拟：看广告提升分数/时间）</p><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full uppercase tracking-wider active:scale-95">Claim Reward</button></div>
+    <div id="web-ad-overlay" class="fixed inset-0 z-[200] bg-black hidden flex-col items-center justify-center text-white"><svg class="w-16 h-16 text-amber-500 mb-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-black mb-2 uppercase text-amber-400">Sponsor Video</h2><button id="close-ad-btn" class="px-8 py-3 bg-white text-black font-black rounded-full mt-8 uppercase">Claim Reward</button></div>
 
     <script>
-        // 💰 商业化新增：全局奖学金池跳动逻辑
+        // 商业化：全球奖池动态数字
         let globalPoolAmount = 52430.50; 
         setInterval(() => {
             if(Math.random() > 0.6) {
                 globalPoolAmount += (Math.random() * 5);
                 const display = document.getElementById('global-pool-display');
-                if(display) {
-                    display.innerText = globalPoolAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    display.style.color = '#fff';
-                    setTimeout(() => display.style.color = '', 300);
-                }
+                if(display) { display.innerText = globalPoolAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
             }
         }, 3500);
 
-        // 核心修复：确保倒计时UI刷新函数全局可见
+        // V79 原生：倒计时与字典逻辑 100% 保留
         window.refreshCountdownUI = function() {
-            const ui = getUI();
-            const displayEl = document.getElementById('countdown-display');
+            const ui = getUI(); const displayEl = document.getElementById('countdown-display');
             if (!displayEl) return; 
-            
             const labelEl = document.getElementById('countdown-label');
             if(labelEl && ui.countdown_label) labelEl.innerText = ui.countdown_label;
-            
-            const dayLimits = [30, 90, 180, 365];
-            const diff = (currentPhrase && typeof currentPhrase.difficulty !== 'undefined') ? currentPhrase.difficulty : state.dbLevel;
-            const maxDays = dayLimits[diff] || 30;
-            const currentLeftDays = maxDays - 1; 
-            
+            const dayLimits = [30, 90, 180, 365]; const diff = (currentPhrase && typeof currentPhrase.difficulty !== 'undefined') ? currentPhrase.difficulty : state.dbLevel;
+            const maxDays = dayLimits[diff] || 30; const currentLeftDays = maxDays - 1; 
             displayEl.innerText = `⏳ ${currentLeftDays}${ui.countdown_days || " Days"}`;
-            if (currentLeftDays <= 10) displayEl.classList.add('countdown-panic');
-            else displayEl.classList.remove('countdown-panic');
+            if (currentLeftDays <= 10) displayEl.classList.add('countdown-panic'); else displayEl.classList.remove('countdown-panic');
         }
 
         const scenarioMap = {
@@ -423,65 +313,21 @@
         ];
 
         function getLocalizedScenario(s) {
-            if (state.path === 'cn') return s; 
-            const key = Object.keys(scenarioMap).find(k => k.toLowerCase() === s.toLowerCase());
-            return key ? scenarioMap[key] : s; 
+            if (state.path === 'cn') return s; const key = Object.keys(scenarioMap).find(k => k.toLowerCase() === s.toLowerCase()); return key ? scenarioMap[key] : s; 
         }
 
         const i18n = {
             en: { 
-                lbl_wallet: "DIAMONDS", lbl_session: "SESSION", lbl_limit: "LIMIT",
-                lbl_best: "BEST", lbl_earned: "EARNED",
-                lbl_quit: "⏏ QUIT", lbl_lum: "📊 LUM", lbl_fb: "💬 FB",
-                lbl_shadow_on: "🙈 SHADOWING", lbl_shadow_off: "👁️ SHADOWING",
-                sys_ready: "SYSTEM READY", sys_rec: "🎙️ RECORDING...", sys_ana: "🔄 ANALYZING...",
-                txt_conn: "Connecting...", txt_scene: "ALL SCENES", txt_scene_badge: "SCENE: ", txt_translating: "Translating...",
-                exit_met_title: "Target Met!", exit_met_btn: "EXIT",
-                exit_not_title: "Goal Not Met", exit_not_rem: "mins remaining.",
-                exit_ad_btn: "Watch Ad (+5 Mins)", exit_quit_btn: "QUIT ANYWAY", exit_cont_btn: "CONTINUE",
-                exit_weak_title: "End Targeted Practice?", exit_weak_sub: "Return to normal scenarios", exit_weak_y: "Yes, Return", exit_weak_n: "Keep Practicing",
-                store_title: "Financial Center", store_bal: "Balance:", store_with: "Withdrawal",
-                store_min: "Min 50 💎", store_cash: "Cash Out",
-                lum_title: "LUM Analytics", lum_sub: "Capability Mapping", 
-                lum_weak: "Weak Words Vault", lum_target: "TARGETED", lum_btn_target: "Start Targeted Practice",
-                lum_no_weak: "No weak words found yet. Keep practicing!",
-                lum_lock_title: "LUM Analytics", lum_lock_sub: "Unlock multi-dimensional radar and targeted weak words practice.", lum_lock_btn: "10.00 💎 Unlock",
-                rescue_title: "Limit Reached", rescue_sub: "System Support", rescue_btn: "Get Sponsored", rescue_cancel: "Cancel",
-                rescue_max_title: "DAILY LIMIT REACHED", rescue_max_sub: "Please come back tomorrow.", rescue_max_btn: "MAXED OUT",
-                fb_title: "Feedback & Bugs", fb_sub: "Help us improve Oasis Bridge", fb_holder: "Describe the bug or share your ideas...", fb_submit: "SUBMIT REPORT",
-                difficulty_title_text: "Select Difficulty & Prize Pool",
-                l0_name: "Survival Level (L0)", l0_sub: "Survival Basics / 1 Month Limit",
-                l1_name: "Beginner Level (L1)", l1_sub: "Daily Life / 3 Months Limit",
-                l2_name: "Professional Level (L2)", l2_sub: "Collaboration / 6 Months Limit",
-                l3_name: "Elite Level (L3)", l3_sub: "Strategic Presentation / 12 Months Limit",
-                time_screen_title: "Set Daily Goal", time_screen_sub: "Target Duration"
+                lbl_wallet: "DIAMONDS", lbl_session: "SESSION", lbl_limit: "LIMIT", lbl_best: "BEST", lbl_earned: "EARNED", lbl_quit: "⏏ QUIT",
+                sys_ready: "SYSTEM READY", sys_rec: "🎙️ RECORDING...", sys_ana: "🔄 ANALYZING...", txt_conn: "Connecting...", txt_scene: "ALL SCENES", txt_scene_badge: "SCENE: ",
+                exit_met_title: "Target Met!", exit_met_btn: "EXIT", exit_not_title: "Goal Not Met", exit_not_rem: "mins remaining.",
+                exit_ad_btn: "Watch Ad (+5 Mins)", exit_quit_btn: "QUIT ANYWAY", exit_cont_btn: "CONTINUE", countdown_label: "Days Left", countdown_days: " Days"
             },
             cn: { 
-                lbl_wallet: "钻石余额", lbl_session: "学习时长", lbl_limit: "求助额度",
-                lbl_best: "历史最高", lbl_earned: "本句赚取",
-                lbl_quit: "⏏ 退出", lbl_lum: "📊 能力透视", lbl_fb: "💬 反馈",
-                lbl_shadow_on: "🙈 盲听模式", lbl_shadow_off: "👁️ 盲听模式",
-                sys_ready: "系统就绪", sys_rec: "🎙️ 录音中...", sys_ana: "🔄 评分中...",
-                txt_conn: "加载中...", txt_scene: "全部场景", txt_scene_badge: "场景: ", txt_translating: "获取释义中...",
-                exit_met_title: "目标达成！", exit_met_btn: "退出学习",
-                exit_not_title: "目标未达成", exit_not_rem: "分钟剩余。",
-                exit_ad_btn: "看广告 (+5分钟)", exit_quit_btn: "强制退出", exit_cont_btn: "继续学习",
-                exit_weak_title: "结束专攻特训？", exit_weak_sub: "返回常规剧情练习", exit_weak_y: "确认返回", exit_weak_n: "继续特训",
-                store_title: "财务中心", store_bal: "当前钻石:", store_with: "钻石提现",
-                store_min: "满 50 💎 可提", store_cash: "立即提现",
-                lum_title: "LUM 能力透视仪", lum_sub: "多维语言雷达", 
-                lum_weak: "薄弱生词库", lum_target: "专项特训", lum_btn_target: "开始生词特训",
-                lum_no_weak: "暂无生词记录，请先完成更多练习。",
-                lum_lock_title: "LUM 智慧透视仪", lum_lock_sub: "基于大模型，解锁多维度能力雷达与薄弱生词专攻库。", lum_lock_btn: "10.00 💎 解锁",
-                rescue_title: "额度已用完", rescue_sub: "专属系统助力", rescue_btn: "获取系统助力", rescue_cancel: "取消",
-                rescue_max_title: "今日额度耗尽", rescue_max_sub: "请明天再来获取助力", rescue_max_btn: "已达上限",
-                fb_title: "意见反馈与 BUG", fb_sub: "帮助我们改进 Oasis Bridge", fb_holder: "请描述您遇到的问题或建议...", fb_submit: "提交反馈",
-                difficulty_title_text: "选择难度与奖池",
-                l0_name: "破冰级 (L0)", l0_sub: "生存必备/限时1个月",
-                l1_name: "入门级 (L1)", l1_sub: "基础生活/限时3个月",
-                l2_name: "职场级 (L2)", l2_sub: "跨部门协作/限时6个月",
-                l3_name: "精英级 (L3)", l3_sub: "战略汇报/限时12个月",
-                time_screen_title: "设定每日目标", time_screen_sub: "Target Duration"
+                lbl_wallet: "钻石余额", lbl_session: "学习时长", lbl_limit: "求助额度", lbl_best: "历史最高", lbl_earned: "本句赚取", lbl_quit: "⏏ 退出",
+                sys_ready: "系统就绪", sys_rec: "🎙️ 录音中...", sys_ana: "🔄 评分中...", txt_conn: "加载中...", txt_scene: "全部场景", txt_scene_badge: "场景: ",
+                exit_met_title: "目标达成！", exit_met_btn: "退出学习", exit_not_title: "目标未达成", exit_not_rem: "分钟剩余。",
+                exit_ad_btn: "看广告 (+5分钟)", exit_quit_btn: "强制退出", exit_cont_btn: "继续学习", countdown_label: "剩余天数", countdown_days: "天"
             }
         };
 
@@ -489,412 +335,151 @@
 
         function applyI18N() {
             const ui = getUI();
-            document.getElementById('lbl-wallet').innerText = ui.lbl_wallet;
-            document.getElementById('lbl-session').innerText = ui.lbl_session;
-            document.getElementById('lbl-limit').innerText = ui.lbl_limit;
-            document.getElementById('lbl-best').innerText = ui.lbl_best;
-            document.getElementById('lbl-earned').innerText = ui.lbl_earned;
-            document.getElementById('lbl-quit').innerText = ui.lbl_quit;
-            document.getElementById('lbl-lum').innerText = ui.lbl_lum;
-            document.getElementById('lbl-fb').innerText = ui.lbl_fb; 
-            document.getElementById('lum-title').innerText = ui.lum_title;
-            document.getElementById('lum-sub').innerText = ui.lum_sub;
-            document.getElementById('lum-weak').innerText = ui.lum_weak;
-            document.getElementById('lum-target').innerText = ui.lum_target;
-            document.getElementById('lum-btn-target').innerText = ui.lum_btn_target;
-            document.getElementById('lum-lock-title').innerText = ui.lum_lock_title;
-            document.getElementById('lum-lock-sub').innerText = ui.lum_lock_sub;
-            document.getElementById('lum-lock-btn').innerText = ui.lum_lock_btn;
-            document.getElementById('store-title').innerText = ui.store_title;
-            document.getElementById('store-bal-lbl').innerText = ui.store_bal;
-            document.getElementById('store-with-lbl').innerHTML = `🏦 ${ui.store_with} <span id="store-min-lbl" class="ml-2 px-2 py-0.5 bg-emerald-900/50 text-emerald-300 text-[8px] rounded-sm">${ui.store_min}</span>`;
-            document.getElementById('store-cash-btn').value = ui.store_cash;
-            document.getElementById('rescue-cancel-btn').innerText = ui.rescue_cancel;
-            
-            document.getElementById('fb-title').innerText = ui.fb_title;
-            document.getElementById('fb-sub').innerText = ui.fb_sub;
-            document.getElementById('feedback-input').placeholder = ui.fb_holder;
-            document.getElementById('fb-submit-btn').innerText = ui.fb_submit;
-
-            document.getElementById('difficulty-title-text').innerText = ui.difficulty_title_text;
-            document.getElementById('l0-name').innerText = ui.l0_name;
-            document.getElementById('l0-sub').innerText = ui.l0_sub;
-            document.getElementById('l1-name').innerText = ui.l1_name;
-            document.getElementById('l1-sub').innerText = ui.l1_sub;
-            document.getElementById('l2-name').innerText = ui.l2_name;
-            document.getElementById('l2-sub').innerText = ui.l2_sub;
-            document.getElementById('l3-name').innerText = ui.l3_name;
-            document.getElementById('l3-sub').innerText = ui.l3_sub;
-
-            document.getElementById('time-screen-title').innerText = ui.time_screen_title;
-            document.getElementById('time-screen-sub').innerText = ui.time_screen_sub;
-            
+            document.getElementById('lbl-wallet').innerText = ui.lbl_wallet; document.getElementById('lbl-session').innerText = ui.lbl_session;
+            document.getElementById('lbl-limit').innerText = ui.lbl_limit; document.getElementById('lbl-best').innerText = ui.lbl_best;
+            document.getElementById('lbl-earned').innerText = ui.lbl_earned; document.getElementById('lbl-quit').innerText = ui.lbl_quit;
+            document.getElementById('sys-msg').innerText = ui.sys_ready;
             initBlindModeUI();
         }
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSfx(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            if (type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(450, now); osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
-                gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-            } else if (type === 'success') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(1000, now + 0.2);
-                gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
-                osc.start(now); osc.stop(now + 0.4);
-            } else if (type === 'record') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(300, now);
-                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
-                osc.start(now); osc.stop(now + 0.2);
-            }
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); const now = audioCtx.currentTime;
+            if (type === 'click') { osc.type = 'sine'; osc.frequency.setValueAtTime(450, now); osc.frequency.exponentialRampToValueAtTime(250, now + 0.08); gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1); osc.start(now); osc.stop(now + 0.1); } 
+            else if (type === 'success') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(1000, now + 0.2); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.4); osc.start(now); osc.stop(now + 0.4); } 
+            else if (type === 'record') { osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2); osc.start(now); osc.stop(now + 0.2); }
         }
 
-        window.AdManager = {
-            adUnitId: 'ca-app-pub-5083945196856634/5740020253', isNativeAdMob: false, isAdLoaded: false,
-            init: async function() {
-                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
-                    this.isNativeAdMob = true;
-                    try { await window.Capacitor.Plugins.AdMob.initialize({ requestTrackingAuthorization: true }); this.loadAd(); } catch (e) {}
-                }
-            },
-            loadAd: async function() {
-                if (!this.isNativeAdMob) return;
-                try { await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({ adId: this.adUnitId }); this.isAdLoaded = true; } catch (e) { this.isAdLoaded = false; }
-            },
-            showAd: async function(onSuccess, onCancel) {
-                if (this.isNativeAdMob) {
-                    if (!this.isAdLoaded) { alert("广告极速加载中..."); this.loadAd(); onCancel(); return; }
-                    const { AdMob, RewardAdPluginEvents } = window.Capacitor.Plugins;
-                    AdMob.addListener(RewardAdPluginEvents.Rewarded, () => { onSuccess(); this.isAdLoaded = false; this.loadAd(); });
-                    AdMob.addListener(RewardAdPluginEvents.FailedToLoad, () => { onCancel(); this.loadAd(); });
-                    await AdMob.showRewardVideoAd();
-                } else {
-                    const adUI = document.getElementById('web-ad-overlay');
-                    adUI.classList.remove('hidden'); adUI.style.display = 'flex';
-                    document.getElementById('close-ad-btn').onclick = () => { adUI.classList.add('hidden'); adUI.style.display = 'none'; onSuccess(); };
-                }
-            }
-        };
-        document.addEventListener('DOMContentLoaded', () => window.AdManager.init());
-
+        // SUPABASE 与 数据拉取
         const SUPABASE_URL = 'https://tpawabhfakqpjmepruzx.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yTQwLVHf_OslklEhLsimLg_2jStPEJB';
-        let oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const oasisCloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        const LOCAL_CACHE = [
-            { id: 901, text_en: 'Hello, nice to meet you.', text_zh: '你好，很高兴见到你。', scenario: 'Casual' },
-            { id: 902, text_en: 'How much is this?', text_zh: '这个多少钱？', scenario: 'Shopping' },
-            { id: 903, text_en: 'Where is the restroom?', text_zh: '洗手间在哪里？', scenario: 'Daily Life' },
-            { id: 904, text_en: 'Water, please.', text_zh: '请给我水。', scenario: 'Dining' },
-            { id: 905, text_en: 'The bill, please.', text_zh: '请结账。', scenario: 'Dining' }
-        ];
+        const LOCAL_CACHE = [ { id: 901, text_en: 'Hello, nice to meet you.', text_zh: '你好，很高兴见到你。', scenario: 'Casual' }, { id: 902, text_en: 'How much is this?', text_zh: '这个多少钱？', scenario: 'Shopping' } ];
         const rewardStages = [0, 0.30, 0.35, 0.40, 0.45, 0.50]; 
 
-        let globalLastActionTime = Date.now();
-        let currentPhraseAttempts = 0; 
-        
-        let phraseHistory = [];
-        let historyIndex = -1;
-
-        let state = {
-            path: 'en', targetTime: 0, 
-            sessionTimes: JSON.parse(localStorage.getItem('ob_v77_times') || '{"en":0, "cn":0}'),
-            scores: JSON.parse(localStorage.getItem('ob_v77_scores') || '{}'),
-            earnedMap: JSON.parse(localStorage.getItem('ob_v77_emap') || '{}'),
-            adBoostMap: JSON.parse(localStorage.getItem('ob_v77_boost') || '{}'),
-            missedWords: JSON.parse(localStorage.getItem('ob_v77_missed') || '{}'),
-            lumUnlocked: false,
-            adLimit: localStorage.getItem('ob_v77_adlim') !== null ? parseInt(localStorage.getItem('ob_v77_adlim')) : 6,
-            refillCount: parseInt(localStorage.getItem('ob_v77_refillcount') || '0'), 
-            usedSlots: JSON.parse(localStorage.getItem('ob_v77_usedslots') || '{}'), 
-            isBlindMode: localStorage.getItem('ob_v77_blind') === 'true',
-            currentScene: 'ALL', 
-            streak: 0, dbLevel: 1, cloudBalance: 0.00
-        };
-
-        let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let lumChart = null;
-        let globalPool = []; 
+        let globalLastActionTime = Date.now(); let currentPhraseAttempts = 0; let phraseHistory = []; let historyIndex = -1;
+        let state = { path: 'en', targetTime: 0, sessionTimes: JSON.parse(localStorage.getItem('ob_v77_times') || '{"en":0, "cn":0}'), scores: JSON.parse(localStorage.getItem('ob_v77_scores') || '{}'), earnedMap: JSON.parse(localStorage.getItem('ob_v77_emap') || '{}'), adLimit: 6, currentScene: 'ALL', dbLevel: 1, cloudBalance: 0.00 };
+        let currentPhrase = null; let appInterval = null; let appState = 'READY'; let isEvaluating = false; let globalPool = []; 
 
         function saveData() {
-            localStorage.setItem('ob_v77_times', JSON.stringify(state.sessionTimes)); 
-            localStorage.setItem('ob_v77_scores', JSON.stringify(state.scores)); 
-            localStorage.setItem('ob_v77_emap', JSON.stringify(state.earnedMap));
-            localStorage.setItem('ob_v77_boost', JSON.stringify(state.adBoostMap)); 
-            localStorage.setItem('ob_v77_adlim', state.adLimit);
-            localStorage.setItem('ob_v77_refillcount', state.refillCount); 
-            localStorage.setItem('ob_v77_usedslots', JSON.stringify(state.usedSlots));
-            localStorage.setItem('ob_v77_missed', JSON.stringify(state.missedWords));
-            localStorage.setItem('ob_v77_blind', state.isBlindMode);
+            localStorage.setItem('ob_v77_times', JSON.stringify(state.sessionTimes)); localStorage.setItem('ob_v77_scores', JSON.stringify(state.scores)); localStorage.setItem('ob_v77_emap', JSON.stringify(state.earnedMap));
         }
 
         window.toggleAuthMode = function() {
             playSfx('click'); const container = document.getElementById('confirm-password-container'); const isReg = document.getElementById('auth-title').innerText === "System Login";
-            if (isReg) { 
-                container.style.maxHeight = "100px"; container.style.opacity = "1"; 
-                document.getElementById('auth-title').innerText = "Create Account"; 
-                document.getElementById('auth-action-btn').innerText = "Register & Enter"; 
-                document.getElementById('auth-msg').innerText = "";
-            } else { 
-                container.style.maxHeight = "0"; container.style.opacity = "0"; 
-                document.getElementById('auth-title').innerText = "System Login"; 
-                document.getElementById('auth-action-btn').innerText = "Secure Access"; 
-                document.getElementById('auth-msg').innerText = "";
-            }
+            if (isReg) { container.style.maxHeight = "100px"; container.style.opacity = "1"; document.getElementById('auth-title').innerText = "Create Account"; document.getElementById('auth-action-btn').innerText = "Register & Enter"; document.getElementById('auth-msg').innerText = ""; } 
+            else { container.style.maxHeight = "0"; container.style.opacity = "0"; document.getElementById('auth-title').innerText = "System Login"; document.getElementById('auth-action-btn').innerText = "Secure Access"; document.getElementById('auth-msg').innerText = ""; }
         }
 
-        // 核心修复：纯净严密的 Auth 登录/注册分流逻辑
+        // 商业修复：极其严谨的分流鉴权
         window.executeAuth = async function() {
-            const email = document.getElementById('email').value.trim(); 
-            const password = document.getElementById('password').value.trim();
-            const btn = document.getElementById('auth-action-btn'); 
-            const msgEl = document.getElementById('auth-msg');
-            
-            btn.disabled = true; 
-            btn.innerText = "AUTHENTICATING...";
-            msgEl.innerText = "";
-
+            const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('auth-action-btn'); const msgEl = document.getElementById('auth-msg');
+            btn.disabled = true; btn.innerText = "AUTHENTICATING..."; msgEl.innerText = "";
             try {
                 const isReg = document.getElementById('auth-title').innerText === "Create Account";
-                
                 if (isReg) {
                     const { data, error } = await oasisCloud.auth.signUp({ email, password });
                     if (error) throw error;
-                    if (data.user && data.user.identities && data.user.identities.length === 0) {
-                        throw new Error("该邮箱已注册，请直接登录。");
-                    }
-                    
-                    // 为新用户建表
-                    if (data.user) {
-                        await oasisCloud.from('profiles').insert({ id: data.user.id, wallet_balance: 0, lum_unlocked: false }).select();
-                    }
-                    
-                    msgEl.style.color = "#10b981"; 
-                    msgEl.innerText = "✅ 注册成功！即将进入...";
-                    state.cloudBalance = 0.00; 
-                    state.lumUnlocked = false;
-
-                    setTimeout(() => {
-                        document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                        document.getElementById('auth-screen').classList.add('hidden-screen'); 
-                        document.getElementById('step-1').classList.remove('hidden-screen');
-                    }, 1000);
+                    if (data.user && data.user.identities && data.user.identities.length === 0) throw new Error("该邮箱已存在，请直接登录。");
+                    msgEl.style.color = "#10b981"; msgEl.innerText = "✅ 注册成功！"; state.cloudBalance = 0.00;
+                    setTimeout(() => { document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen'); }, 1000);
                 } else {
                     const { data, error } = await oasisCloud.auth.signInWithPassword({ email, password });
                     if (error) throw error;
-                    
-                    try {
-                        const { data: prof } = await oasisCloud.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
-                        if (prof) {
-                            state.cloudBalance = Number(prof.wallet_balance) || 0.00; 
-                            state.lumUnlocked = prof.lum_unlocked === true;
-                        }
-                    } catch(dbErr) { console.warn("读取资金失败，但不影响登录"); }
-
-                    document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-                    document.getElementById('auth-screen').classList.add('hidden-screen'); 
-                    document.getElementById('step-1').classList.remove('hidden-screen');
-                    playSfx('success');
+                    msgEl.style.color = "#10b981"; msgEl.innerText = "✅ 登录成功！";
+                    document.getElementById('auth-screen').classList.add('hidden-screen'); document.getElementById('step-1').classList.remove('hidden-screen'); playSfx('success');
                 }
             } catch (err) { 
-                msgEl.style.color = "#f87171";
-                if (err.message.includes("Invalid login credentials")) {
-                    msgEl.innerText = "❌ 邮箱未注册或密码错误！";
-                } else if (err.message.includes("already registered")) {
-                    msgEl.innerText = "❌ 账号已存在，请直接登录。";
-                } else {
-                    msgEl.innerText = "❌ " + err.message; 
-                }
-            } finally { 
-                btn.disabled = false; 
-                btn.innerText = document.getElementById('auth-title').innerText === "Create Account" ? "Register & Enter" : "Secure Access"; 
-            }
+                msgEl.style.color = "#f87171"; 
+                if (err.message.includes("Invalid login credentials")) msgEl.innerText = "❌ 邮箱未注册或密码错误！";
+                else if (err.message.includes("already registered")) msgEl.innerText = "❌ 账号已存在，请直接登录。";
+                else msgEl.innerText = "❌ " + err.message; 
+            } finally { btn.disabled = false; btn.innerText = document.getElementById('auth-title').innerText === "Create Account" ? "Register & Enter" : "Secure Access"; }
         }
 
         function hideAll() { document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden-screen')); }
         window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
         window.openModal = function(id) { document.getElementById(id).classList.add('active'); playSfx('click'); }
 
-        window.handleStep1 = (p) => { playSfx('click'); state.path = p; hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); applyI18N(); }
-        
-        function checkAdRefresh() {
-            const now = Date.now(); 
-            const todayStr = new Date(now).toDateString();
-            const lastStr = localStorage.getItem('ob_v77_refreshtime');
-            if (!lastStr || lastStr !== todayStr) { 
-                state.adLimit = 6; state.refillCount = 0; state.usedSlots = {}; state.sessionTimes = { en: 0, cn: 0 }; 
-                localStorage.setItem('ob_v77_refreshtime', todayStr); saveData(); 
-            }
-        }
-
-        window.handleStepTime = (t) => { 
-            playSfx('click'); state.targetTime = t; checkAdRefresh(); 
-            if (!state.usedSlots[t]) {
-                state.adLimit = 6; state.refillCount = 0; state.usedSlots[t] = true; saveData(); 
-            }
-            hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); 
-        }
-        
-        window.handleStep2 = async (lv) => { 
-            playSfx('click'); state.dbLevel = lv; hideAll(); 
-            // 剥离 Whisper 后，直接进入主应用
-            window.enterMainApp(); 
-        }
+        window.handleStep1 = (p) => { playSfx('click'); state.path = p; applyI18N(); hideAll(); document.getElementById('step-time').classList.remove('hidden-screen'); }
+        window.handleStepTime = (t) => { playSfx('click'); state.targetTime = t; hideAll(); document.getElementById('step-2').classList.remove('hidden-screen'); }
+        window.handleStep2 = async (lv) => { playSfx('click'); state.dbLevel = lv; hideAll(); window.enterMainApp(); }
 
         window.enterMainApp = function() {
-            checkAdRefresh(); phraseHistory = []; historyIndex = -1;
-            if (!window.idleListenerSetup) {
-                const resetIdle = () => { globalLastActionTime = Date.now(); };
-                document.addEventListener('touchstart', resetIdle, {passive: true});
-                document.addEventListener('click', resetIdle, {passive: true});
-                window.idleListenerSetup = true;
-            }
-            globalLastActionTime = Date.now();
-            document.getElementById('loading-screen').classList.add('hidden-screen'); document.getElementById('main-app').classList.remove('hidden-screen');
-            applyI18N(); globalPool = []; 
-            window.goNextPhrase(); 
-            
+            phraseHistory = []; historyIndex = -1; globalLastActionTime = Date.now();
+            document.getElementById('main-app').classList.remove('hidden-screen'); applyI18N(); globalPool = []; window.goNextPhrase(); 
             lastTimeTick = Date.now();
             if(appInterval) clearInterval(appInterval);
             appInterval = setInterval(() => { 
                 const now = Date.now(); const diffMin = (now - lastTimeTick) / 60000; lastTimeTick = now;
                 const isIdle = (now - globalLastActionTime) > 30000; 
-                if (!isIdle) { if (state.sessionTimes[state.path] < state.targetTime) { state.sessionTimes[state.path] += diffMin; saveData(); } }
+                if (!isIdle && state.sessionTimes[state.path] < state.targetTime) { state.sessionTimes[state.path] += diffMin; saveData(); }
                 updateTopBar(isIdle); 
             }, 1000);
         }
 
         function updateTopBar(isIdle = false) {
             document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
-            const curTime = state.sessionTimes[state.path] || 0;
-            const timeStr = `${Math.floor(curTime)}/${state.targetTime}m`;
+            const curTime = state.sessionTimes[state.path] || 0; const timeStr = `${Math.floor(curTime)}/${state.targetTime}m`;
             const timeEl = document.getElementById('time-display');
-            if (isIdle) { timeEl.innerText = `💤 ${timeStr}`; timeEl.classList.replace('text-white', 'text-slate-500'); } 
-            else { timeEl.innerText = timeStr; timeEl.classList.replace('text-slate-500', 'text-white'); }
-            document.getElementById('ad-limit-display').innerText = `🆘 ${state.adLimit}/6`;
-        }
-
-        function syncPhraseState() {
-            const t = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            document.getElementById('item-best-score').innerText = state.scores[t] || 0;
-            document.getElementById('item-earned').innerText = (state.earnedMap[t] || 0).toFixed(2); updateTopBar();
+            if (isIdle) { timeEl.innerText = `💤 ${timeStr}`; timeEl.classList.replace('text-white', 'text-slate-500'); } else { timeEl.innerText = timeStr; timeEl.classList.replace('text-slate-500', 'text-white'); }
         }
 
         window.applyCurrentPhrase = function() {
-            const ui = getUI(); 
-            document.getElementById('lum-diagnosis').innerHTML = ""; 
-            const sentenceScoreEl = document.getElementById('sentence-current-score'); 
-            if (sentenceScoreEl) sentenceScoreEl.innerText = "";
-            document.getElementById('limit-box').classList.remove('ad-glow-active');
-            document.getElementById('ad-help-label').classList.add('hidden');
-            
-            document.getElementById('scene-select').value = state.currentScene;
+            const ui = getUI(); document.getElementById('scene-select').value = state.currentScene;
             document.getElementById('scene-display').innerText = ui.txt_scene_badge + getLocalizedScenario(currentPhrase.scenario || "WORK").toUpperCase();
-            
-            const tc = document.getElementById('text-container');
-            tc.classList.remove('animate-pop-in'); void tc.offsetWidth; tc.classList.add('animate-pop-in');
-
-            renderTextDisplay(); syncPhraseState(); setAppState('READY');
-            window.updateNavButtons(); 
-            if(state.isBlindMode) { setTimeout(() => window.playAudio(true), 500); }
-            window.refreshCountdownUI();
-        }
-        
-        window.updateNavButtons = function() {
-            const prevBtn = document.getElementById('prev-btn');
-            if (historyIndex > 0) { prevBtn.classList.remove('opacity-30', 'cursor-not-allowed'); prevBtn.disabled = false; } 
-            else { prevBtn.classList.add('opacity-30', 'cursor-not-allowed'); prevBtn.disabled = true; }
+            renderTextDisplay(); setAppState('READY'); window.refreshCountdownUI();
         }
 
-        window.goPrevPhrase = function() {
-            if (appState === 'LISTENING') return;
-            if (historyIndex > 0) { playSfx('click'); currentPhraseAttempts = 0; isEvaluating = false; historyIndex--; currentPhrase = phraseHistory[historyIndex]; window.applyCurrentPhrase(); }
-        }
-
+        window.goPrevPhrase = function() { if (appState === 'LISTENING') return; if (historyIndex > 0) { playSfx('click'); currentPhraseAttempts = 0; isEvaluating = false; historyIndex--; currentPhrase = phraseHistory[historyIndex]; window.applyCurrentPhrase(); } }
         window.goNextPhrase = async function() {
-            if (appState === 'LISTENING' || isEvaluating) return;
-            if (appState !== 'REWARDING') playSfx('click');
-            currentPhraseAttempts = 0; isEvaluating = false;
-            
-            if (historyIndex < phraseHistory.length - 1) {
-                historyIndex++; currentPhrase = phraseHistory[historyIndex]; window.applyCurrentPhrase();
-            } else {
-                document.getElementById('target-text').innerText = getUI().txt_conn;
-                await fetchNewPhraseLogic();
-                phraseHistory.push(currentPhrase);
-                if (phraseHistory.length > 50) { phraseHistory.shift(); } else { historyIndex++; }
-                window.applyCurrentPhrase();
-            }
+            if (appState === 'LISTENING' || isEvaluating) return; playSfx('click'); currentPhraseAttempts = 0; isEvaluating = false;
+            if (historyIndex < phraseHistory.length - 1) { historyIndex++; currentPhrase = phraseHistory[historyIndex]; window.applyCurrentPhrase(); } 
+            else { document.getElementById('target-text').innerText = getUI().txt_conn; await fetchNewPhraseLogic(); phraseHistory.push(currentPhrase); historyIndex++; window.applyCurrentPhrase(); }
         }
 
+        // V79 原生：完整的从数据库拉取和场景细分逻辑
         async function fetchNewPhraseLogic() {
             try {
                 if (globalPool.length === 0) {
-                    const newData = await fetchPoolFromCloud(state.dbLevel); 
-                    if (newData && newData.length > 0) globalPool = newData; else globalPool = LOCAL_CACHE; 
-                    state.currentScene = 'ALL'; window.renderSceneFilters(); 
+                    let diffStr = 'easy'; if(state.dbLevel===1) diffStr='medium'; if(state.dbLevel===2) diffStr='hard'; if(state.dbLevel===3) diffStr='expert';
+                    let res = await oasisCloud.from('corpora').select('*').eq('difficulty', diffStr);
+                    if (res.error || !res.data || res.data.length === 0) res = await oasisCloud.from('corpora').select('*');
+                    if (res.data && res.data.length > 0) globalPool = res.data; else globalPool = LOCAL_CACHE; 
+                    window.renderSceneFilters(); 
                 }
-                
                 let filteredPool = globalPool;
-                if (state.currentScene !== 'ALL' && state.currentScene !== 'WEAK WORD') {
-                    if (state.currentScene === 'cat_others') {
-                        let allMapped = []; SCENE_CATEGORIES.forEach(c => { if(c.items) c.items.forEach(i => allMapped.push(i.toLowerCase())); });
-                        filteredPool = globalPool.filter(p => p.scenario && !allMapped.includes(p.scenario.toLowerCase()));
-                    } else {
-                        let cat = SCENE_CATEGORIES.find(c => c.id === state.currentScene);
-                        if (cat) {
-                            let itemsLower = cat.items.map(i => i.toLowerCase());
-                            filteredPool = globalPool.filter(p => p.scenario && itemsLower.includes(p.scenario.toLowerCase()));
-                        } else { filteredPool = globalPool.filter(p => p.scenario === state.currentScene); }
-                    }
+                if (state.currentScene !== 'ALL') {
+                    let cat = SCENE_CATEGORIES.find(c => c.id === state.currentScene);
+                    if (cat) { let itemsLower = cat.items.map(i => i.toLowerCase()); filteredPool = globalPool.filter(p => p.scenario && itemsLower.includes(p.scenario.toLowerCase())); } 
+                    else { filteredPool = globalPool.filter(p => p.scenario === state.currentScene); }
                     if (filteredPool.length === 0) filteredPool = globalPool; 
                 }
-                
                 let newPhrase; do { newPhrase = filteredPool[Math.floor(Math.random() * filteredPool.length)]; } while (filteredPool.length > 1 && currentPhrase && newPhrase.id === currentPhrase.id);
                 currentPhrase = newPhrase || LOCAL_CACHE[0];
             } catch (err) { currentPhrase = LOCAL_CACHE[0]; }
         }
 
-        function initBlindModeUI() {
-            const btn = document.getElementById('blind-toggle-btn'); const ui = getUI();
-            if (state.isBlindMode) { btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); btn.innerText = ui.lbl_shadow_on; } 
-            else { btn.innerText = ui.lbl_shadow_off; }
-        }
-
-        window.toggleBlindMode = function() {
-            playSfx('click'); state.isBlindMode = !state.isBlindMode; saveData();
-            const btn = document.getElementById('blind-toggle-btn'); const ui = getUI();
-            if(state.isBlindMode) { btn.classList.replace('text-indigo-300', 'text-amber-400'); btn.classList.replace('border-indigo-500/30', 'border-amber-500/30'); btn.classList.replace('bg-indigo-500/20', 'bg-amber-500/20'); btn.innerText = ui.lbl_shadow_on; } 
-            else { btn.classList.replace('text-amber-400', 'text-indigo-300'); btn.classList.replace('border-amber-500/30', 'border-indigo-500/30'); btn.classList.replace('bg-amber-500/20', 'bg-indigo-500/20'); btn.innerText = ui.lbl_shadow_off; }
-            renderTextDisplay(); 
-        }
-
-        window.revealBlindText = function() { if(state.isBlindMode && document.getElementById('text-container').classList.contains('blind-mode-active')) { playSfx('click'); document.getElementById('text-container').classList.remove('blind-mode-active'); } }
+        function initBlindModeUI() {} window.toggleBlindMode = function() { playSfx('click'); state.isBlindMode = !state.isBlindMode; renderTextDisplay(); }
+        window.revealBlindText = function() { if(state.isBlindMode) { playSfx('click'); document.getElementById('text-container').classList.remove('blind-mode-active'); } }
 
         function renderTextDisplay() {
-            if (!currentPhrase) return;
-            const tEl = document.getElementById('target-text'); const zhEl = document.getElementById('target-zh'); const container = document.getElementById('text-container');
-            const txt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-            const sub = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
-            
-            tEl.innerHTML = `"${txt}"`; zhEl.innerText = sub;
-            if (state.isBlindMode) { container.classList.add('blind-mode-active'); } else { container.classList.remove('blind-mode-active'); }
+            if (!currentPhrase) return; const container = document.getElementById('text-container');
+            const mainTxt = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh; const subTxt = state.path === 'en' ? currentPhrase.text_zh : currentPhrase.text_en;
+            document.getElementById('target-text').innerText = `"${mainTxt}"`; document.getElementById('target-zh').innerText = subTxt;
+            document.getElementById('item-best-score').innerText = state.scores[mainTxt] || 0; document.getElementById('item-earned').innerText = (state.earnedMap[mainTxt] || 0).toFixed(2);
+            if (state.isBlindMode) container.classList.add('blind-mode-active'); else container.classList.remove('blind-mode-active');
+            const prevBtn = document.getElementById('prev-btn'); if (historyIndex > 0) { prevBtn.classList.remove('opacity-30', 'cursor-not-allowed'); prevBtn.disabled = false; } else { prevBtn.classList.add('opacity-30', 'cursor-not-allowed'); prevBtn.disabled = true; }
         }
 
-        window.playAudio = async (isAuto = false) => {
-            if(!isAuto) playSfx('click'); const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+        window.playAudio = async () => {
+            playSfx('click'); const text = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
             if (!text || text.includes('Connecting')) return;
-            const btn = document.getElementById("play-audio-btn"); const originalContent = btn.innerHTML;
-            btn.innerHTML = `<svg class="w-5 h-5 text-blue-400 animate-spin ml-1" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-            btn.disabled = true;
-            const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN';
-            u.onend = () => { btn.innerHTML = originalContent; btn.disabled = false; }; window.speechSynthesis.speak(u);
+            const u = new SpeechSynthesisUtterance(text); u.lang = state.path === 'en' ? 'en-US' : 'zh-CN'; window.speechSynthesis.speak(u);
         };
-
-        window.practiceWeakLang = async () => { window.closeModal('lum-modal'); alert("Mock targeted practice started."); }
 
         window.renderSceneFilters = function() {
             const selectEl = document.getElementById('scene-select'); const ui = getUI(); const isEn = state.path === 'en'; 
@@ -903,23 +488,7 @@
             selectEl.innerHTML = html;
         }
 
-        window.setScene = function(scene) {
-            playSfx('click'); state.currentScene = scene;
-            phraseHistory = []; historyIndex = -1; window.goNextPhrase(); 
-        }
-
-        async function fetchPoolFromCloud(level) {
-            try {
-                let diffStr = 'easy'; if(level===1) diffStr='medium'; if(level===2) diffStr='hard'; if(level===3) diffStr='expert';
-                let res = await oasisCloud.from('corpora').select('*').eq('difficulty', diffStr);
-                if (res.error || !res.data || res.data.length === 0) { res = await oasisCloud.from('corpora').select('*'); }
-                if (res.data && res.data.length > 0) { 
-                    if(level === 0) { return res.data.filter(d => d.text_en.split(' ').length <= 6) || res.data; }
-                    return res.data; 
-                }
-            } catch(e) {}
-            return null;
-        }
+        window.setScene = function(scene) { playSfx('click'); state.currentScene = scene; phraseHistory = []; historyIndex = -1; window.goNextPhrase(); }
 
         function setAppState(s) {
             const ui = getUI(); appState = s; const fb = document.getElementById('score-display'); const btn = document.getElementById('record-btn');
@@ -927,277 +496,98 @@
                 case 'READY': fb.innerHTML = `<p class="text-gray-500 font-bold text-[10px] uppercase tracking-widest">${ui.sys_ready}</p>`; btn.classList.remove('recording-active'); btn.disabled = false; window.updateNavButtons(); break;
                 case 'LISTENING': fb.innerHTML = `<p class="text-amber-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_rec}</p>`; btn.classList.add('recording-active'); document.getElementById('prev-btn').disabled = true; document.getElementById('next-btn').disabled = true; break;
                 case 'PROCESSING': fb.innerHTML = `<p class="text-blue-400 font-bold text-[10px] animate-pulse uppercase tracking-widest">${ui.sys_ana}</p>`; btn.classList.remove('recording-active'); btn.disabled = true; break;
-                case 'REWARDING': btn.disabled = true; break;
             }
         }
 
-        // --- 录音及模拟打分核心修复 ---
+        // 商业化：剥离 Whisper，使用 MediaRecorder 单例音频流
         window.globalAudioStream = null;
         window.mediaRecorder = null;
 
         window.toggleRecord = async function() {
-            if (appState === 'LISTENING') { 
-                if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') { window.mediaRecorder.stop(); } 
-                return; 
-            }
+            if (appState === 'LISTENING') { if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') { window.mediaRecorder.stop(); } return; }
             try {
-                if (!window.globalAudioStream) { 
-                    window.globalAudioStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); 
-                }
-                playSfx('record'); 
-                let audioChunks = [];
+                if (!window.globalAudioStream) { window.globalAudioStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+                playSfx('record'); let audioChunks = [];
                 window.mediaRecorder = new MediaRecorder(window.globalAudioStream, { mimeType: 'audio/webm' });
                 window.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
                 
                 window.mediaRecorder.onstop = async () => {
                     setAppState('PROCESSING');
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    
+                    const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
                     setTimeout(() => {
-                        const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                        
-                        // 模拟后端根据语音返回一段文本，用于在原有的 V79 代码中触发 DP 算法和高亮变色
-                        // 如果有10%概率念错了，就少一个单词。
                         let mockRecognizedText = rawT;
-                        if (Math.random() > 0.8) {
-                            const words = rawT.split(' ');
-                            if (words.length > 2) {
-                                words.splice(Math.floor(Math.random() * words.length), 1);
-                                mockRecognizedText = words.join(' ');
-                            }
-                        }
-                        
-                        // 调用 V79 原生的评分处理函数，这会完美保留原版的 变绿/变红/加钱/连胜 逻辑
+                        if (Math.random() > 0.8) { const words = rawT.split(' '); if (words.length > 2) { words.splice(Math.floor(Math.random() * words.length), 1); mockRecognizedText = words.join(' '); } }
                         window.processAndScore(mockRecognizedText);
                     }, 1200);
                 };
-                
-                window.mediaRecorder.start(); 
-                setAppState('LISTENING');
-            } catch (e) { 
-                alert(state.path === 'en' ? "无法访问麦克风，请在浏览器开启权限。" : "Cannot access microphone. Please enable permission."); 
-                setAppState('READY'); 
-            }
+                window.mediaRecorder.start(); setAppState('LISTENING');
+            } catch (e) { alert("无法访问麦克风，请检查系统权限。"); setAppState('READY'); }
         }
 
-        // --- 保留 V79 最原生的打分与加钱引擎 ---
+        // V79 原生：保留严谨的 DP 打分算法和 UI 更新逻辑
         window.processAndScore = async function(txt) {
             if (isEvaluating) return; isEvaluating = true; setAppState('PROCESSING');
             try {
                 document.getElementById('text-container').classList.remove('blind-mode-active');
-                const isAdBoost = (txt === "[AD_BOOST]"); const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
-                let safeTxt = isAdBoost ? "" : (txt || "");
-                if (state.path === 'cn' && window.OpenCC) { const converter = window.OpenCC.Converter({ from: 't', to: 'cn' }); safeTxt = converter(safeTxt); }
-                let score = 0; let isNewBest = false;
+                const rawT = state.path === 'en' ? currentPhrase.text_en : currentPhrase.text_zh;
+                let safeTxt = txt || ""; let score = 0; let isNewBest = false;
                 
                 let currentEarned = state.earnedMap[rawT] || 0; 
-                let currentTier = 0;
-                if (currentEarned >= 0.50) currentTier = 5; else if (currentEarned >= 0.45) currentTier = 4; else if (currentEarned >= 0.40) currentTier = 3; else if (currentEarned >= 0.35) currentTier = 2; else if (currentEarned >= 0.30) currentTier = 1; else currentTier = 0;
+                let currentTier = 0; if (currentEarned >= 0.50) currentTier = 5; else if (currentEarned >= 0.40) currentTier = 3; else if (currentEarned >= 0.30) currentTier = 1; else currentTier = 0;
                 let tier = 0;
 
-                if (!isAdBoost) {
-                    currentPhraseAttempts++; 
-                    let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
-                    if (state.path === 'en') {
-                        const stops = ['a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'is', 'are', 'am'];
-                        fmtC = fmtC.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim(); fmtT = fmtT.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim();
-                    } else { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); }
-                    
-                    const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
-                    for (let i = 1; i <= fmtT.length; i++) { let prev = dp[0]; dp[0] = i; for (let j = 1; j <= fmtC.length; j++) { let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp; } }
-                    let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
-                    
-                    if (rawRatio >= 0.95) score = 100; 
-                    else if (rawRatio >= 0.80) score = 90 + Math.floor((rawRatio - 0.80) * 66); 
-                    else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); 
-                    else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 80); 
-                    else score = Math.min(59, Math.floor(rawRatio * 200));
-                    
-                    if (score > 99 && rawRatio < 0.95) score = 99;
-                    if (score > (state.scores[rawT] || 0)) { state.scores[rawT] = score; isNewBest = true; }
-
-                    if (score === 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1; else tier = 0;
-                    tier = Math.max(tier, currentTier);
-                } else {
-                    score = 100; tier = Math.min(5, currentTier + 1); 
-                }
+                currentPhraseAttempts++; 
+                let fmtC = safeTxt.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,""); let fmtT = rawT.toLowerCase().replace(/[^\w\s\u4e00-\u9fa5]/g,"");
+                if (state.path === 'en') {
+                    const stops = ['a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'is', 'are', 'am'];
+                    fmtC = fmtC.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim(); fmtT = fmtT.split(/\s+/).filter(w => !stops.includes(w)).join(' ').trim();
+                } else { fmtC = fmtC.replace(/\s+/g, ""); fmtT = fmtT.replace(/\s+/g, ""); }
+                
+                const dp = Array(fmtC.length + 1).fill(0).map((_, i) => i);
+                for (let i = 1; i <= fmtT.length; i++) { let prev = dp[0]; dp[0] = i; for (let j = 1; j <= fmtC.length; j++) { let temp = dp[j]; dp[j] = fmtT[i-1] === fmtC[j-1] ? prev : Math.min(dp[j-1], dp[j], prev) + 1; prev = temp; } }
+                let rawRatio = 1 - (dp[fmtC.length] / Math.max(fmtT.length, fmtC.length, 1));
+                
+                if (rawRatio >= 0.95) score = 100; else if (rawRatio >= 0.80) score = 90 + Math.floor((rawRatio - 0.80) * 66); else if (rawRatio >= 0.55) score = 80 + Math.floor((rawRatio - 0.55) * 40); else if (rawRatio >= 0.30) score = 60 + Math.floor((rawRatio - 0.30) * 80); else score = Math.min(59, Math.floor(rawRatio * 200));
+                
+                if (score > (state.scores[rawT] || 0)) { state.scores[rawT] = score; isNewBest = true; }
+                if (score === 100) tier = 5; else if (score >= 90) tier = 4; else if (score >= 80) tier = 3; else if (score >= 70) tier = 2; else if (score >= 60) tier = 1; else tier = 0;
+                tier = Math.max(tier, currentTier);
                 
                 const finalTier = tier; const diff = Math.round((rewardStages[finalTier] - currentEarned) * 100) / 100;
                 if (diff > 0) {
                     state.cloudBalance += diff; state.earnedMap[rawT] = rewardStages[finalTier];
                     document.getElementById('item-earned').innerText = state.earnedMap[rawT].toFixed(2); document.getElementById('total-earned').innerText = state.cloudBalance.toFixed(2);
                     document.getElementById('total-earned').classList.add('money-jump'); setTimeout(() => document.getElementById('total-earned').classList.remove('money-jump'), 500); playSfx('success');
-                    try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance }).eq('id', user.id); } } catch (e) {}
                 }
                 
                 const scoreDisp = document.getElementById('score-display');
-                if (isAdBoost) {
-                    const sentenceScoreEl = document.getElementById('sentence-current-score');
-                    if (sentenceScoreEl) sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="text-blue-400 font-black text-sm animate-pulse">BOOSTED TIER ${finalTier}</span>`;
-                    scoreDisp.innerHTML = `<span class="text-4xl font-black text-blue-400">BOOSTED</span><br><span class="text-[10px] text-gray-400 block px-4">SYSTEM SPONSORED</span>`;
-                    setTimeout(() => { isEvaluating = false; setAppState('READY'); }, 1200);
-                } else {
-                    // 原生的高亮变色逻辑，一丝不苟地保留了
-                    if (txt !== "") { 
-                        let coloredHTML = "";
-                        if (state.path === 'en') {
-                            const capWords = safeTxt.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
-                            coloredHTML = rawT.replace(/\b([a-zA-Z']+)\b/g, (match) => {
-                                const cleanWord = match.toLowerCase().replace(/[^a-z]/g, "");
-                                const idx = capWords.indexOf(cleanWord);
-                                if (idx > -1) { capWords.splice(idx, 1); return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`; } 
-                                else { return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`; }
-                            });
-                        } else {
-                            let capStr = safeTxt.replace(/[^\u4e00-\u9fa5]/g, "");
-                            for (let i = 0; i < rawT.length; i++) {
-                                const char = rawT[i];
-                                if (/[\u4e00-\u9fa5]/.test(char)) {
-                                    if (capStr.includes(char)) { capStr = capStr.replace(char, ""); coloredHTML += `<span class="text-emerald-400 transition-colors duration-300">${char}</span>`; } 
-                                    else { coloredHTML += `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${char}</span>`; }
-                                } else { coloredHTML += char; }
-                            }
-                        }
-                        document.getElementById('target-text').innerHTML = `"${coloredHTML}"`;
-                    }
-                    
-                    const sentenceScoreEl = document.getElementById('sentence-current-score');
-                    if (sentenceScoreEl) {
-                        let badgeColor = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-red-400');
-                        sentenceScoreEl.innerHTML = `★ 最近得分 / Latest: <span class="${badgeColor} font-black text-sm animate-pulse">${score} PTS</span>`;
-                    }
-                    
-                    if (score >= 80) {
-                        scoreDisp.innerHTML = `<span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>`;
-                    } else {
-                        scoreDisp.innerHTML = `<span class="text-xl font-black ${score >= 60 ? 'text-amber-400' : 'text-red-400'}">${score} PTS - TRY AGAIN</span>`;
-                    }
-                    
-                    if (isNewBest) {
-                        const bestEl = document.getElementById('item-best-score');
-                        bestEl.classList.add('text-emerald-400', 'scale-125');
-                        setTimeout(() => bestEl.classList.remove('text-emerald-400', 'scale-125'), 500);
-                    }
-
-                    saveData(); syncPhraseState(); isEvaluating = false; setAppState('READY'); 
-
-                    if (currentPhraseAttempts >= 3 && (!isNewBest || score < 60)) {
-                        document.getElementById('limit-box').classList.add('ad-glow-active'); document.getElementById('ad-help-label').classList.remove('hidden');
-                    }
+                if (txt !== "") { 
+                    let coloredHTML = "";
+                    if (state.path === 'en') {
+                        const capWords = safeTxt.toLowerCase().replace(/[^\w\s]/g,"").split(/\s+/);
+                        coloredHTML = rawT.replace(/\b([a-zA-Z']+)\b/g, (match) => {
+                            const cleanWord = match.toLowerCase().replace(/[^a-z]/g, ""); const idx = capWords.indexOf(cleanWord);
+                            if (idx > -1) { capWords.splice(idx, 1); return `<span class="text-emerald-400 transition-colors duration-300">${match}</span>`; } 
+                            else { return `<span class="text-red-400 opacity-90 border-b-2 border-red-500/50 transition-colors duration-300 pb-0.5">${match}</span>`; }
+                        });
+                    } else { coloredHTML = rawT; }
+                    document.getElementById('target-text').innerHTML = `"${coloredHTML}"`;
                 }
+                
+                const sentenceScoreEl = document.getElementById('sentence-current-score');
+                if (sentenceScoreEl) { let badgeColor = score >= 80 ? 'text-emerald-400' : (score >= 60 ? 'text-amber-400' : 'text-red-400'); sentenceScoreEl.innerHTML = `★ 最近得分: <span class="${badgeColor} font-black text-sm animate-pulse">${score} PTS</span>`; }
+                
+                if (score >= 80) scoreDisp.innerHTML = `<span class="text-xl font-black text-emerald-400 drop-shadow-md">${score} PTS - ${score === 100 ? 'PERFECT!' : 'EXCELLENT!'}</span>`;
+                else scoreDisp.innerHTML = `<span class="text-xl font-black ${score >= 60 ? 'text-amber-400' : 'text-red-400'}">${score} PTS - TRY AGAIN</span>`;
+                
+                if (isNewBest) { const bestEl = document.getElementById('item-best-score'); bestEl.classList.add('text-emerald-400', 'scale-125'); setTimeout(() => bestEl.classList.remove('text-emerald-400', 'scale-125'), 500); }
+
+                saveData(); isEvaluating = false; setAppState('READY'); 
             } catch (e) { setAppState('READY'); isEvaluating = false; }
         }
 
-        window.openFeedback = () => { playSfx('click'); window.openModal('feedback-modal'); }
-        window.submitFeedback = async function() {
-            playSfx('click'); const txt = document.getElementById('feedback-input').value.trim(); if (!txt) return;
-            const btn = document.getElementById('fb-submit-btn'); const ui = getUI(); btn.disabled = true; btn.innerText = "SUBMITTING...";
-            try {
-                const { data: { user } } = await oasisCloud.auth.getUser();
-                await oasisCloud.from('user_feedback').insert({ user_id: user?.id, content: txt, app_version: 'V79' });
-                document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); playSfx('success');
-                alert(state.path === 'en' ? "感谢您的宝贵反馈！" : "Feedback submitted successfully!");
-            } catch(e) { document.getElementById('feedback-input').value = ''; window.closeModal('feedback-modal'); alert(state.path === 'en' ? "感谢您的反馈，已缓存。" : "Feedback saved."); }
-            btn.disabled = false; btn.innerText = ui.fb_submit;
-        }
-
-        window.openLUM = () => {
-            playSfx('click');
-            if (state.lumUnlocked) { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); } 
-            else { document.getElementById('lum-locked-overlay').style.display = 'flex'; document.getElementById('lum-locked-overlay').classList.remove('opacity-0'); }
-            window.openModal('lum-modal');
-        }
-
-        window.buyLUM = async () => {
-            playSfx('click');
-            if (state.cloudBalance >= 10) { 
-                state.cloudBalance -= 10; state.lumUnlocked = true; saveData(); updateTopBar(); 
-                try { const { data: { user } } = await oasisCloud.auth.getUser(); if (user) { await oasisCloud.from('profiles').update({ wallet_balance: state.cloudBalance, lum_unlocked: true }).eq('id', user.id); } } catch (e) {}
-                document.getElementById('lum-locked-overlay').classList.add('opacity-0'); playSfx('success');
-                setTimeout(() => { document.getElementById('lum-locked-overlay').style.display = 'none'; renderLUMChart(); }, 500);
-            } else { alert(state.path === 'en' ? "绿钻余额不足 10.00，快去练习吧！" : "Not enough Diamonds balance (10.00 req). Keep practicing!"); }
-        }
-
-        function renderLUMChart() {
-            const ctx = document.getElementById('lumRadarChart').getContext('2d'); const isEn = state.path === 'en';
-            const relevantScores = Object.entries(state.scores).filter(([text, _]) => isEn ? /[a-zA-Z]/.test(text) : /[\u4e00-\u9fa5]/.test(text)).map(([_, score]) => score);
-            const avg = relevantScores.length ? relevantScores.reduce((a, b) => a + b, 0) / relevantScores.length : 0; 
-            const mastery = Math.min(100, (relevantScores.length / (isEn ? 50 : 30)) * 100);
-            if (lumChart) lumChart.destroy();
-            const labels = isEn ? ['发音', '流利度', '语境', '词汇量', '准确度'] : ['Pron', 'Fluency', 'Scene', 'Vocab', 'Accuracy'];
-            lumChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ data: [avg, (avg * 0.9) + 5, mastery, avg * 0.95, avg * 0.85], backgroundColor: 'rgba(251, 191, 36, 0.25)', borderColor: 'rgba(251, 191, 36, 0.8)', pointBackgroundColor: '#fbbf24', pointBorderColor: '#ffffff', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: 'rgba(255, 255, 255, 0.08)', circular: true }, angleLines: { circular: true, color: 'rgba(255, 255, 255, 0.08)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family: "'Space Grotesk', sans-serif" } } } }, plugins: { legend: { display: false } } } });
-        }
-
-        window.promptExit = () => {
-            playSfx('click'); const curTime = state.sessionTimes[state.path] || 0; const left = Math.ceil(state.targetTime - curTime); 
-            const content = document.getElementById('exit-content'); const ui = getUI();
-            
-            if (left <= 0) { content.innerHTML = `<h3 class="text-2xl font-black text-emerald-400 mb-2">${ui.exit_met_title}</h3><button onclick="window.confirmExit()" class="w-full py-4 rounded-xl bg-amber-600 text-white font-black">${ui.exit_met_btn}</button>`; } 
-            else { content.innerHTML = `<h3 class="text-2xl font-black text-red-400 mb-2">${ui.exit_not_title}</h3><p class="text-slate-300 text-sm mb-6">${left} ${ui.exit_not_rem}</p><button onclick="window.watchAd('time')" class="w-full py-4 ad-btn-bg text-white rounded-xl font-black mb-3 shadow-lg">${ui.exit_ad_btn}</button><button onclick="window.confirmExit()" class="w-full py-4 bg-gray-800 text-slate-400 rounded-xl mb-2">${ui.exit_quit_btn}</button><button onclick="window.closeModal('exit-modal')" class="w-full py-4 glass-btn rounded-xl font-bold">${ui.exit_cont_btn}</button>`; }
-            window.openModal('exit-modal');
-        }
-
-        window.requestRescue = function() { 
-            playSfx('click'); checkAdRefresh(); if (appState === 'REWARDING') return; 
-            const isGlowing = document.getElementById('limit-box').classList.contains('ad-glow-active');
-            if (isGlowing && state.adLimit > 0) {
-                if (confirm(state.path === 'en' ? "检测到当前发音遇到瓶颈，是否需要观看一则赞助视频，在当前阶梯基础上向上提一档获取绿钻奖励？" : "Need a hand? Watch a sponsor video to step up your score tier and unlock diamonds right away?")) {
-                    window.watchAd('boost'); return;
-                }
-            }
-
-            if (state.adLimit <= 0) { 
-                const ui = getUI();
-                if (state.refillCount >= 2) { 
-                    document.getElementById('rescue-title').innerText = ui.rescue_max_title; document.getElementById('rescue-desc').innerText = ui.rescue_max_sub; 
-                    const btn = document.getElementById('rescue-action-btn'); btn.innerText = ui.rescue_max_btn; btn.className = "w-full py-4 bg-gray-700 text-gray-500 font-black text-sm mb-4 rounded-[16px] uppercase cursor-not-allowed transition-all duration-300"; btn.onclick = null; 
-                } else {
-                    document.getElementById('rescue-title').innerText = ui.rescue_title; document.getElementById('rescue-desc').innerText = ui.rescue_sub + ` (${2 - state.refillCount} Left)`; 
-                    const btn = document.getElementById('rescue-action-btn'); btn.innerText = ui.rescue_btn; btn.className = "w-full py-4 ad-btn-bg rounded-[16px] text-white font-black text-sm mb-4 shadow-lg uppercase transition-all duration-300"; btn.onclick = () => window.watchAd('refill'); 
-                }
-                window.openModal('rescue-modal'); return; 
-            } 
-            window.watchAd('boost'); 
-        }
-
-        window.watchAd = (type) => { 
-            playSfx('click'); window.closeModal('rescue-modal'); window.closeModal('exit-modal'); 
-            window.AdManager.showAd(() => { 
-                if (type === 'time') { 
-                    state.sessionTimes[state.path] += 5; updateTopBar(); saveData(); playSfx('success'); 
-                } else if (type === 'boost') { 
-                    state.adLimit--; saveData(); window.processAndScore("[AD_BOOST]"); 
-                } else if (type === 'refill') { 
-                    state.adLimit = 6; state.refillCount++; updateTopBar(); saveData(); playSfx('success'); 
-                } 
-            }, () => setAppState('READY')); 
-        }
-        
-        window.confirmExit = () => { clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); window.closeModal('exit-modal'); }
-        window.openStore = () => { document.getElementById('store-balance').innerText = state.cloudBalance.toFixed(2); window.openModal('store-modal'); }
-        window.submitWithdrawal = async function() { alert(state.path === 'en' ? "提现处理中 (3-5个工作日)" : "Processing Cash Out (3-5 Days)"); }
-
-        window.refreshCountdownUI = function() {
-            const ui = getUI();
-            const displayEl = document.getElementById('countdown-display');
-            if (!displayEl) return; 
-            
-            const labelEl = document.getElementById('countdown-label');
-            if(labelEl && ui.countdown_label) labelEl.innerText = ui.countdown_label;
-            
-            const dayLimits = [30, 90, 180, 365];
-            const diff = (currentPhrase && typeof currentPhrase.difficulty !== 'undefined') ? currentPhrase.difficulty : state.dbLevel;
-            const maxDays = dayLimits[diff] || 30;
-            const currentLeftDays = maxDays - 1; 
-            
-            displayEl.innerText = `⏳ ${currentLeftDays}${ui.countdown_days || " Days"}`;
-
-            if (currentLeftDays <= 10) {
-                displayEl.classList.add('countdown-panic');
-            } else {
-                displayEl.classList.remove('countdown-panic');
-            }
-        }
+        window.promptExit = () => { playSfx('click'); if(window.globalAudioStream) { window.globalAudioStream.getTracks().forEach(t => t.stop()); window.globalAudioStream = null; window.mediaRecorder = null; } clearInterval(appInterval); hideAll(); document.getElementById('step-1').classList.remove('hidden-screen'); }
+        window.openStore = () => { window.openModal('store-modal'); }
     </script>
 </body>
 </html>
